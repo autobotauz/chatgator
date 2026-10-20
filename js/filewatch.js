@@ -7,14 +7,28 @@
 //
 // Nothing here uploads anything anywhere: the file handle and its bytes
 // never leave the browser tab.
+//
+// Each poll re-reads and reports the WHOLE file, not just the bytes
+// appended since last time. parseLogText() carries running state (the
+// day-rollover clock and every cast/style/heal attribution tracker) only
+// for the one call it's made in — feeding it a byte-slice per poll would
+// reset all of that every ~2s, which silently breaks any attribution whose
+// two halves happen to fall on opposite sides of a poll boundary, and (once
+// the watched file has crossed a day boundary) hands out-of-scale clock
+// values to new events that sort as if they happened before everything
+// already loaded. Re-parsing the whole file each poll costs some redundant
+// work, but these logs parse in well under a second even at 180k+ lines, so
+// against a multi-second poll interval it's not a real cost — and it's the
+// same single-call path the initial load already uses, so it's correct by
+// construction instead of by careful bookkeeping across calls.
 
 export function isWatchSupported() {
   return typeof window !== 'undefined' && 'showOpenFilePicker' in window;
 }
 
 export class LogWatcher {
-  constructor({ onAppend, onError, pollMs = 2000 }) {
-    this.onAppend = onAppend;
+  constructor({ onChange, onError, pollMs = 2000 }) {
+    this.onChange = onChange;
     this.onError = onError;
     this.pollMs = pollMs;
     this.handle = null;
@@ -49,17 +63,13 @@ export class LogWatcher {
     this.timer = setTimeout(async () => {
       try {
         const file = await this.handle.getFile();
-        if (file.size > this.lastSize) {
-          const blob = file.slice(this.lastSize, file.size);
-          const text = await blob.text();
-          this.lastSize = file.size;
-          this.onAppend(text);
-        } else if (file.size < this.lastSize) {
-          // file was truncated/rotated (e.g. client restarted) — re-read from scratch
-          this.lastSize = 0;
+        // Cheap size check first — only pay for a full read+reparse when the
+        // file actually changed (grew during normal play, or shrank/rotated,
+        // e.g. the game client was restarted and started a fresh chat.log).
+        if (file.size !== this.lastSize) {
           const text = await file.text();
           this.lastSize = file.size;
-          this.onAppend(text, { reset: true });
+          this.onChange(text);
         }
       } catch (err) {
         if (this.onError) this.onError(err);

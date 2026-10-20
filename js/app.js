@@ -289,17 +289,10 @@ function renderActiveTab() {
 async function startWatch() {
   try {
     const watcher = new LogWatcher({
-      onAppend: (text) => {
-        const { events, unmatched } = parseLogText(text);
-        state.rawEvents.push(...events);
-        state.rawEvents.sort((a, b) => (a.clock ?? 0) - (b.clock ?? 0));
-        state.unmatched.push(...unmatched);
-        state.encounters = segmentEncounters(state.rawEvents);
-        buildEncounterSelect();
-        el('encounterSelect').value = 'all';
-        state.scope = 'all';
-        renderActiveTab();
-      },
+      // Full re-parse on every poll via the same path a fresh upload uses —
+      // see filewatch.js for why a byte-slice/incremental-merge here would
+      // be wrong, not just less efficient.
+      onChange: (text) => ingestTexts([{ name: 'live', text }]),
       onError: (err) => console.warn('[chatgator] watch error', err),
     });
     await watcher.pickAndStart();
