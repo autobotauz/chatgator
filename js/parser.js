@@ -121,8 +121,14 @@ const RULES = [
   ['incoming_extra', /^(.+?) does (\d+) extra damage to you!$/, m => ({ attacker: m[1], dmg: +m[2] })],
 
   // ---- healing -------------------------------------------------------------
-  ['heal_out_crit', /^You critical(?:ly)? heal (.+?) for an additional (\d+) hit points?!$/, m => ({ target: m[1], amount: +m[2] })],
-  ['heal_out', /^You heal (.+?) for (\d+) hit points?!$/, m => ({ target: m[1], amount: +m[2] })],
+  // "You heal yourself for N hit points." ends in a period and names
+  // "yourself" instead of a target, unlike every other heal_out line (which
+  // ends "!" and names someone else) — accept both terminators like heal_in
+  // already does, and normalize "yourself" to a clean "You" label.
+  ['heal_out_crit', /^You critical(?:ly)? heal (.+?) for an additional (\d+) hit points?\.?!?$/,
+    m => ({ target: m[1] === 'yourself' ? 'You' : m[1], amount: +m[2] })],
+  ['heal_out', /^You heal (.+?) for (\d+) hit points?\.?!?$/,
+    m => ({ target: m[1] === 'yourself' ? 'You' : m[1], amount: +m[2] })],
   ['heal_in', /^(.+?) heals you for (\d+) hit points?\.?!?$/, m => ({ healer: m[1], amount: +m[2] })],
   ['heal_in', /^You are healed by (.+?) for (\d+) hit points?\.?!?$/, m => ({ healer: m[1], amount: +m[2] })],
 
@@ -312,6 +318,18 @@ export function parseLogText(rawText) {
   // one on any other target is almost certainly an unrelated plain swing.
   const DOT_TICK_WINDOW_MS = 5000;
   let activeDotName = null, activeDotTarget = null, activeDotAt = -Infinity;
+  // A group/AOE heal (e.g. "Group Apotheosis", "Tones of Health") also only
+  // prints "You cast a ... spell!" ONCE, then one "You heal <target> for N
+  // hit points!" line PER target it actually healed. pendingCastName labels
+  // the first of those lines then clears, same as above — but unlike a DoT
+  // tick, the rest of a group heal's lines name DIFFERENT targets (your
+  // other party members), not the same one repeating. So this tracker
+  // deliberately does NOT require a matching target the way activeDotTarget
+  // does: any heal_out/heal_out_crit line within the window counts as
+  // another target of the same cast, until a new cast (or too long a gap)
+  // starts a fresh one.
+  const HEAL_BURST_WINDOW_MS = 2500;
+  let activeHealName = null, activeHealAt = -Infinity;
 
   for (let li = 0; li < lines.length; li++) {
     const raw = lines[li];
@@ -402,7 +420,7 @@ export function parseLogText(rawText) {
         }
         pendingStyleName = null;
         pendingCastName = null; // a weapon swing means we're past any pending spell result
-      } else if (type === 'melee_plain' || type === 'heal_out' || type === 'heal_out_crit') {
+      } else if (type === 'melee_plain') {
         if (pendingCastName && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
           payload.spellName = pendingCastName;
           activeDotName = pendingCastName;
@@ -412,6 +430,16 @@ export function parseLogText(rawText) {
         } else if (activeDotName && payload.target === activeDotTarget && clockMs - activeDotAt <= DOT_TICK_WINDOW_MS) {
           payload.spellName = activeDotName;
           activeDotAt = clockMs; // still ticking — extend the window
+        }
+      } else if (type === 'heal_out' || type === 'heal_out_crit') {
+        if (pendingCastName && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
+          payload.spellName = pendingCastName;
+          activeHealName = pendingCastName;
+          activeHealAt = clockMs;
+          pendingCastName = null;
+        } else if (activeHealName && clockMs - activeHealAt <= HEAL_BURST_WINDOW_MS) {
+          payload.spellName = activeHealName;
+          activeHealAt = clockMs; // still resolving — extend the window
         }
       } else if (type === 'cc_landed') {
         if (pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS) {
