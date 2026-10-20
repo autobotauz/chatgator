@@ -291,7 +291,7 @@ function renderActiveTab() {
 // picker, so it keeps showing the latest callout no matter which encounter
 // or tab you're looking at.
 // ---------------------------------------------------------------------------
-const BG_TICKER_LIMIT = 3;
+const BG_TICKER_LIMIT = 5;
 
 function renderBgTicker() {
   const broadcasts = getBgBroadcasts(state.rawEvents).slice(0, BG_TICKER_LIMIT);
