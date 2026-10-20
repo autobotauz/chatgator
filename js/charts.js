@@ -39,6 +39,30 @@ export function fmtNum(n) {
 }
 export function fmtExact(n) { return Math.round(n).toLocaleString(); }
 
+// Formats a parser `clock`/`t` value (elapsed ms from an arbitrary, non-real
+// anchor — see parser.js) as a bare time-of-day string. This deliberately
+// does NOT go through `new Date(ms).toLocaleTimeString()`: that would run the
+// value through the viewer's browser timezone, shifting the displayed hour
+// away from what's literally printed in the log. We also never show a
+// calendar date — the log doesn't give us a reliable one for a session that
+// may span multiple real days, so showing one would just be a guess dressed
+// up as a fact. Plain modular arithmetic reproduces exactly the HH:MM:SS the
+// parser read off the log line, plus a "+Nd" marker once the elapsed time
+// has wrapped past 24h (so multi-day gaps are still visible as gaps, not
+// silently folded back onto day one).
+export function fmtClock(ms, withSeconds) {
+  if (ms == null || !isFinite(ms)) return '';
+  const totalSec = Math.floor(ms / 1000);
+  const days = Math.floor(totalSec / 86400);
+  const sec = totalSec - days * 86400;
+  const hh = Math.floor(sec / 3600) % 24;
+  const mm = Math.floor(sec / 60) % 60;
+  const ss = sec % 60;
+  const p2 = n => String(n).padStart(2, '0');
+  const time = withSeconds ? `${p2(hh)}:${p2(mm)}:${p2(ss)}` : `${p2(hh)}:${p2(mm)}`;
+  return days > 0 ? `${time} (+${days}d)` : time;
+}
+
 // ---------------------------------------------------------------------------
 // Stat tile: label + big number + optional sub-text + optional accent dot
 // ---------------------------------------------------------------------------
@@ -177,7 +201,7 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
     svg.appendChild(label);
   }
   // x ticks (start / mid / end as clock time)
-  const fmtT = timeFmt || ((t) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  const fmtT = timeFmt || ((t) => fmtClock(t, false));
   [minT, minT + spanT / 2, maxT].forEach((t) => {
     const label = document.createElementNS(svgNS, 'text');
     label.setAttribute('x', x(t)); label.setAttribute('y', height - 6);

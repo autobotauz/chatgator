@@ -4,6 +4,7 @@ import { renderers } from './ui.js';
 import { loadSkillIndex } from './skills.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { SAMPLE_LOG_TEXT } from './sample-data.js';
+import { fmtClock } from './charts.js';
 
 const el = (id) => document.getElementById(id);
 
@@ -126,7 +127,11 @@ function buildEncounterSelect() {
   state.encounters.forEach((enc, i) => {
     const opt = document.createElement('option');
     opt.value = String(enc.id);
-    const time = enc.start ? new Date(enc.start).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '?';
+    // Time only, never a calendar date — the log gives us a bare [HH:MM:SS]
+    // per line and nothing reliably tells us which real day an encounter
+    // fell on across a log that may span many days (see parser.js). The
+    // "(+Nd)" suffix from fmtClock shows elapsed-day gaps instead.
+    const time = enc.start != null ? fmtClock(enc.start, true) : '?';
     opt.textContent = `#${i + 1} — ${time} (${durationLabel(enc.durationMs)})`;
     sel.appendChild(opt);
   });
