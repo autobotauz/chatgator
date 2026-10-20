@@ -141,13 +141,22 @@ export function renderOverview(container, stats, ctx) {
     { color: 'var(--series-1)', label: 'Damage done' },
     { color: 'var(--series-3)', label: 'Healing done' },
     { color: 'var(--series-8)', label: 'Damage taken' },
+    { color: 'var(--series-4)', label: 'Realm points' },
+    { color: 'var(--series-7)', label: 'Deathblow' },
   ]);
   timelineChart(tlCard, {
     series: [
       { name: 'Damage done', color: 'var(--series-1)', points: stats.damageOut.timeline.map(p => ({ t: p.t, v: p.v })) },
       { name: 'Healing done', color: 'var(--series-3)', points: stats.healOut.timeline.map(p => ({ t: p.t, v: p.v })) },
       { name: 'Damage taken', color: 'var(--series-8)', points: stats.damageIn.timeline.map(p => ({ t: p.t, v: p.v })) },
+      { name: 'Realm points', color: 'var(--series-4)', points: stats.realmPoints.timeline.map(p => ({ t: p.t, v: p.v })) },
     ],
+    // Deathblows are discrete "it happened" moments, not a quantity worth
+    // its own line — plotted as markers so they can be read against the
+    // damage/heal/RP lines rather than against each other. No victim name
+    // here by design (just the dot + time); the Realm Points tab's
+    // Deathblows table has the per-kill detail.
+    markers: stats.kills.deathblowLog.map(d => ({ t: d.clock, color: 'var(--series-7)', label: 'Deathblow' })),
   });
 
   if (stats.meta.latestSnapshot) {

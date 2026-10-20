@@ -142,7 +142,7 @@ export function legend(container, entries) {
 // Single x-axis (time), single y-axis (value) — stacked areas when
 // `stacked` is true, overlaid lines otherwise.
 // ---------------------------------------------------------------------------
-export function timelineChart(container, { series, width = 1040, height = 220, stacked = false, valueFmt = fmtNum, timeFmt }) {
+export function timelineChart(container, { series, width = 1040, height = 220, stacked = false, valueFmt = fmtNum, timeFmt, markers = [] }) {
   const pad = { top: 14, right: 16, bottom: 26, left: 48 };
   const innerW = width - pad.left - pad.right;
   const innerH = height - pad.top - pad.bottom;
@@ -155,8 +155,9 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
     container.appendChild(div);
     return div;
   }
-  const minT = Math.min(...allPoints.map(p => p.t));
-  const maxT = Math.max(...allPoints.map(p => p.t));
+  const allT = allPoints.map(p => p.t).concat(markers.map(m => m.t));
+  const minT = Math.min(...allT);
+  const maxT = Math.max(...allT);
   const spanT = Math.max(1, maxT - minT);
 
   let maxV;
@@ -250,6 +251,26 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
   base.setAttribute('stroke', 'var(--baseline)'); base.setAttribute('stroke-width', '1');
   svg.appendChild(base);
 
+  // Discrete point-in-time events (e.g. a deathblow) rather than a
+  // continuous quantity — a thin dashed rule across the plot at the exact
+  // moment it happened, for correlating by eye against the series lines.
+  // Deliberately NOT its own hover target: a busy session can have dozens
+  // of these within a few pixels of each other, where individually
+  // hoverable dots would mostly just shadow one another. Hovering the chart
+  // anywhere (below) reports a plain count for whichever bucket it lands
+  // in instead, which degrades gracefully no matter how many land together.
+  markers.forEach((m) => {
+    const mx = x(m.t);
+    const rule = document.createElementNS(svgNS, 'line');
+    rule.setAttribute('x1', mx); rule.setAttribute('x2', mx);
+    rule.setAttribute('y1', pad.top); rule.setAttribute('y2', pad.top + innerH);
+    rule.setAttribute('stroke', m.color || 'var(--series-7)');
+    rule.setAttribute('stroke-width', '1.5');
+    rule.setAttribute('stroke-dasharray', '3,3');
+    rule.setAttribute('opacity', '0.75');
+    svg.appendChild(rule);
+  });
+
   // hover crosshair + tooltip via an invisible overlay rect
   const overlay = document.createElementNS(svgNS, 'rect');
   overlay.setAttribute('x', pad.left); overlay.setAttribute('y', pad.top);
@@ -263,6 +284,10 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
   svg.appendChild(overlay);
 
   const basePoints = series[0] ? series[0].points : [];
+  // Bucket width, derived from the (uniform, by construction) spacing
+  // between consecutive series points — used below to count how many
+  // markers fall in whichever bucket the pointer is nearest to.
+  const bucketWidth = basePoints.length > 1 ? basePoints[1].t - basePoints[0].t : spanT;
   overlay.addEventListener('mousemove', (ev) => {
     const rect = svg.getBoundingClientRect();
     const scale = width / rect.width;
@@ -277,8 +302,18 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
       const p = s.points[idx];
       return `<div class="tt-row"><span><span class="swatch" style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${s.color};margin-right:5px;"></span>${esc(s.name)}</span><span>${p ? fmtExact(p.v) : 0}</span></div>`;
     }).join('');
+    const bucketCenter = basePoints[idx] ? basePoints[idx].t : t;
+    const nearbyMarkers = markers.filter(m => Math.abs(m.t - bucketCenter) <= bucketWidth / 2);
+    const markerRows = [];
+    for (const m of nearbyMarkers) {
+      const existing = markerRows.find(r => r.label === (m.label || 'Event'));
+      if (existing) existing.count++; else markerRows.push({ label: m.label || 'Event', color: m.color, count: 1 });
+    }
+    const markerHtml = markerRows.map(r =>
+      `<div class="tt-row"><span><span class="swatch" style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${r.color || 'var(--series-7)'};margin-right:5px;"></span>${esc(r.label)}</span><span>${r.count}</span></div>`
+    ).join('');
     const timeLabel = basePoints[idx] ? fmtT(basePoints[idx].t) : '';
-    showTooltip(ev.clientX, ev.clientY, `<div class="tt-title">${timeLabel}</div>${rows}`);
+    showTooltip(ev.clientX, ev.clientY, `<div class="tt-title">${timeLabel}</div>${rows}${markerHtml}`);
   });
   overlay.addEventListener('mouseleave', () => { crosshair.style.display = 'none'; hideTooltip(); });
 
