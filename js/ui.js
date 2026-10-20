@@ -161,6 +161,24 @@ export function renderHealing(container, stats, ctx) {
   statTile(g, { label: 'Heal crit rate', value: stats.healOut.critRate + '%', sub: `${stats.healOut.crits} crit heals` });
   statTile(g, { label: 'Healing received', value: fmtNum(stats.healIn.total) });
 
+  const spellSec = section(container);
+  h3(spellSec, 'Healing done by spell');
+  const spellCard = card(spellSec);
+  const spellItems = sourceMapToItems(stats.healOut.bySpell);
+  barChart(spellCard, { items: spellItems, colorFn: (_, i) => seriesColor(i + 2) });
+  dataTable(spellCard, {
+    columns: [
+      { key: 'name', label: 'Spell' },
+      { key: 'totalHits', label: 'Heals', num: true },
+      { key: 'crits', label: 'Crit heals', num: true },
+      { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
+      { key: 'dmg', label: 'Total healed', num: true, fmt: fmtExact },
+      { key: 'avg', label: 'Avg', num: true },
+      { key: 'max', label: 'Max', num: true },
+    ],
+    rows: sourceMapToRows(stats.healOut.bySpell),
+  });
+
   const outSec = section(container);
   h3(outSec, 'Healing done by target');
   const outCard = card(outSec);
@@ -290,26 +308,36 @@ export function renderSpells(container, stats, ctx) {
   const byName = {};
   for (const [name, s] of Object.entries(stats.damageOut.bySource)) {
     if (name.startsWith('Melee')) continue;
-    byName[name] = { name, role: 'Damage', ...s, healAmt: 0 };
+    byName[name] = { name, role: 'Damage', ...s };
   }
-  // Note: healOut is keyed by target, not by spell name (the log doesn't name
-  // the heal spell on the result line), so healing is shown on its own tab
-  // rather than merged into this per-spell damage table.
+  // Healing spells (e.g. "Greater Restoration") are attributed by name via
+  // the "You cast a ... spell!" line that precedes each heal result line —
+  // merged in here alongside damage abilities so one table shows everything
+  // a character cast, whichever role it played.
+  for (const [name, s] of Object.entries(stats.healOut.bySpell || {})) {
+    if (name === 'Heal (spell not identified)') continue;
+    if (byName[name]) {
+      byName[name] = { ...byName[name], role: 'Damage + Heal' };
+    } else {
+      byName[name] = { name, role: 'Heal', ...s };
+    }
+  }
   const rows = Object.values(byName).sort((a, b) => b.dmg - a.dmg);
 
   const castOnly = stats.spellsCast.filter(n => !byName[n]);
 
   const s = section(container);
-  h3(s, 'Spells, styles &amp; abilities used (damage)');
+  h3(s, 'Spells, styles &amp; abilities used');
   const c = card(s);
   dataTable(c, {
     columns: [
       { key: 'name', label: 'Name' },
+      { key: 'role', label: 'Role' },
       { key: 'info', label: 'Type' },
       { key: 'totalHits', label: 'Hits', num: true },
       { key: 'crits', label: 'Crits', num: true },
       { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
-      { key: 'dmg', label: 'Total dmg', num: true, fmt: fmtExact },
+      { key: 'dmg', label: 'Total dmg/heal', num: true, fmt: fmtExact },
       { key: 'avg', label: 'Avg', num: true },
     ],
     rows: rows.map(r => ({ ...r, info: describeSkill(skillMap, r.name) || '—' })),
@@ -317,7 +345,7 @@ export function renderSpells(container, stats, ctx) {
 
   if (castOnly.length) {
     const s2 = section(container);
-    h3(s2, 'Also cast (no direct damage logged — buffs, debuffs, CC, heals, pets…)');
+    h3(s2, 'Also cast (no direct damage/heal logged — buffs, debuffs, CC, pets…)');
     const c2 = card(s2);
     c2.innerHTML = castOnly.map(n => `<span class="pill" style="margin:3px">${n}</span>`).join('');
   }

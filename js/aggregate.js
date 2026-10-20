@@ -127,35 +127,41 @@ export function buildStats(events, playerNameHint) {
   }
 
   let totalMeleeHits = 0, totalMeleeCrits = 0, totalMeleeMisses = 0, totalMeleeDmg = 0;
-  let pendingWeapon = null; // last weapon used, for "You hit X for N extra damage!" follow-ups
+  let pendingWeapon = null;    // last weapon used, for the generic "Melee: <weapon>" bucket
+  let lastMeleeLabel = 'Melee'; // bucket key the most recent swing landed in — crit/extra follow-ups reuse it,
+                                 // so a style's crit or a spell's "extra damage" line lands on the same row
 
   for (const e of events) {
     switch (e.type) {
       case 'melee_weapon': {
-        bump(dmgOutBySource, `Melee: ${e.weapon}`, e.dmg, false);
+        pendingWeapon = e.weapon;
+        const key = e.styleName || `Melee: ${e.weapon}`;
+        lastMeleeLabel = key;
+        bump(dmgOutBySource, key, e.dmg, false);
         totalMeleeHits++; totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
-        pendingWeapon = e.weapon;
         break;
       }
       case 'melee_plain': {
-        const key = pendingWeapon ? `Melee: ${pendingWeapon}` : 'Melee';
+        // No weapon name on this line — it's either a basic swing (no style
+        // triggered this tick) or, if a "You cast a <Spell> spell!" happened
+        // moments ago, that spell's direct-damage result.
+        const key = e.spellName || (pendingWeapon ? `Melee: ${pendingWeapon}` : 'Melee');
+        lastMeleeLabel = key;
         bump(dmgOutBySource, key, e.dmg, false);
         totalMeleeHits++; totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
       case 'melee_extra': {
-        const key = pendingWeapon ? `Melee: ${pendingWeapon} (style)` : 'Melee (style)';
-        bump(dmgOutBySource, key, e.dmg, false);
+        bump(dmgOutBySource, lastMeleeLabel, e.dmg, false);
         totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
       case 'melee_crit_named':
       case 'melee_crit_generic': {
-        const key = pendingWeapon ? `Melee: ${pendingWeapon}` : 'Melee';
-        bump(dmgOutBySource, key, e.dmg, true);
+        bump(dmgOutBySource, lastMeleeLabel, e.dmg, true);
         totalMeleeCrits++; totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
@@ -225,15 +231,18 @@ export function buildStats(events, playerNameHint) {
 
   // ---- healing out / in --------------------------------------------------------
   const healOutByTarget = {};
+  const healOutBySpell = {};
   const healOutPoints = [];
   let healOutTotal = 0, healOutHits = 0, healOutCrits = 0;
   for (const e of events) {
     if (e.type === 'heal_out') {
       bump(healOutByTarget, e.target, e.amount, false);
+      bump(healOutBySpell, e.spellName || 'Heal (spell not identified)', e.amount, false);
       healOutTotal += e.amount; healOutHits++;
       healOutPoints.push({ clock: e.clock, amount: e.amount });
     } else if (e.type === 'heal_out_crit') {
       bump(healOutByTarget, e.target, e.amount, true);
+      bump(healOutBySpell, e.spellName || 'Heal (spell not identified)', e.amount, true);
       healOutTotal += e.amount; healOutCrits++;
       healOutPoints.push({ clock: e.clock, amount: e.amount });
     }
@@ -332,6 +341,7 @@ export function buildStats(events, playerNameHint) {
       hits: healOutHits, crits: healOutCrits,
       critRate: (healOutHits + healOutCrits) ? +(100 * healOutCrits / (healOutHits + healOutCrits)).toFixed(1) : 0,
       byTarget: finalizeSourceMap(healOutByTarget),
+      bySpell: finalizeSourceMap(healOutBySpell),
       hps: durationSec ? +(healOutTotal / durationSec).toFixed(1) : 0,
       timeline: bucketTimeline(healOutPoints, startClock, endClock),
     },

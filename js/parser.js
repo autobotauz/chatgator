@@ -41,7 +41,7 @@ const RULES = [
   ['stats_deathblows', /^Deathblows:\s*([\d,]+)$/, m => ({ value: toNum(m[1]) })],
   ['stats_solo_kills', /^Solo kills:\s*([\d,]+)$/, m => ({ value: toNum(m[1]) })],
   ['stats_deaths', /^Deaths:\s*([\d,]+)$/, m => ({ value: toNum(m[1]) })],
-  ['stats_hp_healed', /^HP healed:\s*([\d,]+) and (\d+) RP gained from this heal$/, m => ({ hp: toNum(m[1]), rp: toNum(m[2]) })],
+  ['stats_hp_healed', /^HP healed:\s*([\d,]+)(?: and (\d+) RP gained from this heal)?$/, m => ({ hp: toNum(m[1]), rp: m[2] ? toNum(m[2]) : 0 })],
   ['stats_rez', /^Resurrections performed:\s*([\d,]+)$/, m => ({ value: toNum(m[1]) })],
   ['stats_online', /^Online time:\s*(.+)$/, m => ({ text: m[1] })],
   ['stats_rp_hour', /^RP\/hour:\s*([\d.,]+)$/, m => ({ value: parseFloat(m[1].replace(/,/g, '')) })],
@@ -78,8 +78,18 @@ const RULES = [
     m => ({ name: m[1], target: m[2], dmg: +m[3], pct: m[4] ? parseFloat(m[4]) : null })],
   ['ability_hit', /^Your (.+?) hits (.+?) for (\d+) damage!$/, m => ({ name: m[1], target: m[2], dmg: +m[3] })],
 
+  // ---- styles: "You perform your <Style> perfectly! (+N, Growth Rate: x)"
+  // confirms the weapon swing that immediately follows was a style, not a
+  // plain swing. Consumed by the next melee_weapon event in the main loop
+  // below (never pushed as its own event — it's pure setup context).
+  ['style_perform', /^You perform your (.+?) perfectly!(?:\s*\(([+-]?\d+)?,?\s*Growth Rate:\s*([\d.]+)\))?$/,
+    m => ({ name: m[1], bonus: m[2] ? +m[2] : null })],
+  ['style_perform', /^You perform your (.+?)!(?:\s*\(([+-]?\d+)?,?\s*Growth Rate:\s*([\d.]+)\))?$/,
+    m => ({ name: m[1], bonus: m[2] ? +m[2] : null })],
+
   // ---- melee (weapon) damage, outgoing -----------------------------------
-  ['melee_weapon', /^You attack (.+?) with your (.+?) and hit for (\d+)(?:\s*\(([+-]\d+)\))? damage!$/,
+  // trailing "(Damage Modifier: N)" is extra debug info some rulesets append; ignored.
+  ['melee_weapon', /^You attack (.+?) with your (.+?) and hit for (\d+)(?:\s*\(([+-]\d+)\))? damage!(?:\s*\(Damage Modifier:\s*[\d.]+\))?$/,
     m => ({ target: m[1], weapon: m[2], dmg: +m[3], mod: m[4] ? +m[4] : null })],
   ['melee_extra', /^You hit (.+?) for (\d+) extra damage!$/, m => ({ target: m[1], dmg: +m[2] })],
   ['melee_plain', /^You hit (.+?) for (\d+)(?:\s*\(([+-]\d+)\))? damage!$/,
@@ -213,6 +223,25 @@ const RULES = [
   ['flavor', /^You guild pays \d+ bounty points to maintain .+$/, () => ({})],
   ['flavor', /^\[Guild\] \[.+?\]$/, () => ({})],
   ['flavor', /^Your efforts (attacking|defending) .+? have not gone unnoticed \([\d.]+% participation\)\.$/, () => ({})],
+
+  // ---- gear-swap / weapon-switch spam (common with macro'd combat styles) ----
+  ['flavor', /^You attempt to use .+?\.$/, () => ({})],
+  ['flavor', /^You sheathe .+?\.$/, () => ({})],
+  ['flavor', /^You wield .+? in (your (left|right) hand|both hands)\.$/, () => ({})],
+  ['flavor', /^You enter combat mode and target \[.+?\]$/, () => ({})],
+  ['flavor', /^You prepare to perform an? .+?!$/, () => ({})],
+  ['flavor', /^You are now preparing to perform an? .+? style as a backup for .+?!$/, () => ({})],
+  ['flavor', /^No '.+?' found in inventory$/i, () => ({})],
+  ['flavor', /^You must be out of combat\.$/, () => ({})],
+  ['flavor', /^You can't (attack yourself|enter melee combat mode with a fired weapon)!\s*$/, () => ({})],
+  ['flavor', /^You must wait \d+ seconds? (to use this spell|before you can cast a spell again)!$/, () => ({})],
+  ['flavor', /^You don't have enough power to cast that!$/, () => ({})],
+  ['flavor', /^You move and interrupt your spellcast\.$/, () => ({})],
+  ['flavor', /^You gather energy from your surroundings\.(?:\s*\(Siphon Chance:\s*[\d.]+%\))?$/, () => ({})],
+  ['flavor', /^\[Reset\] to try again$/, () => ({})],
+  ['flavor', /^.+? (seems to be moving more slowly|is entranced)\.?$/, () => ({})],
+  ['flavor', /^.+?'s movement returns to normal\.$/, () => ({})],
+  ['flavor', /^.+? attacks move with the speed of the wind!$/, () => ({})],
 ];
 
 function toNum(s) { return parseInt(String(s).replace(/,/g, ''), 10); }
@@ -228,6 +257,17 @@ export function parseLogText(rawText) {
   let fallbackBase = Date.UTC(2000, 0, 1); // used if no Opened marker ever appears
   let sawAnyOpen = false;
   let inInfoBlock = false; // inside an item/spell "<Begin Info: ...> ... <End Info>" tooltip dump
+
+  // Neither styles nor spell-damage/heal results carry their own name on
+  // the result line — "You perform your Glowing Blade perfectly!" and
+  // "You cast a Screeching Scream spell!" are separate lines from the
+  // "You attack ... and hit for N damage!" / "You hit ... for N damage!" /
+  // "You heal ... for N hit points!" that follow a beat later. These two
+  // bits of state bridge that gap so the result can be labeled correctly.
+  const STYLE_WINDOW_MS = 3000;
+  const CAST_WINDOW_MS = 4000;
+  let pendingStyleName = null, pendingStyleAt = -Infinity;
+  let pendingCastName = null, pendingCastAt = -Infinity;
 
   for (let li = 0; li < lines.length; li++) {
     const raw = lines[li];
@@ -291,8 +331,34 @@ export function parseLogText(rawText) {
 
     const parsed = matchLine(body);
     if (parsed) {
-      if (parsed.type !== 'flavor') {
-        events.push({ t: clockMs, clock: clockMs, type: parsed.type, raw: body, ...parsed.payload });
+      if (parsed.type === 'style_perform') {
+        pendingStyleName = parsed.payload.name;
+        pendingStyleAt = clockMs;
+        continue; // setup-only line, not an event itself
+      }
+      if (parsed.type === 'cast') {
+        pendingCastName = parsed.payload.name;
+        pendingCastAt = clockMs;
+      }
+
+      const payload = { ...parsed.payload };
+      let type = parsed.type;
+
+      if (type === 'melee_weapon') {
+        if (pendingStyleName && clockMs - pendingStyleAt <= STYLE_WINDOW_MS) {
+          payload.styleName = pendingStyleName;
+        }
+        pendingStyleName = null;
+        pendingCastName = null; // a weapon swing means we're past any pending spell result
+      } else if (type === 'melee_plain' || type === 'heal_out' || type === 'heal_out_crit') {
+        if (pendingCastName && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
+          payload.spellName = pendingCastName;
+          pendingCastName = null;
+        }
+      }
+
+      if (type !== 'flavor') {
+        events.push({ t: clockMs, clock: clockMs, type, raw: body, ...payload });
       }
     } else {
       if (unmatched.length < 500) unmatched.push(body);
