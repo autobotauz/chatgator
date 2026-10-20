@@ -8,13 +8,14 @@ const ENCOUNTER_GAP_MS = 20000; // a 20s silence ends one encounter and starts t
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
   'ability_hit', 'ability_crit', 'cast', 'cast_begin',
-  'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost',
+  'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
   'incoming_dmg', 'incoming_crit', 'incoming_extra',
   'heal_out', 'heal_out_crit', 'heal_in',
   'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in',
   'resist_named', 'resist_generic',
   'rp_bonus', 'rp_reason', 'rp_plain',
   'kill_feed', 'resurrected_by', 'you_died',
+  'cc_landed',
 ]);
 
 export function segmentEncounters(events) {
@@ -122,7 +123,7 @@ export function buildStats(events, playerNameHint) {
   const dmgOutPoints = [];
   const petStats = {}; // name -> { dmg, heals, hits, crits, bySource:{} }
   function petBucket(name) {
-    if (!petStats[name]) petStats[name] = { dmg: 0, heals: 0, hits: 0, crits: 0, bySource: {} };
+    if (!petStats[name]) petStats[name] = { dmg: 0, heals: 0, hits: 0, crits: 0, bySource: {}, spellsCast: 0, resists: 0 };
     return petStats[name];
   }
 
@@ -142,13 +143,23 @@ export function buildStats(events, playerNameHint) {
     if (!dmgOutWeapons[key]) dmgOutWeapons[key] = new Set();
     dmgOutWeapons[key].add(weapon);
   }
+  // A style thrown with more than one weapon (common with a dual-wield or
+  // weapon-swap macro) must NOT share one bucket across weapons — "Numb with
+  // weapon A" and "Numb with weapon B" can hit for very different numbers,
+  // and merging them (as an earlier version of this did, joining the weapon
+  // names together with "/") hides exactly the comparison a melee player
+  // wants. So the style+weapon pair IS the bucket key; this map remembers
+  // the bare style name for each composite key so the table/skill-lookup
+  // can still show "Numb" as the Name and the weapon in its own column.
+  const dmgOutBaseName = {};
 
   for (const e of events) {
     switch (e.type) {
       case 'melee_weapon': {
         pendingWeapon = e.weapon;
         lastMeleeWeapon = e.weapon;
-        const key = e.styleName || `Melee: ${e.weapon}`;
+        const key = e.styleName ? `${e.styleName} (${e.weapon})` : `Melee: ${e.weapon}`;
+        if (e.styleName) dmgOutBaseName[key] = e.styleName;
         lastMeleeLabel = key;
         bump(dmgOutBySource, key, e.dmg, false);
         trackWeapon(key, e.weapon);
@@ -229,6 +240,14 @@ export function buildStats(events, playerNameHint) {
         const p = petBucket(e.pet); p.heals += e.amount;
         break;
       }
+      case 'pet_cast': {
+        // Only count this toward a pet we've independently confirmed is
+        // yours (via a summon/melee/self-heal line) — a BG log is full of
+        // other players' pets casting the same generic "The X casts a
+        // spell!" text, and we don't want those miscounted as yours.
+        if (petNames.has(e.pet)) petBucket(e.pet).spellsCast++;
+        break;
+      }
       default: break;
     }
   }
@@ -280,6 +299,11 @@ export function buildStats(events, playerNameHint) {
   let blocks = 0, youParries = 0, youEvades = 0, enemyParriedYou = 0, enemyEvadedYou = 0, enemyBlockedYou = 0;
   let resistCount = 0;
   const resistBySource = {};
+  // A CC/debuff application (e.g. a pet's root, or your own mez) with no
+  // damage number of its own — tracked separately from resistBySource so a
+  // spell's "landed vs resisted" rate reflects real attempts even when it
+  // never shows up in the damage table at all.
+  const ccLandedBySource = {};
   for (const e of events) {
     if (e.type === 'block') blocks++;
     else if (e.type === 'you_parry') youParries++;
@@ -291,6 +315,8 @@ export function buildStats(events, playerNameHint) {
       resistCount++;
       const key = e.source || 'Unknown';
       resistBySource[key] = (resistBySource[key] || 0) + 1;
+    } else if (e.type === 'cc_landed' && e.sourceName) {
+      ccLandedBySource[e.sourceName] = (ccLandedBySource[e.sourceName] || 0) + 1;
     }
   }
   const incomingHitsLanded = Object.values(dmgInBySource).reduce((a, s) => a + s.hits + s.crits, 0);
@@ -368,6 +394,46 @@ export function buildStats(events, playerNameHint) {
   const dmgOutBySourceFinal = finalizeSourceMap(dmgOutBySource);
   for (const [key, weapons] of Object.entries(dmgOutWeapons)) {
     if (dmgOutBySourceFinal[key]) dmgOutBySourceFinal[key].weapon = Array.from(weapons).join(' / ');
+  }
+  for (const [key, baseName] of Object.entries(dmgOutBaseName)) {
+    if (dmgOutBySourceFinal[key]) dmgOutBySourceFinal[key].displayName = baseName;
+  }
+  // Fold resists (and CC/debuff landings, which carry no damage number of
+  // their own) into the per-ability table so "how often does this spell or
+  // style get resisted" sits right next to its hits/crits — including an
+  // ability that landed zero damage hits because it's pure CC, which would
+  // otherwise vanish from the table entirely. Pet-sourced ones are kept on
+  // the Pets tab instead (via petStats below), not mixed in here.
+  for (const [key, count] of Object.entries(resistBySource)) {
+    if (petNames.has(key)) continue;
+    if (!dmgOutBySourceFinal[key]) dmgOutBySourceFinal[key] = { ...emptySourceStat(), totalHits: 0, avg: 0, critRate: 0 };
+    dmgOutBySourceFinal[key].resists = count;
+  }
+  for (const [key, count] of Object.entries(ccLandedBySource)) {
+    if (petNames.has(key)) continue;
+    if (!dmgOutBySourceFinal[key]) dmgOutBySourceFinal[key] = { ...emptySourceStat(), totalHits: 0, avg: 0, critRate: 0 };
+    dmgOutBySourceFinal[key].ccLanded = count;
+  }
+  for (const entry of Object.values(dmgOutBySourceFinal)) {
+    const attempts = entry.totalHits + (entry.ccLanded || 0) + (entry.resists || 0);
+    entry.resistRate = attempts ? +(100 * (entry.resists || 0) / attempts).toFixed(1) : 0;
+  }
+
+  // Same idea for pets: a pet's cast landing or being resisted is tracked
+  // per pet rather than mixed into the player's own ability table.
+  for (const [pet, count] of Object.entries(resistBySource)) {
+    if (petStats[pet]) petStats[pet].resists = count;
+  }
+  for (const [pet, count] of Object.entries(ccLandedBySource)) {
+    if (petStats[pet]) petStats[pet].ccLanded = count;
+  }
+  for (const p of Object.values(petStats)) {
+    // Deliberately excludes p.hits/p.crits here: those are the pet's melee
+    // swings, a completely different ability from whatever it's casting, so
+    // mixing them in would dilute the spell's own resist rate. Landed/
+    // resisted are the only two outcomes a pet's spell-cast line has.
+    const attempts = (p.ccLanded || 0) + (p.resists || 0);
+    p.resistRate = attempts ? +(100 * (p.resists || 0) / attempts).toFixed(1) : 0;
   }
 
   return {

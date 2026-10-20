@@ -162,9 +162,22 @@ a { color: var(--series-1); }
 .viz-tooltip .tt-row { display:flex; gap:8px; justify-content: space-between; }
 
 /* ---------- table ---------- */
+.data-table-wrap { width: 100%; }
+.table-filter {
+  display: block; width: 100%; max-width: 260px; margin: 0 0 8px auto;
+  padding: 6px 10px; font-size: 12.5px; font-family: var(--font);
+  background: var(--surface-0); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+.table-filter:focus { outline: 2px solid var(--series-1); outline-offset: 1px; }
 table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 table.data-table th, table.data-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--grid); }
 table.data-table th { color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; }
+table.data-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+table.data-table th.sortable:hover { color: var(--text-primary); }
+table.data-table th.sortable::after { content: ''; display: inline-block; width: 0.7em; margin-left: 3px; opacity: .5; }
+table.data-table th.sort-asc::after { content: '▲'; opacity: 1; }
+table.data-table th.sort-desc::after { content: '▼'; opacity: 1; }
 table.data-table td.num, table.data-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
 table.data-table tbody tr:hover { background: var(--surface-2); }
 

@@ -2,21 +2,20 @@
 // Pure, dependency-free, runs entirely client-side. Nothing in this file
 // ever sends data anywhere — it only reads the string it's given.
 //
-// Every event has: { t: <ms since file start>, clock: <ms-of-day epoch estimate>, type, ...fields }
-// `t` is used for ordering/bucketing; `clock` carries enough date info to
-// render real timestamps when a session-open date is known.
-
-const MONTHS = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
-
-// "Sun Oct 15 14:12:36 2023"  ->  Date
-function parseLogOpenDate(str) {
-  const m = str.match(/\w+\s+(\w+)\s+(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\s+(\d{4})/);
-  if (!m) return null;
-  const [, mon, day, hh, mm, ss, yyyy] = m;
-  const monthIdx = MONTHS[mon];
-  if (monthIdx === undefined) return null;
-  return new Date(Date.UTC(+yyyy, monthIdx, +day, +hh, +mm, +ss));
-}
+// Every event has: { t: <elapsed ms since the first line we saw>, clock: same
+// value, type, ...fields }. The game only ever prints a bare [HH:MM:SS] on
+// each line — no date, and the header's "*** Chat Log Opened: <date>" text
+// is informational only (a relog a few seconds later gets its own header,
+// so it's not a reliable day boundary either). So we never attempt to
+// recover a real calendar date: `clock` is a purely synthetic, always-
+// forward-moving elapsed clock anchored at the first timestamp the file
+// contains. Whenever the printed HH:MM:SS goes backwards by more than a
+// few seconds (allowing for ordinary out-of-order log writes), we assume a
+// midnight rollover happened and add a day's worth of ms — that's the only
+// day-boundary signal we have, and it's still a guess across a log that
+// spans many real days. Display code must only ever render the time-of-day
+// portion of `clock`, never a calendar date, since we don't actually know
+// what the date was.
 
 const LINE_RE = /^\[(\d{2}):(\d{2}):(\d{2})\]\s?(.*)$/;
 const OPEN_RE = /^\*\*\*\s*Chat Log Opened:\s*(.+)$/;
@@ -69,8 +68,20 @@ const RULES = [
   ['pet_hit', /^Your (.+?) hit (.+?) for (\d+) damage!$/, m => ({ pet: m[1], target: m[2], dmg: +m[3] })],
   // "Your <pet> heals itself for N hit points."
   ['pet_self_heal', /^Your (.+?) heals itself for (\d+) hit points?\.$/, m => ({ pet: m[1], amount: +m[2] })],
-  // flavor-only pet announcement — not counted, but useful for pet-name discovery
-  ['pet_flavor', /^The (.+?) (attacks|casts) /, m => ({ pet: m[1] })],
+  // "The <pet> casts a spell!" — counted per pet (once we know it's really
+  // your pet — see aggregate.js's petNames gate) so pet spellcasting shows up
+  // at all instead of silently vanishing. We deliberately don't try to parse
+  // the spell's actual effect line (immobilize, snare, "seems weaker", etc.)
+  // by name — every pet class has different ones and a BG log is full of
+  // other people's pets producing the exact same generic text at the same
+  // moment, so that'd be a guess. Resists are still fully captured, though:
+  // "<target> resists your <pet>'s effect!" already names the pet directly,
+  // the same way it names a player's spell, so no special-casing is needed.
+  ['pet_cast', /^The (.+?) casts a spell!$/, m => ({ pet: m[1] })],
+  // flavor-only pet announcement (attack telegraph with no damage number,
+  // the real hit/miss comes from a separate "Your <pet> ..." line) — not
+  // counted, but useful for pet-name discovery and keeps it out of unmatched.
+  ['pet_flavor', /^The (.+?) attacks /, m => ({ pet: m[1] })],
 
   // ---- named ability (spell / style / RA / proc) damage -----------------
   // crit MUST be matched before the plain hit rule (both start the same way)
@@ -175,8 +186,17 @@ const RULES = [
   // ---- ambient third-party combat / world noise (common in busy RvR/keep-siege logs) ----
   ['flavor', /^.+? attacks .+? and (hits|misses|is (blocked|parried|evaded))!?$/, () => ({})],
   ['flavor', /^.+? attacks .+? with (his|her|its|their) .+?!$/, () => ({})],
-  ['flavor', /^.+? is (stunned|rooted|mesmerized) and cannot move!$/, () => ({})],
-  ['flavor', /^.+? (begins moving more slowly|seems vulnerable to .+? magic|is covered in lava|is surrounded by an? .+?|'s (attack speed is slowed|skin erupts in open wounds|strength returns to normal)|looks healthy again|seems weaker)!?\.?$/, () => ({})],
+  // ---- CC/debuff landing on a target — attributed to whichever cast (yours
+  // or your pet's) just happened, within a short window, so e.g. a pet's
+  // root/snare/mez spell shows up as something rather than silent noise.
+  // Each pet/class has its own wording for this, so these are the specific
+  // ones we've actually seen; anything else still just falls through as
+  // ordinary unattributed flavor text below, same as before.
+  ['cc_landed', /^(.+?) cannot seem to move!$/, m => ({ target: m[1], effect: 'immobilize' })],
+  ['cc_landed', /^(.+?) is (stunned|rooted|mesmerized) and cannot move!$/, m => ({ target: m[1], effect: m[2] })],
+  ['cc_landed', /^(.+?) begins moving more slowly!?\.?$/, m => ({ target: m[1], effect: 'snare' })],
+  ['cc_landed', /^(.+?) seems weaker!?\.?$/, m => ({ target: m[1], effect: 'debuff' })],
+  ['flavor', /^.+? (seems vulnerable to .+? magic|is covered in lava|is surrounded by an? .+?|'s (attack speed is slowed|skin erupts in open wounds|strength returns to normal)|looks healthy again)!?\.?$/, () => ({})],
   ['flavor', /^The (lava falls from|destructive energy around|acidic mist around) .+?[.!]$/, () => ({})],
   ['flavor', /^.+? dies\.$/, () => ({})],
   ['flavor', /^.+? drops? .+\.$/, () => ({})],
@@ -204,7 +224,8 @@ const RULES = [
   ['flavor', /says?, ".*"$/, () => ({})],
   ['flavor', /^You have been charged .+ for the teleport\.$/, () => ({})],
   ['flavor', /^\[.+?\] .+? \(\d+s\),?$/, () => ({})],
-  ['flavor', /^.+? (becomes more resistant to .+?|is blessed with holy protection|takes a second wind|begins attacking faster|is entranced|looks calmer)[.!]?$/, () => ({})],
+  ['cc_landed', /^(.+?) is entranced!?\.?$/, m => ({ target: m[1], effect: 'mesmerize' })],
+  ['flavor', /^.+? (becomes more resistant to .+?|is blessed with holy protection|takes a second wind|begins attacking faster|looks calmer)[.!]?$/, () => ({})],
   ['flavor', /^.+?'s (attacks (move with the speed of the wind|return to normal)|armor returns to normal|crush vulnerability fades|enhanced strength fades)\.?$/, () => ({})],
   ['flavor', /^Your attacks move with the speed of the wind!$/, () => ({})],
   ['flavor', /^You are (protected from .+?|entranced|invigorated)!$/, () => ({})],
@@ -239,7 +260,7 @@ const RULES = [
   ['flavor', /^You move and interrupt your spellcast\.$/, () => ({})],
   ['flavor', /^You gather energy from your surroundings\.(?:\s*\(Siphon Chance:\s*[\d.]+%\))?$/, () => ({})],
   ['flavor', /^\[Reset\] to try again$/, () => ({})],
-  ['flavor', /^.+? (seems to be moving more slowly|is entranced)\.?$/, () => ({})],
+  ['cc_landed', /^(.+?) seems to be moving more slowly\.?$/, m => ({ target: m[1], effect: 'snare' })],
   ['flavor', /^.+?'s movement returns to normal\.$/, () => ({})],
   ['flavor', /^.+? attacks move with the speed of the wind!$/, () => ({})],
 ];
@@ -251,10 +272,9 @@ export function parseLogText(rawText) {
 
   const events = [];
   const unmatched = [];
-  let currentOpen = null;      // Date at most recent "Chat Log Opened"
-  let dayOffsetMs = 0;         // added when we detect a midnight rollover within one open block
-  let lastTimeOfDayMs = -1;
-  let fallbackBase = Date.UTC(2000, 0, 1); // used if no Opened marker ever appears
+  let dayOffsetMs = 0;          // added each time the printed clock jumps backwards (assumed midnight rollover)
+  let lastTimeOfDayMs = -1;     // never reset — the whole file is one continuous forward timeline
+  const base = 0; // elapsed ms from the first line's own time-of-day — not a real calendar epoch
   let sawAnyOpen = false;
   let inInfoBlock = false; // inside an item/spell "<Begin Info: ...> ... <End Info>" tooltip dump
 
@@ -268,6 +288,30 @@ export function parseLogText(rawText) {
   const CAST_WINDOW_MS = 4000;
   let pendingStyleName = null, pendingStyleAt = -Infinity;
   let pendingCastName = null, pendingCastAt = -Infinity;
+  // A CC/debuff landing (cc_landed) or an unnamed resist (resist_generic) is
+  // attributed to whichever cast — yours or your pet's — most recently
+  // happened, and unlike pendingCastName above this one is deliberately NOT
+  // cleared on first use: a single AOE cast can land on (or be resisted by)
+  // several targets in a row, each producing its own confirmation line.
+  const EFFECT_WINDOW_MS = 4000;
+  let pendingEffectName = null, pendingEffectAt = -Infinity, pendingEffectIsPet = false;
+  // A DoT or channeled spell (e.g. "Arawn's Inferno") only prints "You cast
+  // a ... spell!" ONCE, but then produces a separate bare "You hit <target>
+  // for N damage!" line per tick — the exact same line shape as a plain
+  // unstyled weapon swing. pendingCastName (below) correctly labels the
+  // FIRST tick, but since it's single-use (cleared right after, so an
+  // unrelated plain swing a few seconds later doesn't inherit a stale spell
+  // name), every tick after the first would otherwise fall through to the
+  // "last weapon used" fallback and get completely misattributed — the
+  // damage is real, it just lands in the wrong weapon's bucket, sometimes
+  // very far from where the player was actually standing when it ticked.
+  // Fix: once a tick is confirmed for a spell, keep tracking that spell
+  // AND the target it hit — a later bare hit on that same target, within
+  // the window (refreshed each tick so a long DoT keeps attributing
+  // correctly), is almost certainly another tick of the same thing, while
+  // one on any other target is almost certainly an unrelated plain swing.
+  const DOT_TICK_WINDOW_MS = 5000;
+  let activeDotName = null, activeDotTarget = null, activeDotAt = -Infinity;
 
   for (let li = 0; li < lines.length; li++) {
     const raw = lines[li];
@@ -290,11 +334,13 @@ export function parseLogText(rawText) {
 
     const openM = trimmed.match(OPEN_RE);
     if (openM) {
-      const d = parseLogOpenDate(openM[1]);
-      currentOpen = d || currentOpen;
+      // Informational only: we deliberately do NOT reset dayOffsetMs/lastTimeOfDayMs
+      // here. A relog can happen seconds later (same day) or after the file has
+      // skipped ahead by real days with no way to tell from the text alone — the
+      // only signal we trust for a day boundary is the printed clock itself going
+      // backwards, handled below, regardless of how many "Chat Log Opened" headers
+      // appear in between.
       sawAnyOpen = true;
-      dayOffsetMs = 0;
-      lastTimeOfDayMs = -1;
       events.push({ t: null, type: 'session_open', raw: trimmed, dateText: openM[1] });
       continue;
     }
@@ -314,7 +360,6 @@ export function parseLogText(rawText) {
         dayOffsetMs += 86400000;
       }
       lastTimeOfDayMs = timeOfDayMs;
-      const base = (currentOpen ? currentOpen.getTime() - ((currentOpen.getUTCHours() * 3600 + currentOpen.getUTCMinutes() * 60 + currentOpen.getUTCSeconds()) * 1000) : fallbackBase);
       clockMs = base + dayOffsetMs + timeOfDayMs;
       body = rest.trim();
       if (!body) continue;
@@ -339,6 +384,13 @@ export function parseLogText(rawText) {
       if (parsed.type === 'cast') {
         pendingCastName = parsed.payload.name;
         pendingCastAt = clockMs;
+        pendingEffectName = parsed.payload.name;
+        pendingEffectAt = clockMs;
+        pendingEffectIsPet = false;
+      } else if (parsed.type === 'pet_cast') {
+        pendingEffectName = parsed.payload.pet;
+        pendingEffectAt = clockMs;
+        pendingEffectIsPet = true;
       }
 
       const payload = { ...parsed.payload };
@@ -353,7 +405,23 @@ export function parseLogText(rawText) {
       } else if (type === 'melee_plain' || type === 'heal_out' || type === 'heal_out_crit') {
         if (pendingCastName && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
           payload.spellName = pendingCastName;
+          activeDotName = pendingCastName;
+          activeDotTarget = payload.target;
+          activeDotAt = clockMs;
           pendingCastName = null;
+        } else if (activeDotName && payload.target === activeDotTarget && clockMs - activeDotAt <= DOT_TICK_WINDOW_MS) {
+          payload.spellName = activeDotName;
+          activeDotAt = clockMs; // still ticking — extend the window
+        }
+      } else if (type === 'cc_landed') {
+        if (pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS) {
+          payload.sourceName = pendingEffectName;
+          payload.isPet = pendingEffectIsPet;
+        }
+      } else if (type === 'resist_generic') {
+        if (!payload.source && pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS) {
+          payload.source = pendingEffectName;
+          payload.isPet = pendingEffectIsPet;
         }
       }
 

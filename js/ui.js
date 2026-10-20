@@ -18,24 +18,89 @@ function durationLabel(ms) {
   return m ? `${m}m ${s}s` : `${s}s`;
 }
 
-function dataTable(parent, { columns, rows }) {
+// Numbers in a row can arrive either raw (e.g. 1076) or already formatted by
+// a column's own `fmt` into display text (e.g. "1,076", "18.8%", "—") — some
+// callers pre-format before the row even reaches here. Sorting always wants
+// the numeric value regardless of which form it's in, so a "num" column's
+// cells are coerced back to a number for comparison; "—"/blank sorts as the
+// lowest value rather than throwing comparisons off as NaN.
+function sortableValue(v, isNum) {
+  if (!isNum) return (v == null ? '' : String(v)).toLowerCase();
+  if (typeof v === 'number') return v;
+  const n = parseFloat(String(v).replace(/[,%]/g, ''));
+  return isNaN(n) ? -Infinity : n;
+}
+
+function dataTable(parent, { columns, rows, filterable = true }) {
+  const wrap = document.createElement('div');
+  wrap.className = 'data-table-wrap';
+
+  let filterInput = null;
+  if (filterable && rows.length > 6) {
+    filterInput = document.createElement('input');
+    filterInput.type = 'search';
+    filterInput.placeholder = 'Filter…';
+    filterInput.className = 'table-filter';
+    wrap.appendChild(filterInput);
+  }
+
   const table = document.createElement('table');
   table.className = 'data-table';
   const thead = document.createElement('thead');
-  thead.innerHTML = '<tr>' + columns.map(c => `<th class="${c.num ? 'num' : ''}">${c.label}</th>`).join('') + '</tr>';
+  const headRow = document.createElement('tr');
+  columns.forEach((c) => {
+    const th = document.createElement('th');
+    th.className = (c.num ? 'num ' : '') + 'sortable';
+    th.textContent = c.label;
+    th.title = 'Click to sort';
+    headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
   table.appendChild(thead);
   const tbody = document.createElement('tbody');
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="${columns.length}" class="empty-state">No data</td></tr>`;
-  } else {
-    for (const row of rows) {
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  parent.appendChild(wrap);
+
+  let sortIdx = null, sortDir = 1;
+
+  function renderBody() {
+    let displayRows = rows;
+    if (filterInput && filterInput.value.trim()) {
+      const q = filterInput.value.trim().toLowerCase();
+      displayRows = displayRows.filter(row =>
+        columns.some(c => String(c.fmt ? c.fmt(row[c.key]) : (row[c.key] ?? '')).toLowerCase().includes(q)));
+    }
+    if (sortIdx != null) {
+      const c = columns[sortIdx];
+      displayRows = displayRows.slice().sort((a, b) => {
+        const av = sortableValue(a[c.key], c.num), bv = sortableValue(b[c.key], c.num);
+        return av < bv ? -sortDir : av > bv ? sortDir : 0;
+      });
+    }
+    tbody.innerHTML = '';
+    if (!displayRows.length) {
+      tbody.innerHTML = `<tr><td colspan="${columns.length}" class="empty-state">No data</td></tr>`;
+      return;
+    }
+    for (const row of displayRows) {
       const tr = document.createElement('tr');
       tr.innerHTML = columns.map(c => `<td class="${c.num ? 'num' : ''}">${c.fmt ? c.fmt(row[c.key]) : row[c.key]}</td>`).join('');
       tbody.appendChild(tr);
     }
   }
-  table.appendChild(tbody);
-  parent.appendChild(table);
+
+  Array.from(headRow.children).forEach((th, i) => {
+    th.addEventListener('click', () => {
+      if (sortIdx === i) sortDir *= -1; else { sortIdx = i; sortDir = 1; }
+      Array.from(headRow.children).forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+      th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+      renderBody();
+    });
+  });
+  if (filterInput) filterInput.addEventListener('input', renderBody);
+
+  renderBody();
   return table;
 }
 
@@ -45,7 +110,11 @@ function sourceMapToItems(bySource) {
 
 function sourceMapToRows(bySource) {
   return Object.entries(bySource)
-    .map(([name, s]) => ({ name, ...s }))
+    // A style thrown with more than one weapon gets one row per weapon (see
+    // aggregate.js), each internally keyed by "Style (Weapon)" so the rows
+    // stay distinct — displayName puts the bare style back in the Name
+    // column, with the specific weapon shown in its own Weapon column.
+    .map(([name, s]) => ({ ...s, name: s.displayName || name }))
     .sort((a, b) => b.dmg - a.dmg);
 }
 
@@ -127,6 +196,9 @@ export function renderDamage(container, stats, ctx) {
       { key: 'totalHits', label: 'Hits', num: true },
       { key: 'crits', label: 'Crits', num: true },
       { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
+      { key: 'ccLanded', label: 'Landed (CC)', num: true, fmt: v => v || 0 },
+      { key: 'resists', label: 'Resists', num: true, fmt: v => v || 0 },
+      { key: 'resistRate', label: 'Resist %', num: true, fmt: v => (v || 0) + '%' },
       { key: 'dmg', label: 'Total dmg', num: true, fmt: fmtExact },
       { key: 'avg', label: 'Avg', num: true },
       { key: 'min', label: 'Min', num: true },
@@ -242,6 +314,21 @@ export function renderPets(container, stats, ctx) {
     const p = stats.pets.byPet[name];
     const s = section(container);
     h3(s, `${name} — ${fmtExact(p.dmg)} damage, ${fmtExact(p.heals)} self-healed`);
+    if (p.spellsCast) {
+      const spellSub = card(s);
+      // Pet spells (e.g. a CC/root cast) rarely show a damage number on the
+      // result line itself, so there's nothing to put in the breakdown table
+      // below — but cast count and resist rate are both fully known (the
+      // resist line always names the pet directly, however varied the
+      // actual effect text is spell to spell), so they get their own strip.
+      spellSub.innerHTML = `
+        <div class="grid cols-4" style="gap:10px">
+          ${tile('Spells cast', fmtExact(p.spellsCast))}
+          ${tile('Landed (CC/debuff)', fmtExact(p.ccLanded || 0))}
+          ${tile('Resisted', fmtExact(p.resists || 0))}
+          ${tile('Resist %', (p.resistRate || 0) + '%')}
+        </div>`;
+    }
     const c = card(s);
     dataTable(c, {
       columns: [
@@ -331,9 +418,12 @@ export function renderSpells(container, stats, ctx) {
   clear(container);
   const skillMap = ctx && ctx.skillMap || {};
   const byName = {};
-  for (const [name, s] of Object.entries(stats.damageOut.bySource)) {
-    if (name.startsWith('Melee')) continue;
-    byName[name] = { name, role: 'Damage', ...s };
+  for (const [key, s] of Object.entries(stats.damageOut.bySource)) {
+    if (key.startsWith('Melee')) continue;
+    // Keep per-weapon rows distinct (same composite key as the Damage tab —
+    // see aggregate.js) but show the bare style/spell name here, same idea
+    // as sourceMapToRows.
+    byName[key] = { name: s.displayName || key, role: 'Damage', ...s };
   }
   // Healing spells (e.g. "Greater Restoration") are attributed by name via
   // the "You cast a ... spell!" line that precedes each heal result line —
@@ -349,7 +439,12 @@ export function renderSpells(container, stats, ctx) {
   }
   const rows = Object.values(byName).sort((a, b) => b.dmg - a.dmg);
 
-  const castOnly = stats.spellsCast.filter(n => !byName[n]);
+  // byName can now hold several rows for one style name (one per weapon —
+  // see aggregate.js), each keyed by its own composite string, so "already
+  // covered" has to be checked against the bare names actually shown, not
+  // the raw map keys.
+  const coveredNames = new Set(rows.map(r => r.name));
+  const castOnly = stats.spellsCast.filter(n => !coveredNames.has(n));
 
   const s = section(container);
   h3(s, 'Spells, styles &amp; abilities used');
@@ -363,6 +458,9 @@ export function renderSpells(container, stats, ctx) {
       { key: 'totalHits', label: 'Hits', num: true },
       { key: 'crits', label: 'Crits', num: true },
       { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
+      { key: 'ccLanded', label: 'Landed (CC)', num: true, fmt: v => v || 0 },
+      { key: 'resists', label: 'Resists', num: true, fmt: v => v || 0 },
+      { key: 'resistRate', label: 'Resist %', num: true, fmt: v => (v || 0) + '%' },
       { key: 'dmg', label: 'Total dmg/heal', num: true, fmt: fmtExact },
       { key: 'avg', label: 'Avg', num: true },
     ],
