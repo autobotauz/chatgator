@@ -130,14 +130,28 @@ export function buildStats(events, playerNameHint) {
   let pendingWeapon = null;    // last weapon used, for the generic "Melee: <weapon>" bucket
   let lastMeleeLabel = 'Melee'; // bucket key the most recent swing landed in — crit/extra follow-ups reuse it,
                                  // so a style's crit or a spell's "extra damage" line lands on the same row
+  let lastMeleeWeapon = null;   // weapon behind that same swing, for crit/extra follow-up lines
+  // A style name (e.g. "Glowing Blade") replaces the weapon in the bucket
+  // label, so without this the weapon a melee player actually swung with —
+  // which can change fight to fight with a dual-wield/weapon-swap macro —
+  // would disappear once any style is involved. Tracked per bucket since the
+  // same style can, in principle, be thrown with more than one weapon.
+  const dmgOutWeapons = {};
+  function trackWeapon(key, weapon) {
+    if (!weapon) return;
+    if (!dmgOutWeapons[key]) dmgOutWeapons[key] = new Set();
+    dmgOutWeapons[key].add(weapon);
+  }
 
   for (const e of events) {
     switch (e.type) {
       case 'melee_weapon': {
         pendingWeapon = e.weapon;
+        lastMeleeWeapon = e.weapon;
         const key = e.styleName || `Melee: ${e.weapon}`;
         lastMeleeLabel = key;
         bump(dmgOutBySource, key, e.dmg, false);
+        trackWeapon(key, e.weapon);
         totalMeleeHits++; totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
@@ -148,6 +162,8 @@ export function buildStats(events, playerNameHint) {
         // moments ago, that spell's direct-damage result.
         const key = e.spellName || (pendingWeapon ? `Melee: ${pendingWeapon}` : 'Melee');
         lastMeleeLabel = key;
+        if (!e.spellName) { lastMeleeWeapon = pendingWeapon; trackWeapon(key, pendingWeapon); }
+        else lastMeleeWeapon = null;
         bump(dmgOutBySource, key, e.dmg, false);
         totalMeleeHits++; totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
@@ -155,6 +171,7 @@ export function buildStats(events, playerNameHint) {
       }
       case 'melee_extra': {
         bump(dmgOutBySource, lastMeleeLabel, e.dmg, false);
+        trackWeapon(lastMeleeLabel, lastMeleeWeapon);
         totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
@@ -162,6 +179,7 @@ export function buildStats(events, playerNameHint) {
       case 'melee_crit_named':
       case 'melee_crit_generic': {
         bump(dmgOutBySource, lastMeleeLabel, e.dmg, true);
+        trackWeapon(lastMeleeLabel, lastMeleeWeapon);
         totalMeleeCrits++; totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
@@ -306,6 +324,37 @@ export function buildStats(events, playerNameHint) {
     if (e.type === 'resurrected_by') resurrectedCount++;
   }
 
+  // ---- deathblow log (who you killed, and the RP that came from it) --------------
+  // The kill feed ("X was just killed by you in Zone.") never names the RP amount
+  // itself — that's a separate "You get N realm points!" line (plus an optional
+  // guild-buff bonus line) immediately after it. We attribute the nearest
+  // not-yet-claimed RP-gain line(s) within a short window to each deathblow; a
+  // kill with no RP line nearby (rare, but zerg combat logs can interleave
+  // unpredictably) is still listed, just with an unknown RP amount rather than a
+  // guessed one.
+  const DEATHBLOW_RP_WINDOW_MS = 2500;
+  const deathblowLog = [];
+  if (playerName) {
+    const claimedRp = new Set();
+    for (let i = 0; i < events.length; i++) {
+      const e = events[i];
+      if (e.type !== 'kill_feed' || normalizeName(e.killer) !== normalizeName(playerName)) continue;
+      let rp = 0, rpKnown = false;
+      for (let j = i + 1; j < events.length; j++) {
+        const e2 = events[j];
+        if (e2.clock == null || e.clock == null || e2.clock - e.clock > DEATHBLOW_RP_WINDOW_MS) break;
+        if (e2.type === 'kill_feed') break; // the next kill's own reward starts here
+        if ((e2.type === 'rp_plain' || e2.type === 'rp_reason' || e2.type === 'rp_bonus') && !claimedRp.has(j)) {
+          rp += e2.amount;
+          rpKnown = true;
+          claimedRp.add(j);
+        }
+      }
+      deathblowLog.push({ victim: e.victim, zone: e.zone, clock: e.clock, rp, rpKnown });
+    }
+  }
+  const deathblowRpTotal = deathblowLog.reduce((a, d) => a + (d.rpKnown ? d.rp : 0), 0);
+
   // ---- spans / DPS/HPS -----------------------------------------------------------
   const clocks = events.map(e => e.clock).filter(x => x != null);
   const startClock = clocks.length ? Math.min(...clocks) : null;
@@ -316,6 +365,11 @@ export function buildStats(events, playerNameHint) {
   const totalDmgOut = sumVals(dmgOutBySource) + sumPetDmg(petStats);
   const totalDmgIn = sumVals(dmgInBySource);
 
+  const dmgOutBySourceFinal = finalizeSourceMap(dmgOutBySource);
+  for (const [key, weapons] of Object.entries(dmgOutWeapons)) {
+    if (dmgOutBySourceFinal[key]) dmgOutBySourceFinal[key].weapon = Array.from(weapons).join(' / ');
+  }
+
   return {
     meta: {
       playerName, startClock, endClock, durationMs,
@@ -324,7 +378,7 @@ export function buildStats(events, playerNameHint) {
     },
     damageOut: {
       total: totalDmgOut,
-      bySource: finalizeSourceMap(dmgOutBySource),
+      bySource: dmgOutBySourceFinal,
       dps: durationSec ? +(totalDmgOut / durationSec).toFixed(1) : 0,
       melee: { hits: totalMeleeHits, crits: totalMeleeCrits, misses: totalMeleeMisses, dmg: totalMeleeDmg,
         critRate: (totalMeleeHits + totalMeleeCrits) ? +(100 * totalMeleeCrits / (totalMeleeHits + totalMeleeCrits)).toFixed(1) : 0 },
@@ -368,7 +422,7 @@ export function buildStats(events, playerNameHint) {
       perHour: durationSec ? +(rpTotal / (durationSec / 3600)).toFixed(0) : 0,
       timeline: bucketTimeline(rpPoints, startClock, endClock),
     },
-    kills: { deathblows, deaths, resurrectedCount, killVictims },
+    kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal },
     spellsCast: Array.from(castNames),
   };
 }

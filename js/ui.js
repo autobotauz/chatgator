@@ -3,7 +3,7 @@
 // Every render function clears its container first, so panels can be
 // re-rendered freely when the user switches encounters.
 
-import { statTile, barChart, legend, timelineChart, fmtNum, fmtExact, seriesColor } from './charts.js';
+import { statTile, barChart, legend, timelineChart, fmtNum, fmtExact, fmtClock, seriesColor } from './charts.js';
 import { describeSkill } from './skills.js';
 
 function clear(el) { el.innerHTML = ''; }
@@ -123,6 +123,7 @@ export function renderDamage(container, stats, ctx) {
   dataTable(outCard, {
     columns: [
       { key: 'name', label: 'Source' },
+      { key: 'weapon', label: 'Weapon', fmt: v => v || '—' },
       { key: 'totalHits', label: 'Hits', num: true },
       { key: 'crits', label: 'Crits', num: true },
       { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
@@ -299,6 +300,30 @@ export function renderRealm(container, stats, ctx) {
   const byCard = card(bySec);
   const items = Object.entries(rp.byReason).map(([label, value]) => ({ label, value }));
   barChart(byCard, { items, colorFn: (_, i) => seriesColor(i) });
+
+  const dbSec = section(container);
+  h3(dbSec, 'Deathblows');
+  const dbCard = card(dbSec);
+  const log = stats.kills.deathblowLog || [];
+  if (!log.length) {
+    dbCard.innerHTML = `<p class="sub" style="margin:0">No deathblows credited to you in this view (the log only shows a kill as yours when the kill-feed line names you as the killer).</p>`;
+  } else {
+    dbCard.innerHTML = `<p class="sub" style="margin:0 0 10px">${fmtExact(log.length)} deathblow${log.length === 1 ? '' : 's'} · ${fmtExact(stats.kills.deathblowRpTotal)} RP attributed to them (the realm-point line right after a kill isn't addressed to a name, so this matches it by timing and can miss or misattribute during heavy, simultaneous zerg kills).</p>`;
+    dataTable(dbCard, {
+      columns: [
+        { key: 'time', label: 'Time' },
+        { key: 'victim', label: 'Killed' },
+        { key: 'zone', label: 'Zone' },
+        { key: 'rp', label: 'RP', num: true },
+      ],
+      rows: log.slice().reverse().map(d => ({
+        time: fmtClock(d.clock, true),
+        victim: d.victim,
+        zone: d.zone || '—',
+        rp: d.rpKnown ? fmtExact(d.rp) : '—',
+      })),
+    });
+  }
 }
 
 // ===========================================================================
@@ -333,6 +358,7 @@ export function renderSpells(container, stats, ctx) {
     columns: [
       { key: 'name', label: 'Name' },
       { key: 'role', label: 'Role' },
+      { key: 'weapon', label: 'Weapon', fmt: v => v || '—' },
       { key: 'info', label: 'Type' },
       { key: 'totalHits', label: 'Hits', num: true },
       { key: 'crits', label: 'Crits', num: true },

@@ -58,17 +58,27 @@ el('btnSample').addEventListener('click', () => {
   ingestTexts([{ name: 'sample.log', text: SAMPLE_LOG_TEXT }]);
 });
 
-el('btnLoadAnother').addEventListener('click', () => {
+el('btnLoadAnother').addEventListener('click', startNewSession);
+
+function startNewSession() {
   stopWatching();
   el('appMain').hidden = true;
   el('dropzoneSection').hidden = false;
-  state.rawEvents = []; state.unmatched = []; state.encounters = [];
-});
+  el('btnLoadAnother').hidden = true;
+  el('btnDownloadSnapshot').hidden = true;
+  state.rawEvents = []; state.unmatched = []; state.encounters = []; state.scope = 'all';
+}
 
 if (isWatchSupported()) {
   el('btnWatch').hidden = false;
   el('btnWatch').addEventListener('click', startWatch);
+  el('btnWatchHeader').hidden = false;
+  el('btnWatchHeader').addEventListener('click', () => {
+    if (state.watcher) stopWatching(); else startWatch();
+  });
 }
+
+el('btnDownloadSnapshot').addEventListener('click', downloadSnapshot);
 
 async function loadFiles(files) {
   const texts = [];
@@ -107,6 +117,8 @@ function ingestTexts(fileTexts) {
 
   el('dropzoneSection').hidden = true;
   el('appMain').hidden = false;
+  el('btnLoadAnother').hidden = false;
+  el('btnDownloadSnapshot').hidden = false;
 
   buildEncounterSelect();
   renderActiveTab();
@@ -236,6 +248,7 @@ async function startWatch() {
     el('watchStatus').hidden = false;
     el('watchDot').classList.add('live');
     el('watchLabel').textContent = 'Watching live — keep this tab open';
+    if (isWatchSupported()) el('btnWatchHeader').textContent = '⏹ Stop watching';
   } catch (err) {
     if (err && err.name !== 'AbortError') console.warn('[chatgator] could not start watch mode', err);
   }
@@ -244,4 +257,61 @@ function stopWatching() {
   if (state.watcher) { state.watcher.stop(); state.watcher = null; }
   el('watchStatus').hidden = true;
   el('watchDot').classList.remove('live');
+  if (isWatchSupported()) el('btnWatchHeader').textContent = 'Watch a live log file…';
+}
+
+// ---------------------------------------------------------------------------
+// Download snapshot — saves the currently-viewed stats as a JSON file so a
+// session's parse can be kept/shared without re-uploading the raw chat.log.
+// ---------------------------------------------------------------------------
+function downloadSnapshot() {
+  if (!state.rawEvents.length) return;
+  const stats = currentStats();
+  const scopeLabel = state.scope === 'all'
+    ? 'all encounters combined'
+    : (() => {
+        const enc = state.encounters.find(e => String(e.id) === String(state.scope));
+        return enc ? `encounter starting ${fmtClock(enc.start, true)}` : String(state.scope);
+      })();
+  const snapshot = {
+    tool: 'Chat Gator',
+    exportedAt: new Date().toISOString(), // real wall-clock time of this export, not a log timestamp
+    scope: scopeLabel,
+    player: stats.meta.playerName || null,
+    officialStatsSnapshot: stats.meta.latestSnapshot || null,
+    summary: {
+      damageDone: stats.damageOut.total,
+      dps: stats.damageOut.dps,
+      healingDone: stats.healOut.total,
+      hps: stats.healOut.hps,
+      damageTaken: stats.damageIn.total,
+      dtps: stats.damageIn.dtps,
+      realmPoints: stats.realmPoints.total,
+      rpPerHour: stats.realmPoints.perHour,
+      deathblows: stats.kills.deathblows,
+      deaths: stats.kills.deaths,
+    },
+    damageDoneBySource: stats.damageOut.bySource,
+    damageTakenBySource: stats.damageIn.bySource,
+    healingDoneBySpell: stats.healOut.bySpell,
+    healingDoneByTarget: stats.healOut.byTarget,
+    healingReceivedBySource: stats.healIn.bySource,
+    pets: stats.pets,
+    defense: stats.defense,
+    realmPointsByReason: stats.realmPoints.byReason,
+    deathblowLog: stats.kills.deathblowLog,
+    deathblowRpTotal: stats.kills.deathblowRpTotal,
+    spellsCast: stats.spellsCast,
+  };
+  const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const namePart = (stats.meta.playerName || 'session').replace(/[^a-z0-9_-]+/gi, '_');
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  a.href = url;
+  a.download = `chatgator-${namePart}-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
