@@ -1,5 +1,5 @@
 import { parseLogText } from './parser.js';
-import { buildStats, segmentEncounters } from './aggregate.js';
+import { buildStats, segmentEncounters, getBgBroadcasts } from './aggregate.js';
 import { renderers } from './ui.js';
 import { loadSkillIndex } from './skills.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
@@ -67,6 +67,7 @@ function startNewSession() {
   el('btnLoadAnother').hidden = true;
   el('btnDownloadSnapshot').hidden = true;
   el('snapshotPill').hidden = true;
+  el('bgTicker').hidden = true;
   state.rawEvents = []; state.unmatched = []; state.encounters = []; state.scope = 'all'; state.isSnapshot = false;
 }
 
@@ -261,6 +262,7 @@ document.querySelectorAll('.tab').forEach(btn => {
 function renderActiveTab() {
   if (!state.rawEvents.length) return;
   const stats = currentStats();
+  renderBgTicker();
 
   el('characterName').textContent = stats.meta.playerName ? `👤 ${stats.meta.playerName}` : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
   const encLabel = state.scope === 'all'
@@ -280,6 +282,36 @@ function renderActiveTab() {
       unmatched: state.unmatched,
       eventCount: scopeEventCount,
     });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// /bg center broadcast ticker — persistent across every tab, always built
+// from the *whole* session (state.rawEvents), independent of the encounter
+// picker, so it keeps showing the latest callout no matter which encounter
+// or tab you're looking at.
+// ---------------------------------------------------------------------------
+const BG_TICKER_LIMIT = 3;
+
+function renderBgTicker() {
+  const broadcasts = getBgBroadcasts(state.rawEvents).slice(0, BG_TICKER_LIMIT);
+  const ticker = el('bgTicker');
+  const list = el('bgTickerList');
+  list.innerHTML = '';
+  if (!broadcasts.length) { ticker.hidden = true; return; }
+  ticker.hidden = false;
+  for (const b of broadcasts) {
+    const li = document.createElement('li');
+    const time = document.createElement('span');
+    time.className = 'bg-ticker-time';
+    time.textContent = b.clock != null ? fmtClock(b.clock, true) : '';
+    const text = document.createElement('span');
+    text.className = 'bg-ticker-text';
+    text.textContent = b.count > 1 ? `${b.text} (×${b.count})` : b.text;
+    text.title = b.text;
+    li.appendChild(time);
+    li.appendChild(text);
+    list.appendChild(li);
   }
 }
 

@@ -41,6 +41,26 @@ export function segmentEncounters(events) {
   }));
 }
 
+// "Last N distinct messages" per the user's call: a leader often spams the
+// same /bg center line several times in a row (or across a whole fight), so
+// showing every raw occurrence would just repeat one message instead of
+// surfacing what's actually new. We keep insertion order by *last* seen
+// occurrence, so a message that gets repeated again later bubbles back to
+// the front rather than staying stuck at its first appearance. This is
+// exported standalone (not only reached via buildStats) so the header
+// ticker can show the latest broadcasts for the whole session regardless
+// of which encounter/tab is currently selected.
+export function getBgBroadcasts(events) {
+  const map = new Map(); // text -> { text, clock, count }
+  for (const e of events) {
+    if (e.type !== 'bg_broadcast') continue;
+    const existing = map.get(e.text);
+    if (existing) { existing.clock = e.clock; existing.count++; }
+    else map.set(e.text, { text: e.text, clock: e.clock, count: 1 });
+  }
+  return [...map.values()].sort((a, b) => (b.clock ?? 0) - (a.clock ?? 0));
+}
+
 function emptySourceStat() {
   return { hits: 0, crits: 0, dmg: 0, critDmg: 0, min: null, max: 0, misses: 0, resists: 0 };
 }
@@ -381,6 +401,9 @@ export function buildStats(events, playerNameHint) {
   }
   const deathblowRpTotal = deathblowLog.reduce((a, d) => a + (d.rpKnown ? d.rp : 0), 0);
 
+  // ---- /bg center broadcasts ----------------------------------------------
+  const bgBroadcasts = getBgBroadcasts(events);
+
   // ---- spans / DPS/HPS -----------------------------------------------------------
   const clocks = events.map(e => e.clock).filter(x => x != null);
   const startClock = clocks.length ? Math.min(...clocks) : null;
@@ -490,6 +513,7 @@ export function buildStats(events, playerNameHint) {
     },
     kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal },
     spellsCast: Array.from(castNames),
+    bgBroadcasts,
   };
 }
 
