@@ -66,7 +66,8 @@ function startNewSession() {
   el('dropzoneSection').hidden = false;
   el('btnLoadAnother').hidden = true;
   el('btnDownloadSnapshot').hidden = true;
-  state.rawEvents = []; state.unmatched = []; state.encounters = []; state.scope = 'all';
+  el('snapshotPill').hidden = true;
+  state.rawEvents = []; state.unmatched = []; state.encounters = []; state.scope = 'all'; state.isSnapshot = false;
 }
 
 if (isWatchSupported()) {
@@ -81,6 +82,16 @@ if (isWatchSupported()) {
 el('btnDownloadSnapshot').addEventListener('click', downloadSnapshot);
 
 async function loadFiles(files) {
+  // A shared snapshot (exported via "Download snapshot") is a .json file —
+  // route it to its own importer instead of trying to parse it as a chat.log.
+  // Mixing a snapshot with raw logs in one drop isn't a meaningful merge
+  // (its event clocks belong to a different parse session), so a snapshot
+  // present in the drop wins and anything else in that drop is ignored.
+  const jsonFile = files.find(f => /\.json$/i.test(f.name));
+  if (jsonFile) {
+    await loadSnapshotFile(jsonFile);
+    return;
+  }
   const texts = [];
   for (const file of files) {
     const buf = await file.arrayBuffer();
@@ -88,6 +99,53 @@ async function loadFiles(files) {
     texts.push({ name: file.name, text });
   }
   ingestTexts(texts);
+}
+
+// ---------------------------------------------------------------------------
+// Snapshot import — load a session someone else exported with "Download
+// snapshot" and shared with you as a .json file. This is a static upload,
+// not live: it replays their already-parsed events through the same
+// stats/UI pipeline a freshly-parsed log would use, so you get full
+// encounter switching and sortable tables, just no "watch live" (there's no
+// real file behind it to tail).
+// ---------------------------------------------------------------------------
+async function loadSnapshotFile(file) {
+  let data;
+  try {
+    data = JSON.parse(await file.text());
+  } catch {
+    alert('That file isn\'t valid JSON — expected a Chat Gator snapshot exported with "Download snapshot".');
+    return;
+  }
+  if (!data || data.tool !== 'Chat Gator' || !Array.isArray(data.events)) {
+    alert('That JSON file doesn\'t look like a Chat Gator session snapshot (missing "events").');
+    return;
+  }
+  ingestSnapshotEvents(data);
+}
+
+function ingestSnapshotEvents(data) {
+  stopWatching();
+  state.rawEvents = data.events.slice().sort((a, b) => (a.clock ?? 0) - (b.clock ?? 0));
+  state.unmatched = []; // the original log's unmatched lines weren't carried in the export
+  state.encounters = segmentEncounters(state.rawEvents);
+  state.scope = 'all';
+  state.isSnapshot = true;
+
+  el('dropzoneSection').hidden = true;
+  el('appMain').hidden = false;
+  el('btnLoadAnother').hidden = false;
+  el('btnDownloadSnapshot').hidden = false;
+  el('btnWatchHeader').hidden = true; // no live file handle behind an imported snapshot
+  el('snapshotPill').hidden = false;
+  el('snapshotPill').title = data.exportedAt
+    ? `Imported snapshot · exported ${new Date(data.exportedAt).toLocaleString()}${data.player ? ` · ${data.player}` : ''}`
+    : 'Imported snapshot';
+
+  buildEncounterSelect();
+  renderActiveTab();
+
+  loadSkillIndex().then((map) => { state.skillMap = map; renderActiveTab(); });
 }
 
 // DAoC chat.log files are typically Windows-1252 (not UTF-8) — a straight
@@ -114,11 +172,14 @@ function ingestTexts(fileTexts) {
   state.unmatched = allUnmatched;
   state.encounters = segmentEncounters(allEvents);
   state.scope = 'all';
+  state.isSnapshot = false;
 
   el('dropzoneSection').hidden = true;
   el('appMain').hidden = false;
   el('btnLoadAnother').hidden = false;
   el('btnDownloadSnapshot').hidden = false;
+  el('snapshotPill').hidden = true;
+  if (isWatchSupported()) el('btnWatchHeader').hidden = false;
 
   buildEncounterSelect();
   renderActiveTab();
@@ -273,8 +334,15 @@ function downloadSnapshot() {
         const enc = state.encounters.find(e => String(e.id) === String(state.scope));
         return enc ? `encounter starting ${fmtClock(enc.start, true)}` : String(state.scope);
       })();
+  // The events for whatever scope is currently selected — this is what lets
+  // someone else's upload of this file reconstruct the full session (encounter
+  // switching, sortable tables, everything), not just a flat summary.
+  const scopeEvents = state.scope === 'all'
+    ? state.rawEvents
+    : (state.encounters.find(e => String(e.id) === String(state.scope))?.events || state.rawEvents);
   const snapshot = {
     tool: 'Chat Gator',
+    format: 'chatgator-session-v1',
     exportedAt: new Date().toISOString(), // real wall-clock time of this export, not a log timestamp
     scope: scopeLabel,
     player: stats.meta.playerName || null,
@@ -302,14 +370,19 @@ function downloadSnapshot() {
     deathblowLog: stats.kills.deathblowLog,
     deathblowRpTotal: stats.kills.deathblowRpTotal,
     spellsCast: stats.spellsCast,
+    // Raw events for this scope — re-uploading this file replays them through
+    // the same stats pipeline a freshly-parsed log would use.
+    events: scopeEvents,
   };
   const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const namePart = (stats.meta.playerName || 'session').replace(/[^a-z0-9_-]+/gi, '_');
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
   a.href = url;
-  a.download = `chatgator-${namePart}-${stamp}.json`;
+  a.download = `${namePart}_${stamp}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();

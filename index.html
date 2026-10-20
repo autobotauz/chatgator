@@ -28,14 +28,14 @@
   <section id="dropzoneSection">
     <div class="dropzone" id="dropzone">
       <h2>Drop your DAoC chat.log here</h2>
-      <p>Or pick a file, pick several at once, or try a sample log first.</p>
+      <p>Or pick a file, pick several at once, or try a sample log first — or drop a <code>.json</code> snapshot someone shared with you to view their session.</p>
       <div class="actions">
         <button class="btn primary" id="btnPickFile">Choose file(s)</button>
         <button class="btn" id="btnWatch" hidden>Watch a live log file…</button>
         <button class="btn" id="btnSample">Try a sample log</button>
       </div>
-      <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt" multiple>
-      <p class="privacy">Everything happens on your machine — your log is parsed in this browser tab and is never uploaded to any server. "Watch a live log file" uses your browser's File System Access API so you can point it at your actual <code>chat.log</code> and see stats update as you play (Chrome/Edge only; other browsers can just re-drop the file).</p>
+      <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt,.json" multiple>
+      <p class="privacy">Everything happens on your machine — your log is parsed in this browser tab and is never uploaded to any server. "Watch a live log file" uses your browser's File System Access API so you can point it at your actual <code>chat.log</code> and see stats update as you play (Chrome/Edge only; other browsers can just re-drop the file). Use "⬇ Download snapshot" to save a session as a <code>.json</code> file you can send to someone else — they can drop it right back in here to see it.</p>
     </div>
   </section>
 
@@ -46,6 +46,7 @@
       <select id="encounterSelect"></select>
       <span class="meta" id="encounterMeta"></span>
       <span class="meta" id="officialStatsNote"></span>
+      <span class="pill" id="snapshotPill" hidden title="">📦 Imported snapshot</span>
     </div>
 
     <nav class="tabbar">
