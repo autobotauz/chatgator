@@ -1,0 +1,369 @@
+// aggregate.js — turns the flat event list from parser.js into the stats
+// object the UI/charts consume. Also splits the log into discrete
+// "encounters" (bursts of activity separated by quiet gaps) so a single
+// multi-hour chat.log can be viewed as a set of individual fights, the way
+// a live meter would show one fight at a time.
+
+const ENCOUNTER_GAP_MS = 20000; // a 20s silence ends one encounter and starts the next
+const COMBAT_TYPES = new Set([
+  'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
+  'ability_hit', 'ability_crit', 'cast', 'cast_begin',
+  'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost',
+  'incoming_dmg', 'incoming_crit', 'incoming_extra',
+  'heal_out', 'heal_out_crit', 'heal_in',
+  'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in',
+  'resist_named', 'resist_generic',
+  'rp_bonus', 'rp_reason', 'rp_plain',
+  'kill_feed', 'resurrected_by', 'you_died',
+]);
+
+export function segmentEncounters(events) {
+  const timed = events.filter(e => e.clock != null && COMBAT_TYPES.has(e.type));
+  if (!timed.length) return [];
+  const segments = [];
+  let cur = [timed[0]];
+  for (let i = 1; i < timed.length; i++) {
+    const gap = timed[i].clock - timed[i - 1].clock;
+    if (gap > ENCOUNTER_GAP_MS) {
+      segments.push(cur);
+      cur = [];
+    }
+    cur.push(timed[i]);
+  }
+  if (cur.length) segments.push(cur);
+  return segments.map((evs, idx) => ({
+    id: idx,
+    start: evs[0].clock,
+    end: evs[evs.length - 1].clock,
+    durationMs: Math.max(1000, evs[evs.length - 1].clock - evs[0].clock),
+    events: evs,
+  }));
+}
+
+function emptySourceStat() {
+  return { hits: 0, crits: 0, dmg: 0, critDmg: 0, min: null, max: 0, misses: 0, resists: 0 };
+}
+
+function bump(map, key, dmg, isCrit) {
+  if (!map[key]) map[key] = emptySourceStat();
+  const s = map[key];
+  if (isCrit) { s.crits++; s.critDmg += dmg; }
+  else { s.hits++; }
+  s.dmg += dmg;
+  if (s.min == null || dmg < s.min) s.min = dmg;
+  if (dmg > s.max) s.max = dmg;
+  return s;
+}
+
+function finalizeSourceMap(map) {
+  const out = {};
+  for (const [name, s] of Object.entries(map)) {
+    const totalHits = s.hits + s.crits;
+    out[name] = {
+      ...s,
+      totalHits,
+      avg: totalHits ? Math.round(s.dmg / totalHits) : 0,
+      critRate: totalHits ? +(100 * s.crits / totalHits).toFixed(1) : 0,
+    };
+  }
+  return out;
+}
+
+function bucketTimeline(points, startClock, endClock, buckets = 40) {
+  if (!points.length || endClock <= startClock) return [];
+  const span = endClock - startClock;
+  const size = Math.max(1000, span / buckets);
+  const arr = new Array(Math.ceil(span / size) + 1).fill(0).map((_, i) => ({ t: startClock + i * size, v: 0 }));
+  for (const p of points) {
+    const idx = Math.min(arr.length - 1, Math.floor((p.clock - startClock) / size));
+    if (idx >= 0) arr[idx].v += p.amount;
+  }
+  return arr;
+}
+
+export function buildStats(events, playerNameHint) {
+  // ---- pet-name discovery ------------------------------------------------
+  const petNames = new Set();
+  for (const e of events) {
+    if (e.type === 'pet_summon' || e.type === 'pet_command' || e.type === 'pet_melee' ||
+        e.type === 'pet_melee_stray' || e.type === 'pet_hit' || e.type === 'pet_self_heal' || e.type === 'pet_lost') {
+      petNames.add(e.pet);
+    }
+  }
+
+  // ---- /stats snapshots (most recent wins) --------------------------------
+  let playerName = playerNameHint || null;
+  const statsSnapshots = [];
+  let curSnap = null;
+  for (const e of events) {
+    if (e.type === 'stats_header') { curSnap = { player: e.player }; statsSnapshots.push(curSnap); playerName = playerName || e.player; }
+    else if (curSnap) {
+      if (e.type === 'stats_total_rp') curSnap.totalRP = e.value;
+      else if (e.type === 'stats_deathblows') curSnap.deathblows = e.value;
+      else if (e.type === 'stats_solo_kills') curSnap.soloKills = e.value;
+      else if (e.type === 'stats_deaths') curSnap.deaths = e.value;
+      else if (e.type === 'stats_hp_healed') { curSnap.hpHealed = e.hp; curSnap.rpFromHeal = e.rp; }
+      else if (e.type === 'stats_rez') curSnap.resurrections = e.value;
+      else if (e.type === 'stats_online') curSnap.onlineTime = e.text;
+      else if (e.type === 'stats_rp_hour') curSnap.rpPerHour = e.value;
+      else if (e.type === 'stats_kpd') curSnap.killsPerDeath = e.value;
+      else if (e.type === 'stats_rpk') curSnap.rpPerKill = e.value;
+      else if (e.type === 'stats_standing') curSnap.standing = e.value;
+    }
+  }
+  const latestSnapshot = statsSnapshots[statsSnapshots.length - 1] || null;
+
+  // ---- spells cast (for Spell vs Style/Ability tagging) -------------------
+  const castNames = new Set();
+  for (const e of events) if (e.type === 'cast') castNames.add(e.name);
+
+  // ---- damage out -----------------------------------------------------------
+  const dmgOutBySource = {};
+  const dmgOutPoints = [];
+  const petStats = {}; // name -> { dmg, heals, hits, crits, bySource:{} }
+  function petBucket(name) {
+    if (!petStats[name]) petStats[name] = { dmg: 0, heals: 0, hits: 0, crits: 0, bySource: {} };
+    return petStats[name];
+  }
+
+  let totalMeleeHits = 0, totalMeleeCrits = 0, totalMeleeMisses = 0, totalMeleeDmg = 0;
+  let pendingWeapon = null; // last weapon used, for "You hit X for N extra damage!" follow-ups
+
+  for (const e of events) {
+    switch (e.type) {
+      case 'melee_weapon': {
+        bump(dmgOutBySource, `Melee: ${e.weapon}`, e.dmg, false);
+        totalMeleeHits++; totalMeleeDmg += e.dmg;
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        pendingWeapon = e.weapon;
+        break;
+      }
+      case 'melee_plain': {
+        const key = pendingWeapon ? `Melee: ${pendingWeapon}` : 'Melee';
+        bump(dmgOutBySource, key, e.dmg, false);
+        totalMeleeHits++; totalMeleeDmg += e.dmg;
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+      case 'melee_extra': {
+        const key = pendingWeapon ? `Melee: ${pendingWeapon} (style)` : 'Melee (style)';
+        bump(dmgOutBySource, key, e.dmg, false);
+        totalMeleeDmg += e.dmg;
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+      case 'melee_crit_named':
+      case 'melee_crit_generic': {
+        const key = pendingWeapon ? `Melee: ${pendingWeapon}` : 'Melee';
+        bump(dmgOutBySource, key, e.dmg, true);
+        totalMeleeCrits++; totalMeleeDmg += e.dmg;
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+      case 'you_miss': totalMeleeMisses++; break;
+
+      case 'ability_hit': {
+        if (petNames.has(e.name)) {
+          const p = petBucket(e.name); p.dmg += e.dmg; p.hits++;
+          bump(p.bySource, e.name, e.dmg, false);
+        } else {
+          bump(dmgOutBySource, e.name, e.dmg, false);
+        }
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+      case 'ability_crit': {
+        if (petNames.has(e.name)) {
+          const p = petBucket(e.name); p.dmg += e.dmg; p.crits++;
+          bump(p.bySource, e.name, e.dmg, true);
+        } else {
+          bump(dmgOutBySource, e.name, e.dmg, true);
+        }
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+
+      case 'pet_melee': {
+        const p = petBucket(e.pet); p.dmg += e.dmg; p.hits++;
+        bump(p.bySource, 'Melee', e.dmg, false);
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+      case 'pet_melee_stray': {
+        const p = petBucket(e.pet); p.dmg += e.dmg; p.hits++;
+        bump(p.bySource, 'Melee (stray)', e.dmg, false);
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+      case 'pet_hit': {
+        const p = petBucket(e.pet); p.dmg += e.dmg; p.hits++;
+        bump(p.bySource, 'Proc', e.dmg, false);
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+      case 'pet_self_heal': {
+        const p = petBucket(e.pet); p.heals += e.amount;
+        break;
+      }
+      default: break;
+    }
+  }
+
+  // ---- damage in --------------------------------------------------------------
+  const dmgInBySource = {};
+  const dmgInPoints = [];
+  const normAttacker = (name) => (name === 'Damage' ? 'Damage over time (unattributed)' : name);
+  for (const e of events) {
+    if (e.type === 'incoming_dmg' || e.type === 'incoming_extra') {
+      bump(dmgInBySource, normAttacker(e.attacker), e.dmg, false);
+      dmgInPoints.push({ clock: e.clock, amount: e.dmg });
+    } else if (e.type === 'incoming_crit') {
+      bump(dmgInBySource, normAttacker(e.attacker), e.dmg, true);
+      dmgInPoints.push({ clock: e.clock, amount: e.dmg });
+    }
+  }
+
+  // ---- healing out / in --------------------------------------------------------
+  const healOutByTarget = {};
+  const healOutPoints = [];
+  let healOutTotal = 0, healOutHits = 0, healOutCrits = 0;
+  for (const e of events) {
+    if (e.type === 'heal_out') {
+      bump(healOutByTarget, e.target, e.amount, false);
+      healOutTotal += e.amount; healOutHits++;
+      healOutPoints.push({ clock: e.clock, amount: e.amount });
+    } else if (e.type === 'heal_out_crit') {
+      bump(healOutByTarget, e.target, e.amount, true);
+      healOutTotal += e.amount; healOutCrits++;
+      healOutPoints.push({ clock: e.clock, amount: e.amount });
+    }
+  }
+  const healInBySource = {};
+  const healInPoints = [];
+  let healInTotal = 0;
+  for (const e of events) {
+    if (e.type === 'heal_in') {
+      bump(healInBySource, e.healer, e.amount, false);
+      healInTotal += e.amount;
+      healInPoints.push({ clock: e.clock, amount: e.amount });
+    }
+  }
+
+  // ---- defense (your mitigation of incoming attacks) ---------------------------
+  let blocks = 0, youParries = 0, youEvades = 0, enemyParriedYou = 0, enemyEvadedYou = 0, enemyBlockedYou = 0;
+  let resistCount = 0;
+  const resistBySource = {};
+  for (const e of events) {
+    if (e.type === 'block') blocks++;
+    else if (e.type === 'you_parry') youParries++;
+    else if (e.type === 'you_evade') youEvades++;
+    else if (e.type === 'parry_in') enemyParriedYou++;
+    else if (e.type === 'evade_in') enemyEvadedYou++;
+    else if (e.type === 'block_in') enemyBlockedYou++;
+    else if (e.type === 'resist_generic' || e.type === 'resist_named') {
+      resistCount++;
+      const key = e.source || 'Unknown';
+      resistBySource[key] = (resistBySource[key] || 0) + 1;
+    }
+  }
+  const incomingHitsLanded = Object.values(dmgInBySource).reduce((a, s) => a + s.hits + s.crits, 0);
+  const totalIncomingAttackAttempts = blocks + youParries + youEvades + incomingHitsLanded;
+
+  // ---- realm points --------------------------------------------------------------
+  let rpTotal = 0, rpBonusTotal = 0;
+  const rpByReason = {};
+  const rpPoints = [];
+  for (const e of events) {
+    if (e.type === 'rp_plain' || e.type === 'rp_reason') {
+      rpTotal += e.amount;
+      const key = e.reason || 'Kill / assist';
+      rpByReason[key] = (rpByReason[key] || 0) + e.amount;
+      rpPoints.push({ clock: e.clock, amount: e.amount });
+    } else if (e.type === 'rp_bonus') {
+      rpTotal += e.amount; rpBonusTotal += e.amount;
+      rpByReason["Guild buff"] = (rpByReason["Guild buff"] || 0) + e.amount;
+      rpPoints.push({ clock: e.clock, amount: e.amount });
+    }
+  }
+
+  // ---- kills / deaths ------------------------------------------------------------
+  let deathblows = 0, deaths = 0, resurrectedCount = 0;
+  const killVictims = [];
+  for (const e of events) {
+    if (e.type === 'kill_feed' && playerName) {
+      if (normalizeName(e.killer) === normalizeName(playerName)) { deathblows++; killVictims.push(e.victim); }
+      if (normalizeName(e.victim) === normalizeName(playerName)) deaths++;
+    }
+    if (e.type === 'resurrected_by') resurrectedCount++;
+  }
+
+  // ---- spans / DPS/HPS -----------------------------------------------------------
+  const clocks = events.map(e => e.clock).filter(x => x != null);
+  const startClock = clocks.length ? Math.min(...clocks) : null;
+  const endClock = clocks.length ? Math.max(...clocks) : null;
+  const durationMs = (startClock != null && endClock != null) ? Math.max(1000, endClock - startClock) : 1000;
+  const durationSec = durationMs / 1000;
+
+  const totalDmgOut = sumVals(dmgOutBySource) + sumPetDmg(petStats);
+  const totalDmgIn = sumVals(dmgInBySource);
+
+  return {
+    meta: {
+      playerName, startClock, endClock, durationMs,
+      statsSnapshots, latestSnapshot,
+      petNames: Array.from(petNames),
+    },
+    damageOut: {
+      total: totalDmgOut,
+      bySource: finalizeSourceMap(dmgOutBySource),
+      dps: durationSec ? +(totalDmgOut / durationSec).toFixed(1) : 0,
+      melee: { hits: totalMeleeHits, crits: totalMeleeCrits, misses: totalMeleeMisses, dmg: totalMeleeDmg,
+        critRate: (totalMeleeHits + totalMeleeCrits) ? +(100 * totalMeleeCrits / (totalMeleeHits + totalMeleeCrits)).toFixed(1) : 0 },
+      timeline: bucketTimeline(dmgOutPoints, startClock, endClock),
+    },
+    damageIn: {
+      total: totalDmgIn,
+      bySource: finalizeSourceMap(dmgInBySource),
+      dtps: durationSec ? +(totalDmgIn / durationSec).toFixed(1) : 0,
+      timeline: bucketTimeline(dmgInPoints, startClock, endClock),
+    },
+    healOut: {
+      total: healOutTotal,
+      hits: healOutHits, crits: healOutCrits,
+      critRate: (healOutHits + healOutCrits) ? +(100 * healOutCrits / (healOutHits + healOutCrits)).toFixed(1) : 0,
+      byTarget: finalizeSourceMap(healOutByTarget),
+      hps: durationSec ? +(healOutTotal / durationSec).toFixed(1) : 0,
+      timeline: bucketTimeline(healOutPoints, startClock, endClock),
+    },
+    healIn: {
+      total: healInTotal,
+      bySource: finalizeSourceMap(healInBySource),
+      timeline: bucketTimeline(healInPoints, startClock, endClock),
+    },
+    pets: {
+      byPet: Object.fromEntries(Object.entries(petStats).map(([k, v]) => [k, { ...v, bySource: finalizeSourceMap(v.bySource) }])),
+      combinedDmg: sumPetDmg(petStats),
+      combinedHeals: Object.values(petStats).reduce((a, p) => a + p.heals, 0),
+    },
+    defense: {
+      blocks, youParries, youEvades, enemyParriedYou, enemyEvadedYou, enemyBlockedYou, resistCount,
+      resistBySource,
+      totalIncomingAttackAttempts,
+      blockRate: pct(blocks, totalIncomingAttackAttempts),
+      parryRate: pct(youParries, totalIncomingAttackAttempts),
+      evadeRate: pct(youEvades, totalIncomingAttackAttempts),
+    },
+    realmPoints: {
+      total: rpTotal, bonusTotal: rpBonusTotal, byReason: rpByReason,
+      perHour: durationSec ? +(rpTotal / (durationSec / 3600)).toFixed(0) : 0,
+      timeline: bucketTimeline(rpPoints, startClock, endClock),
+    },
+    kills: { deathblows, deaths, resurrectedCount, killVictims },
+    spellsCast: Array.from(castNames),
+  };
+}
+
+function sumVals(map) { return Object.values(map).reduce((a, s) => a + s.dmg, 0); }
+function sumPetDmg(petStats) { return Object.values(petStats).reduce((a, p) => a + p.dmg, 0); }
+function pct(n, total) { return total ? +(100 * n / total).toFixed(1) : 0; }
+function normalizeName(s) { return (s || '').trim().toLowerCase(); }

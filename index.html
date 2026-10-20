@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat Gator — DAoC Combat Log Parser</title>
+<meta name="description" content="Upload a Dark Age of Camelot chat.log and get a damage/heal meter, spell breakdowns, crit rates, pets, and realm points — entirely in your browser, nothing is uploaded.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐊</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="app-header">
+    <div class="app-title">
+      <h1>🐊 Chat Gator</h1>
+      <span class="tag">static · runs 100% in your browser</span>
+    </div>
+    <div class="header-actions">
+      <span class="watch-status" id="watchStatus" hidden><span class="watch-dot" id="watchDot"></span><span id="watchLabel">Watching live</span></span>
+      <button class="icon-btn" id="btnTheme" title="Toggle light/dark">🌓</button>
+      <button class="btn" id="btnLoadAnother" hidden>Load another log</button>
+    </div>
+  </header>
+
+  <section id="dropzoneSection">
+    <div class="dropzone" id="dropzone">
+      <h2>Drop your DAoC chat.log here</h2>
+      <p>Or pick a file, pick several at once, or try a sample log first.</p>
+      <div class="actions">
+        <button class="btn primary" id="btnPickFile">Choose file(s)</button>
+        <button class="btn" id="btnWatch" hidden>Watch a live log file…</button>
+        <button class="btn" id="btnSample">Try a sample log</button>
+      </div>
+      <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt" multiple>
+      <p class="privacy">Everything happens on your machine — your log is parsed in this browser tab and is never uploaded to any server. "Watch a live log file" uses your browser's File System Access API so you can point it at your actual <code>chat.log</code> and see stats update as you play (Chrome/Edge only; other browsers can just re-drop the file).</p>
+    </div>
+  </section>
+
+  <main id="appMain" hidden>
+
+    <div class="encounter-bar">
+      <strong id="characterName">—</strong>
+      <select id="encounterSelect"></select>
+      <span class="meta" id="encounterMeta"></span>
+      <span class="meta" id="officialStatsNote"></span>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="damage">Damage</button>
+      <button class="tab" data-tab="healing">Healing</button>
+      <button class="tab" data-tab="pets">Pets</button>
+      <button class="tab" data-tab="defense">Defense</button>
+      <button class="tab" data-tab="realm">Realm Points</button>
+      <button class="tab" data-tab="spells">Spells &amp; Styles</button>
+      <button class="tab" data-tab="debug">Raw / Debug</button>
+    </nav>
+
+    <section class="panel active" id="panel-overview"></section>
+    <section class="panel" id="panel-damage"></section>
+    <section class="panel" id="panel-healing"></section>
+    <section class="panel" id="panel-pets"></section>
+    <section class="panel" id="panel-defense"></section>
+    <section class="panel" id="panel-realm"></section>
+    <section class="panel" id="panel-spells"></section>
+    <section class="panel" id="panel-debug"></section>
+
+  </main>
+
+  <p class="footer-note">
+    Chat Gator reads the Dark Age of Camelot <code>chat.log</code> format straight from your browser — drag a file in, nothing leaves your machine.<br>
+    Built for the DAoC community. Spell/realm-ability names are best-effort matched against a public spell database when your browser can reach it; everything else comes straight from your log.
+  </p>
+
+</div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
