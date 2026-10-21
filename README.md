@@ -30,7 +30,7 @@ type/class (and even that one fails silently and harmlessly if it's blocked
    several files at once (e.g. a few sessions) and they'll be merged.
 3. No file handy? Click **Try a sample log** to see it working first.
 4. Use the dropdown at the top to look at **one encounter at a time** (the
-   parser automatically splits the log into fights separated by ~20s of
+   parser automatically splits the log into fights separated by ~45s of
    quiet) or **All combined** for session totals.
 5. Click through the tabs: Overview, Damage, Healing, Pets, Defense, Realm
    Points, Spells & Styles, and Raw/Debug (which shows exactly which lines
@@ -81,7 +81,7 @@ ever silently miscounted into the wrong bucket.
 
 `js/aggregate.js` takes that event list and:
 
-- Splits it into **encounters** (bursts of activity separated by a 20s
+- Splits it into **encounters** (bursts of activity separated by a 45s
   gap of silence), the same way a live damage meter would show one fight
   at a time, since a single `chat.log` can span weeks of play.
 - Rolls events up into totals, per-source breakdowns (by spell/style/

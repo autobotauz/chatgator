@@ -4,7 +4,7 @@
 // multi-hour chat.log can be viewed as a set of individual fights, the way
 // a live meter would show one fight at a time.
 
-const ENCOUNTER_GAP_MS = 20000; // a 20s silence ends one encounter and starts the next
+const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts the next
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
   'ability_hit', 'ability_crit', 'cast', 'cast_begin',
