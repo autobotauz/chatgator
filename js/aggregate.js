@@ -8,7 +8,7 @@ const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts t
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
   'ability_hit', 'ability_crit', 'cast', 'cast_begin',
-  'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
+  'pet_melee', 'pet_melee_stray', 'pet_melee_crit', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
   'incoming_dmg', 'incoming_crit', 'incoming_extra',
   'heal_out', 'heal_out_crit', 'heal_in',
   'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in',
@@ -107,7 +107,8 @@ export function buildStats(events, playerNameHint) {
   const petNames = new Set();
   for (const e of events) {
     if (e.type === 'pet_summon' || e.type === 'pet_command' || e.type === 'pet_melee' ||
-        e.type === 'pet_melee_stray' || e.type === 'pet_hit' || e.type === 'pet_self_heal' || e.type === 'pet_lost') {
+        e.type === 'pet_melee_stray' || e.type === 'pet_melee_crit' || e.type === 'pet_hit' ||
+        e.type === 'pet_self_heal' || e.type === 'pet_lost') {
       petNames.add(e.pet);
     }
   }
@@ -247,6 +248,12 @@ export function buildStats(events, playerNameHint) {
       case 'pet_melee_stray': {
         const p = petBucket(e.pet); p.dmg += e.dmg; p.hits++;
         bump(p.bySource, 'Melee (stray)', e.dmg, false);
+        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
+        break;
+      }
+      case 'pet_melee_crit': {
+        const p = petBucket(e.pet); p.dmg += e.dmg; p.crits++;
+        bump(p.bySource, 'Melee', e.dmg, true);
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }

@@ -66,6 +66,9 @@ const RULES = [
     m => ({ pet: m[1], target: m[2], dmg: +m[3], mod: m[4] ? +m[4] : null })],
   // "Your <pet> hit <target> for N damage!" (proc-style line, often @@-tagged)
   ['pet_hit', /^Your (.+?) hit (.+?) for (\d+) damage!$/, m => ({ pet: m[1], target: m[2], dmg: +m[3] })],
+  // "Your <pet> critical hits <target> for an additional N damage! (Crit Chance: N%)"
+  ['pet_melee_crit', /^Your (.+?) critical(?:ly)? hits (.+?) for an additional (\d+) damage!(?:\s*\(Crit Chance:\s*([\d.]+)%\))?$/,
+    m => ({ pet: m[1], target: m[2], dmg: +m[3], pct: m[4] ? parseFloat(m[4]) : null })],
   // "Your <pet> heals itself for N hit points."
   ['pet_self_heal', /^Your (.+?) heals itself for (\d+) hit points?\.$/, m => ({ pet: m[1], amount: +m[2] })],
   // "The <pet> casts a spell!" — counted per pet (once we know it's really
@@ -373,6 +376,10 @@ const RULES = [
   ['flavor', /^Spell effect set to show for: \w+$/, () => ({})],
   ['flavor', /^You target \[.+?\]$/, () => ({})],
   ['flavor', /^Your (constitution|target) is (already fully restored|not in view)!?\.?$/, () => ({})],
+  ['flavor', /^Your power is already full\.$/, () => ({})],
+  ['flavor', /^Your attacks return to normal\.$/, () => ({})],
+  ['flavor', /^.+?'s actions are noticeably slower!$/, () => ({})],
+  ['flavor', /^No enhancement of that type found on the target\.$/, () => ({})],
   ['flavor', /^You (use .+? \(\d+\/\d+\)|die.+Type \/release to return to your last bindpoint\.|died fighting for your realm and lose no experience!|will now release to the nearest border or portal keep in \d+ more seconds?!)$/, () => ({})],
   ['flavor', /^Your (holy aura wears off|skin (hardens|loses its extra strength)|movement is slowed!|protection against \w+ magic fades|extra protection against \w+ (magic )?fades|disease fades)\.?!?$/, () => ({})],
   ['flavor', /^Some of your enhancing magic has been ripped away by a spell!$/, () => ({})],

@@ -28,10 +28,16 @@
   <section id="dropzoneSection">
     <div class="dropzone" id="dropzone">
       <h2>Drop your DAoC chat.log here</h2>
-      <p>Or pick a file, pick several at once, or try a sample log first — or drop a <code>.json</code> snapshot someone shared with you to view their session.</p>
+      <p>Or pick a file, pick several at once, or try a sample log first — pick a class below to see how Chat Gator renders its spells, styles, and pets — or drop a <code>.json</code> snapshot someone shared with you to view their session.</p>
       <div class="actions">
         <button class="btn primary" id="btnPickFile">Choose file(s)</button>
         <button class="btn" id="btnWatch" hidden>Watch a live log file…</button>
+        <select class="btn" id="sampleClassSelect" title="Choose a class for the sample log">
+          <option value="bonedancer">Bonedancer</option>
+          <option value="occultist">Occultist</option>
+          <option value="armsman">Armsman</option>
+          <option value="cleric">Cleric</option>
+        </select>
         <button class="btn" id="btnSample">Try a sample log</button>
       </div>
       <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt,.json" multiple>

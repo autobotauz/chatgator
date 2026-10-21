@@ -3,7 +3,7 @@ import { buildStats, segmentEncounters, getBgBroadcasts } from './aggregate.js';
 import { renderers } from './ui.js';
 import { loadSkillIndex } from './skills.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
-import { SAMPLE_LOG_TEXT } from './sample-data.js';
+import { SAMPLE_LOGS } from './sample-data.js';
 import { fmtClock } from './charts.js';
 
 const el = (id) => document.getElementById(id);
@@ -55,7 +55,10 @@ el('fileInput').addEventListener('change', (e) => {
 });
 
 el('btnSample').addEventListener('click', () => {
-  ingestTexts([{ name: 'sample.log', text: SAMPLE_LOG_TEXT }]);
+  const key = el('sampleClassSelect').value;
+  const sample = SAMPLE_LOGS[key];
+  if (!sample) return;
+  ingestTexts([{ name: `${key}.log`, text: sample.text }]);
 });
 
 el('btnLoadAnother').addEventListener('click', startNewSession);
