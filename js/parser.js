@@ -23,7 +23,7 @@ const CLOSE_RE = /^\*\*\*\s*Chat Log Closed:\s*(.+)$/;
 
 // Chat-channel lines we should never try to run combat regexes against,
 // e.g. "@@[Region] Hilyth: ..." or "@@Bleblu says, "...""
-const CHAT_CHANNEL_RE = /^@@(\[[A-Za-z ]+\]\s*[^:]+:|[A-Za-z0-9'_-]+\s+(says|tells|yells|whispers|says to you|replies))/;
+const CHAT_CHANNEL_RE = /^@@(\[[A-Za-z ]+\]\s*[^:]+:|[A-Za-z0-9'_-]+\s+(says|tells|yells|whispers|says to you|replies|sends?))/;
 
 function stripAt(line) {
   return line.startsWith('@@') ? line.slice(2) : line;
@@ -234,6 +234,11 @@ const RULES = [
   ['flavor', /^Your stats and abilities have been enhanced/, () => ({})],
   ['flavor', /^(Guild Message:|Welcome to |Moving to page|Items returned:|\[Right click to display|Unlocked Teleport Locations:|Locked locations:|##)/, () => ({})],
   ['flavor', /says?, ".*"$/, () => ({})],
+  // /send tells — private messages, same category as say/whisper/tell above.
+  // These should normally already be caught by the @@-prefixed CHAT_CHANNEL_RE
+  // check before a line ever reaches these RULES; this is just a safety net
+  // for the rare case one reaches here without its @@ marker.
+  ['flavor', /^.+? sends?, ".*"(\s+to .+?)?\.?$/, () => ({})],
   ['flavor', /^You have been charged .+ for the teleport\.$/, () => ({})],
   ['flavor', /^\[.+?\] .+? \(\d+s\),?$/, () => ({})],
   ['cc_landed', /^(.+?) is entranced!?\.?$/, m => ({ target: m[1], effect: 'mesmerize' })],
@@ -471,6 +476,8 @@ const RULES = [
   ['flavor', /^.+? begs .+?( to pick them)?\.$/, () => ({})],
   ['flavor', /^.+?'s crystal shield fades\.$/, () => ({})],
   ['flavor', /^You sit down\.\s+Type '\/stand' or move to stand up\.$/, () => ({})],
+  ['flavor', /^You will quit after sitting for \d+ seconds?\.\s+Type '\/stand' or move if you don't want to quit\.$/, () => ({})],
+  ['flavor', /^You are no longer waiting to quit\.$/, () => ({})],
   ['flavor', /^.+? recovers their weapon\.$/, () => ({})],
   ['flavor', /^No Matches\.$/, () => ({})],
   ['flavor', /^You cannot teleport unless you are near a valid portal stone\.$/, () => ({})],
