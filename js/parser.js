@@ -597,6 +597,10 @@ const RULES = [
   ['flavor', /^.+? gains a clinical precision to its death dealing\.$/, () => ({})],
   ['flavor', /^Your guild is awarded \d+ merit points!$/, () => ({})],
   ['flavor', /^\d+\) <(Leader|Member)>.+$/, () => ({})],
+  // "/bg roster" / "/bgwho" listing rows: "2) (Bard)Airmid (Eldritch)Nuki ..." —
+  // a group number followed by one or more "(Class)Name" pairs with no
+  // space between the class parens and the name that follows them.
+  ['flavor', /^\d+\)\s+(\(\w+\)\S+\s*)+$/, () => ({})],
   ['flavor', /^.+? is no longer guarding you\.$/, () => ({})],
   ['flavor', /^.+? begins to charge wildly!$/, () => ({})],
   ['flavor', /^.+? doesn't currently have a target\.$/, () => ({})],
