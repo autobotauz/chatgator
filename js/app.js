@@ -44,6 +44,43 @@ const state = {
 })();
 
 // ---------------------------------------------------------------------------
+// Live-watch refresh interval — how often LogWatcher re-reads the file while
+// "Watch a live log file…" is active. Some abilities have cooldowns as
+// short as 5s, so the old fixed 2s poll could still miss or badly lag a
+// fast one; letting the user dial it down (as low as 1s) makes the
+// cooldown tracker actually reliable for those. Each poll is still cheap
+// when idle — LogWatcher only re-parses once the file's size has actually
+// changed — so a short interval mostly costs a few extra stat() calls
+// between real updates, not full re-parses.
+// ---------------------------------------------------------------------------
+const DEFAULT_WATCH_INTERVAL_MS = 2000;
+
+(function initWatchInterval() {
+  const sel = el('watchIntervalSelect');
+  for (let s = 1; s <= 30; s++) {
+    const opt = document.createElement('option');
+    opt.value = String(s * 1000);
+    opt.textContent = `${s}s`;
+    sel.appendChild(opt);
+  }
+  let saved = DEFAULT_WATCH_INTERVAL_MS;
+  try {
+    const raw = +localStorage.getItem('chatgator:watchIntervalMs');
+    if (raw >= 1000 && raw <= 30000) saved = raw;
+  } catch { /* ignore */ }
+  state.watchIntervalMs = saved;
+  sel.value = String(saved);
+  sel.addEventListener('change', () => {
+    const ms = +sel.value;
+    state.watchIntervalMs = ms;
+    try { localStorage.setItem('chatgator:watchIntervalMs', String(ms)); } catch { /* ignore */ }
+    // Already watching? Re-pace the running poll loop immediately instead
+    // of waiting for whatever interval it was already mid-wait on.
+    if (state.watcher) state.watcher.setPollMs(ms);
+  });
+})();
+
+// ---------------------------------------------------------------------------
 // File loading (drag/drop, picker, sample)
 // ---------------------------------------------------------------------------
 const dropzone = el('dropzone');
@@ -90,6 +127,7 @@ if (isWatchSupported()) {
   el('btnWatch').hidden = false;
   el('btnWatch').addEventListener('click', startWatch);
   el('btnWatchHeader').hidden = false;
+  el('watchIntervalWrap').hidden = false;
   el('btnWatchHeader').addEventListener('click', () => {
     if (state.watcher) stopWatching(); else startWatch();
   });
@@ -462,6 +500,7 @@ async function startWatch() {
       // be wrong, not just less efficient.
       onChange: (text) => ingestTexts([{ name: 'live', text }]),
       onError: (err) => console.warn('[chatgator] watch error', err),
+      pollMs: state.watchIntervalMs,
     });
     await watcher.pickAndStart();
     const initialText = await watcher.readAll();

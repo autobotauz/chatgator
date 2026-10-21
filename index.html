@@ -18,6 +18,10 @@
     </div>
     <div class="header-actions">
       <span class="watch-status" id="watchStatus" hidden><span class="watch-dot" id="watchDot"></span><span id="watchLabel">Watching live</span></span>
+      <label class="watch-interval" id="watchIntervalWrap" hidden title="How often to re-read the watched chat.log while live. Lower catches short ability cooldowns sooner, at the cost of re-parsing the file more often — each poll only does real work when the file has actually grown, so an idle interval between pulses is cheap either way.">
+        <span class="watch-interval-text">Refresh:</span>
+        <select class="btn" id="watchIntervalSelect"></select>
+      </label>
       <button class="btn" id="btnWatchHeader" hidden>Watch a live log file…</button>
       <button class="btn" id="btnDownloadSnapshot" hidden>⬇ Download snapshot</button>
       <button class="icon-btn" id="btnTheme" title="Toggle light/dark">🌓</button>

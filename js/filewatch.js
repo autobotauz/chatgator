@@ -82,4 +82,18 @@ export class LogWatcher {
     this.stopped = true;
     if (this.timer) clearTimeout(this.timer);
   }
+
+  // Change how often we poll while already watching. Takes effect for the
+  // *next* poll immediately — a timer already scheduled with setTimeout
+  // keeps the delay it was given at schedule time, so without this we'd
+  // only pick up the new interval one poll late. Clearing and
+  // re-scheduling right away means turning the interval down (e.g. to
+  // catch a 5s ability cooldown) takes effect at once instead of waiting
+  // out whatever the old interval had left.
+  setPollMs(ms) {
+    this.pollMs = ms;
+    if (this.stopped) return;
+    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    this._poll();
+  }
 }
