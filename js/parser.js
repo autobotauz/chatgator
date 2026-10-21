@@ -350,6 +350,7 @@ const RULES = [
   ['flavor', /^You begin playing .+?!$/, () => ({})], // bard song announcements
   ['flavor', /^The damage was lessened by your equipment!$/, () => ({})],
   ['flavor', /^.+?'s skin hardens\.$/, () => ({})],
+  ['flavor', /^Bark falls from .+?'s skin\.$/, () => ({})],
   ['flavor', /^.+?'s weapon is enchanted\.$/, () => ({})],
   ['flavor', /^.+?'s weapon skill has increased!$/, () => ({})],
   ['flavor', /^.+? attacks are quickened by a dark power!$/, () => ({})],
