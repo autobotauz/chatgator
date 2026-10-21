@@ -21,10 +21,16 @@ const state = {
   // is a synthetic elapsed-ms value anchored to the first timestamp in the
   // file (see parser.js), never a real calendar date — so to turn "time
   // since last cast" into a *ticking* countdown while watching a live log,
-  // we remember the newest clock value we've seen and the real Date.now()
-  // we saw it at, then extrapolate forward with the wall clock between
-  // polls. Reset to null on a static (non-watched) load, where the tracker
-  // just shows a frozen snapshot as of the end of that file instead.
+  // we remember a (clock, real Date.now()) pair and extrapolate forward
+  // from it with the wall clock between polls, rather than re-deriving
+  // "now" from whatever we most recently read — see advanceLiveSync() for
+  // why re-deriving it every poll is wrong whenever a poll runs late (and
+  // on a backgrounded tab, Chrome throttles timers hard, so it often does).
+  // Reset to null on a static (non-watched) load, where the tracker just
+  // shows a frozen snapshot as of the end of that file instead; and
+  // unconditionally re-seeded fresh on any full reload (new file, or the
+  // watched file being rotated/restarted) — only the pure-append path
+  // (ingestAppend) advances it forward-only instead of re-seeding.
   liveSync: null,
   // Carried parser state (day-rollover clock, pending style/cast/heal
   // attribution — see parseLogText's `resume` param) from the most recent
@@ -296,7 +302,7 @@ function ingestAppend(chunkText) {
   }
   state.encounters = segmentEncounters(state.rawEvents);
   state.lastUpdatedAt = Date.now();
-  state.liveSync = { clock: lastKnownClock(state.rawEvents), wallTime: Date.now() };
+  advanceLiveSync(lastKnownClock(state.rawEvents));
 
   buildEncounterSelect();
   renderActiveTab();
@@ -447,6 +453,38 @@ function lastKnownClock(events) {
     if (events[i].clock != null) return events[i].clock;
   }
   return null;
+}
+
+// Advances the live-clock sync point forward only — never rewinds it.
+//
+// The bug this fixes: a poll can arrive late for all sorts of reasons
+// (chrome throttles timers hard in a backgrounded tab — easily to a
+// once-a-minute cadence after a few minutes unfocused, which is the normal
+// case while you're actually alt-tabbed into the game). When a late poll
+// finally delivers a backlog of lines, the *newest* clock value in that
+// backlog is already seconds (or tens of seconds) old by the time we see
+// it — it reflects whenever the game printed that line, not "right now".
+// Re-anchoring liveSync to {that backlog clock, Date.now()} on every poll
+// (what this used to do) tells the countdown "that old moment IS right
+// now", which quietly rewinds its sense of time backward by exactly the
+// poll's lateness — the countdown then shows MORE time remaining than is
+// real, by that same amount, every single time a poll lags. That's
+// consistent with seeing ~45s left here against ~7s left in-game: the
+// in-game clock had moved on for ~38s while our estimate of "now" didn't.
+//
+// The fix: only resync if the new data proves our running estimate is
+// actually BEHIND the log's own clock (the normal, on-time case, and a
+// tiny periodic correction for JS timer drift over a long session) —
+// never because a late poll's data happens to be older than our estimate,
+// which is exactly backlog, not a correction.
+function advanceLiveSync(newestClock) {
+  if (newestClock == null) return;
+  const now = Date.now();
+  if (!state.liveSync) { state.liveSync = { clock: newestClock, wallTime: now }; return; }
+  const estimatedNow = state.liveSync.clock + (now - state.liveSync.wallTime);
+  if (newestClock > estimatedNow) {
+    state.liveSync = { clock: newestClock, wallTime: now };
+  }
 }
 
 // Most recent cast time per recognized ability name. Events are already
