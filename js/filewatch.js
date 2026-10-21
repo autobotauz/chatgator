@@ -8,19 +8,28 @@
 // Nothing here uploads anything anywhere: the file handle and its bytes
 // never leave the browser tab.
 //
-// Each poll re-reads and reports the WHOLE file, not just the bytes
-// appended since last time. parseLogText() carries running state (the
-// day-rollover clock and every cast/style/heal attribution tracker) only
-// for the one call it's made in — feeding it a byte-slice per poll would
-// reset all of that every ~2s, which silently breaks any attribution whose
-// two halves happen to fall on opposite sides of a poll boundary, and (once
-// the watched file has crossed a day boundary) hands out-of-scale clock
-// values to new events that sort as if they happened before everything
-// already loaded. Re-parsing the whole file each poll costs some redundant
-// work, but these logs parse in well under a second even at 180k+ lines, so
-// against a multi-second poll interval it's not a real cost — and it's the
-// same single-call path the initial load already uses, so it's correct by
-// construction instead of by careful bookkeeping across calls.
+// Each poll reads only the bytes appended since last time (`file.slice`),
+// not the whole file — a chat.log that's grown into the tens of thousands
+// of lines over a long session would otherwise cost more to re-parse on
+// every single poll as the session goes on, which is how "refresh every
+// 2s" ends up taking the better part of a minute to actually show up once
+// the file is big: the fixed poll interval stays the same, but the work
+// behind each one keeps growing. parser.js's parseLogText() now accepts an
+// optional `resume` state (the `state` field it returns) specifically so
+// this can hand it just the new chunk and still get identical results to
+// one big call — see the comment on parseLogText for what that carries.
+//
+// Two things this still has to get right on top of a plain byte-slice:
+//   1. A poll can land mid-line if the game client is still writing when we
+//      read — we only report *complete* lines (ending in '\n') to the
+//      caller and hold the dangling remainder back for the next poll by
+//      simply not advancing `lastSize` past it, so the next slice starts
+//      from the same spot and picks up the rest once it's written.
+//   2. If the file *shrinks* (restarted client -> fresh/rotated chat.log),
+//      there's no "new tail" to speak of — that's reported as a full
+//      reset (`{ reset: true }`) with the whole new file's text, and the
+//      caller is expected to throw away any carried parser/UI state and
+//      start over, exactly like loading a brand new file.
 
 export function isWatchSupported() {
   return typeof window !== 'undefined' && 'showOpenFilePicker' in window;
@@ -63,14 +72,32 @@ export class LogWatcher {
     this.timer = setTimeout(async () => {
       try {
         const file = await this.handle.getFile();
-        // Cheap size check first — only pay for a full read+reparse when the
-        // file actually changed (grew during normal play, or shrank/rotated,
-        // e.g. the game client was restarted and started a fresh chat.log).
-        if (file.size !== this.lastSize) {
+        if (file.size < this.lastSize) {
+          // Shrank — the client rotated or restarted logging to a fresh
+          // file. There's no "new tail" relative to our old position, so
+          // just report the whole (smaller) file as a full reset.
           const text = await file.text();
           this.lastSize = file.size;
-          this.onChange(text);
+          this.onChange(text, { reset: true });
+        } else if (file.size > this.lastSize) {
+          const chunk = await file.slice(this.lastSize).text();
+          const cut = chunk.lastIndexOf('\n');
+          if (cut === -1) {
+            // Grown, but still no complete line in the new bytes yet (the
+            // client is mid-write on a long line) — wait for more without
+            // moving lastSize, so the next poll re-reads from the same spot.
+          } else {
+            const complete = chunk.slice(0, cut + 1);
+            const remainder = chunk.slice(cut + 1);
+            // Only advance lastSize past what we actually consumed — the
+            // trailing partial line's bytes (if any) stay unconsumed so the
+            // next poll's slice starts there and completes it, rather than
+            // us guessing where a safe cut point is in character terms.
+            this.lastSize = file.size - new TextEncoder().encode(remainder).length;
+            this.onChange(complete, { reset: false });
+          }
         }
+        // file.size === this.lastSize: nothing new, nothing to do.
       } catch (err) {
         if (this.onError) this.onError(err);
       }

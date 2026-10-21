@@ -657,16 +657,33 @@ const RULES = [
 
 function toNum(s) { return parseInt(String(s).replace(/,/g, ''), 10); }
 
-export function parseLogText(rawText) {
+// `resume`, when given, is the `state` object returned by an earlier call —
+// see the return value below. Passing it in lets the live-watch path feed
+// just the *new* lines appended to a growing chat.log (instead of
+// re-parsing the whole file from scratch every poll) while still getting
+// identical results to one big call, by picking every piece of
+// cross-line state back up exactly where the previous call left off: the
+// day-rollover clock, which weapon/style/cast is still "pending" a result,
+// and the last clock value seen (for a no-timestamp line arriving right at
+// the start of a new chunk, which would otherwise have no local event to
+// fall back on). See filewatch.js for the chunking side of this.
+export function parseLogText(rawText, resume) {
   const lines = rawText.split(/\r?\n/);
 
   const events = [];
   const unmatched = [];
-  let dayOffsetMs = 0;          // added each time the printed clock jumps backwards (assumed midnight rollover)
-  let lastTimeOfDayMs = -1;     // never reset — the whole file is one continuous forward timeline
+  let dayOffsetMs = resume?.dayOffsetMs ?? 0;          // added each time the printed clock jumps backwards (assumed midnight rollover)
+  let lastTimeOfDayMs = resume?.lastTimeOfDayMs ?? -1; // never reset — the whole file is one continuous forward timeline
   const base = 0; // elapsed ms from the first line's own time-of-day — not a real calendar epoch
-  let sawAnyOpen = false;
-  let inInfoBlock = false; // inside an item/spell "<Begin Info: ...> ... <End Info>" tooltip dump
+  let sawAnyOpen = resume?.sawAnyOpen ?? false;
+  let inInfoBlock = resume?.inInfoBlock ?? false; // inside an item/spell "<Begin Info: ...> ... <End Info>" tooltip dump
+  // Carried fallback for a no-timestamp line with no local event yet this
+  // call. Defaults to 0 (not null) to match the original single-call
+  // behavior for the rare case a file opens with one of these lines before
+  // any timestamped line at all — `lastEventClock` itself distinguishes
+  // "found nothing" (null) from a genuine 0, so a real resumed value always
+  // still wins once there is one.
+  let lastClock = resume?.lastClock ?? 0;
 
   // Neither styles nor spell-damage/heal results carry their own name on
   // the result line — "You perform your Glowing Blade perfectly!" and
@@ -676,15 +693,15 @@ export function parseLogText(rawText) {
   // bits of state bridge that gap so the result can be labeled correctly.
   const STYLE_WINDOW_MS = 3000;
   const CAST_WINDOW_MS = 4000;
-  let pendingStyleName = null, pendingStyleAt = -Infinity;
-  let pendingCastName = null, pendingCastAt = -Infinity;
+  let pendingStyleName = resume?.pendingStyleName ?? null, pendingStyleAt = resume?.pendingStyleAt ?? -Infinity;
+  let pendingCastName = resume?.pendingCastName ?? null, pendingCastAt = resume?.pendingCastAt ?? -Infinity;
   // A CC/debuff landing (cc_landed) or an unnamed resist (resist_generic) is
   // attributed to whichever cast — yours or your pet's — most recently
   // happened, and unlike pendingCastName above this one is deliberately NOT
   // cleared on first use: a single AOE cast can land on (or be resisted by)
   // several targets in a row, each producing its own confirmation line.
   const EFFECT_WINDOW_MS = 4000;
-  let pendingEffectName = null, pendingEffectAt = -Infinity, pendingEffectIsPet = false;
+  let pendingEffectName = resume?.pendingEffectName ?? null, pendingEffectAt = resume?.pendingEffectAt ?? -Infinity, pendingEffectIsPet = resume?.pendingEffectIsPet ?? false;
   // A DoT or channeled spell (e.g. "Arawn's Inferno") only prints "You cast
   // a ... spell!" ONCE, but then produces a separate bare "You hit <target>
   // for N damage!" line per tick — the exact same line shape as a plain
@@ -701,7 +718,7 @@ export function parseLogText(rawText) {
   // correctly), is almost certainly another tick of the same thing, while
   // one on any other target is almost certainly an unrelated plain swing.
   const DOT_TICK_WINDOW_MS = 5000;
-  let activeDotName = null, activeDotTarget = null, activeDotAt = -Infinity;
+  let activeDotName = resume?.activeDotName ?? null, activeDotTarget = resume?.activeDotTarget ?? null, activeDotAt = resume?.activeDotAt ?? -Infinity;
   // A group/AOE heal (e.g. "Group Apotheosis", "Tones of Health") also only
   // prints "You cast a ... spell!" ONCE, then one "You heal <target> for N
   // hit points!" line PER target it actually healed. pendingCastName labels
@@ -713,7 +730,7 @@ export function parseLogText(rawText) {
   // another target of the same cast, until a new cast (or too long a gap)
   // starts a fresh one.
   const HEAL_BURST_WINDOW_MS = 2500;
-  let activeHealName = null, activeHealAt = -Infinity;
+  let activeHealName = resume?.activeHealName ?? null, activeHealAt = resume?.activeHealAt ?? -Infinity;
 
   for (let li = 0; li < lines.length; li++) {
     const raw = lines[li];
@@ -767,8 +784,11 @@ export function parseLogText(rawText) {
       if (!body) continue;
     } else {
       // Lines with no [HH:MM:SS] prefix: /stats block rows, item-info blocks, etc.
+      // Fall back to the carried `lastClock` when this call's own local
+      // `events` is still empty (e.g. a chunk that opens with one of these
+      // lines) — otherwise identical to the always-fresh-call behavior.
       body = trimmed;
-      clockMs = lastEventClock(events);
+      clockMs = lastEventClock(events) ?? lastClock;
     }
 
     if (body.startsWith('@@')) {
@@ -845,14 +865,36 @@ export function parseLogText(rawText) {
     }
   }
 
-  return { events, unmatched, sawAnyOpen };
+  // Carry every piece of cross-line state forward so a later call can pick
+  // up exactly where this one left off — see the `resume` param above.
+  return {
+    events,
+    unmatched,
+    sawAnyOpen,
+    state: {
+      dayOffsetMs,
+      lastTimeOfDayMs,
+      sawAnyOpen,
+      inInfoBlock,
+      lastClock: lastEventClock(events) ?? lastClock,
+      pendingStyleName, pendingStyleAt,
+      pendingCastName, pendingCastAt,
+      pendingEffectName, pendingEffectAt, pendingEffectIsPet,
+      activeDotName, activeDotTarget, activeDotAt,
+      activeHealName, activeHealAt,
+    },
+  };
 }
 
 function lastEventClock(events) {
   for (let i = events.length - 1; i >= 0; i--) {
     if (events[i].clock != null) return events[i].clock;
   }
-  return 0;
+  // `null`, not 0 — 0 is a legitimate clock value (the very first moment in
+  // the file) and `?? lastClock` at both call sites needs a true "nothing
+  // found yet" sentinel to correctly fall through to the carried resume
+  // value instead of masking it with a bogus zero.
+  return null;
 }
 
 function matchLine(body) {

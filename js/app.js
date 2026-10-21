@@ -26,6 +26,17 @@ const state = {
   // polls. Reset to null on a static (non-watched) load, where the tracker
   // just shows a frozen snapshot as of the end of that file instead.
   liveSync: null,
+  // Carried parser state (day-rollover clock, pending style/cast/heal
+  // attribution — see parseLogText's `resume` param) from the most recent
+  // parse of the single actively-watched file, so the next poll's new
+  // lines can be parsed incrementally instead of re-parsing the whole
+  // growing file every time. Only meaningful while watching; null for a
+  // plain static/multi-file load.
+  parseResumeState: null,
+  // Date.now() of the last time we actually picked up new lines (initial
+  // load, or a live poll that found the file had grown) — drives the
+  // "Last updated" line under the cooldown tracker.
+  lastUpdatedAt: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -119,8 +130,11 @@ function startNewSession() {
   el('snapshotPill').hidden = true;
   el('bgTicker').hidden = true;
   el('cooldownTracker').hidden = true;
+  el('lastUpdated').hidden = true;
   state.rawEvents = []; state.unmatched = []; state.encounters = []; state.scope = 'all'; state.isSnapshot = false;
   state.liveSync = null;
+  state.parseResumeState = null;
+  state.lastUpdatedAt = null;
 }
 
 if (isWatchSupported()) {
@@ -216,10 +230,15 @@ function decodeLogBytes(buf) {
 function ingestTexts(fileTexts) {
   const allEvents = [];
   const allUnmatched = [];
+  let resumeState = null;
   for (const { text } of fileTexts) {
-    const { events, unmatched } = parseLogText(text);
+    const { events, unmatched, state: parseState } = parseLogText(text);
     allEvents.push(...events);
     allUnmatched.push(...unmatched);
+    // Resuming only makes sense for a single growing file (the live-watch
+    // case) — a multi-file drop or a sample log has no "next chunk" coming,
+    // and interleaving more than one file's state doesn't mean anything.
+    if (fileTexts.length === 1) resumeState = parseState;
   }
   allEvents.sort((a, b) => (a.clock ?? 0) - (b.clock ?? 0));
   state.rawEvents = allEvents;
@@ -227,6 +246,8 @@ function ingestTexts(fileTexts) {
   state.encounters = segmentEncounters(allEvents);
   state.scope = 'all';
   state.isSnapshot = false;
+  state.parseResumeState = resumeState;
+  state.lastUpdatedAt = Date.now();
 
   // If we're actively watching a live log file, anchor the cooldown
   // tracker's live-clock sync point to the newest line we just read, paired
@@ -248,6 +269,37 @@ function ingestTexts(fileTexts) {
   renderActiveTab();
 
   loadSkillIndex().then((map) => { state.skillMap = map; renderActiveTab(); });
+}
+
+// ---------------------------------------------------------------------------
+// Incremental live-watch update — handles just the NEW complete lines
+// LogWatcher read since the last poll (see filewatch.js), instead of
+// re-parsing the whole growing file every time. parseLogText() is handed
+// `state.parseResumeState` (the carried day-rollover/pending-attribution
+// state from the previous chunk) so the result is identical to one big
+// call having parsed the whole file at once — see parseLogText's own
+// comment for exactly what that carries and why.
+//
+// Because the file only ever grows forward in time while watching, new
+// events are always newer than everything already in state.rawEvents, so
+// we can just append instead of re-sorting the whole (possibly huge by
+// now) array on every poll — that resort was never the expensive part,
+// but there's no reason to pay for it repeatedly either.
+// ---------------------------------------------------------------------------
+function ingestAppend(chunkText) {
+  const { events, unmatched, state: parseState } = parseLogText(chunkText, state.parseResumeState);
+  state.parseResumeState = parseState;
+  if (events.length) state.rawEvents.push(...events);
+  if (unmatched.length) {
+    state.unmatched.push(...unmatched);
+    if (state.unmatched.length > 500) state.unmatched.length = 500; // same cap parseLogText applies per call
+  }
+  state.encounters = segmentEncounters(state.rawEvents);
+  state.lastUpdatedAt = Date.now();
+  state.liveSync = { clock: lastKnownClock(state.rawEvents), wallTime: Date.now() };
+
+  buildEncounterSelect();
+  renderActiveTab();
 }
 
 // ---------------------------------------------------------------------------
@@ -326,6 +378,7 @@ function renderActiveTab() {
   const stats = currentStats();
   renderBgTicker();
   renderCooldownTracker();
+  renderLastUpdated();
 
   el('characterName').textContent = stats.meta.playerName ? `👤 ${stats.meta.playerName}` : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
   const encLabel = state.scope === 'all'
@@ -481,12 +534,41 @@ function renderCooldownTracker() {
   }
 }
 
-// Re-render every second so active cooldowns visibly count down while
-// watching a live log. Against a static (non-watched) file this just
-// redraws the same frozen end-of-file snapshot each tick — harmless, and
-// keeps this one code path correct for both cases rather than branching.
+// "Last updated" — how long ago we last picked up new lines from the log,
+// shown under the cooldown tracker so it's obvious whether the view is
+// actually keeping up. While watching live, this ticking up past a couple
+// multiples of the configured refresh interval (flagged in orange) usually
+// means the watched file genuinely isn't growing right now, not that
+// anything here is broken — e.g. nothing new has been typed/cast since, or
+// the browser tab lost its file handle (rare, but happens if the OS asks
+// to re-grant permission after the tab's been backgrounded a long while).
+const STALE_UPDATE_MULTIPLE = 3;
+
+function fmtAgo(ms) {
+  const sec = Math.max(0, Math.round(ms / 1000));
+  if (sec < 1) return 'just now';
+  if (sec < 60) return `${sec}s ago`;
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return `${m}m ${s}s ago`;
+}
+
+function renderLastUpdated() {
+  const el_ = el('lastUpdated');
+  if (!state.lastUpdatedAt) { el_.hidden = true; return; }
+  el_.hidden = false;
+  const ageMs = Date.now() - state.lastUpdatedAt;
+  el_.textContent = `🕓 Last updated: ${fmtAgo(ageMs)}`;
+  const stale = state.watcher && ageMs > state.watchIntervalMs * STALE_UPDATE_MULTIPLE;
+  el_.classList.toggle('stale', !!stale);
+}
+
+// Re-render every second so active cooldowns visibly count down, and the
+// "last updated" line keeps ticking, while watching a live log. Against a
+// static (non-watched) file this just redraws the same frozen end-of-file
+// snapshot each tick — harmless, and keeps this one code path correct for
+// both cases rather than branching.
 setInterval(() => {
-  if (state.rawEvents.length) renderCooldownTracker();
+  if (state.rawEvents.length) { renderCooldownTracker(); renderLastUpdated(); }
 }, 1000);
 
 // ---------------------------------------------------------------------------
@@ -495,10 +577,15 @@ setInterval(() => {
 async function startWatch() {
   try {
     const watcher = new LogWatcher({
-      // Full re-parse on every poll via the same path a fresh upload uses —
-      // see filewatch.js for why a byte-slice/incremental-merge here would
-      // be wrong, not just less efficient.
-      onChange: (text) => ingestTexts([{ name: 'live', text }]),
+      // The common case (file grew) hands us just the new complete lines —
+      // append-parse them with the carried resume state. A reset (file
+      // shrank/rotated) has no "new tail" to speak of, so it's treated
+      // exactly like loading a brand new file: full fresh parse, replacing
+      // everything, same as the initial read below.
+      onChange: (text, { reset }) => {
+        if (reset) ingestTexts([{ name: 'live', text }]);
+        else ingestAppend(text);
+      },
       onError: (err) => console.warn('[chatgator] watch error', err),
       pollMs: state.watchIntervalMs,
     });
