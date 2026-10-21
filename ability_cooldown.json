@@ -1,0 +1,5218 @@
+{
+  "Abate Senses": {
+    "cooldown": "10s",
+    "icon": 13158
+  },
+  "Abolish Sight": {
+    "cooldown": "10s",
+    "icon": 13681
+  },
+  "Abolish Strength": {
+    "cooldown": "10s",
+    "icon": 2656
+  },
+  "Abrogate Coordination": {
+    "cooldown": "10s",
+    "icon": 4165
+  },
+  "Abrogate Strength": {
+    "cooldown": "10s",
+    "icon": 4534
+  },
+  "Abrogation Bolt": {
+    "cooldown": "20s",
+    "icon": 4554
+  },
+  "Aching Curse": {
+    "cooldown": "8s",
+    "icon": 9637
+  },
+  "Acolyte's Redemption": {
+    "cooldown": "30s",
+    "icon": 14401
+  },
+  "Acuity of the Congregation": {
+    "cooldown": "5s",
+    "icon": 1537
+  },
+  "Acuity of the Council": {
+    "cooldown": "5s",
+    "icon": 1536
+  },
+  "Advancing Blow": {
+    "cooldown": "8s",
+    "icon": 10573
+  },
+  "Aggravate": {
+    "cooldown": "20s",
+    "icon": 1071
+  },
+  "Agitating Scintillation": {
+    "cooldown": "10s",
+    "icon": 4256
+  },
+  "Air Pet Elemental Stun": {
+    "cooldown": "1.50s",
+    "icon": 3326
+  },
+  "Alacrity of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10508
+  },
+  "Alacrity of Kudzu": {
+    "cooldown": "2:00 min",
+    "icon": 11220
+  },
+  "Alacrity of the Angel": {
+    "cooldown": "3:00 min",
+    "icon": 1723
+  },
+  "Alacrity of the Archangel": {
+    "cooldown": "3:00 min",
+    "icon": 1726
+  },
+  "Alacrity of the Deep": {
+    "cooldown": "5s",
+    "icon": 1536
+  },
+  "Alacrity of the Heavenly Host": {
+    "cooldown": "3:00 min",
+    "icon": 1727
+  },
+  "Allure of Death": {
+    "cooldown": "10:00 min",
+    "icon": 3075
+  },
+  "Alluring Melodies": {
+    "cooldown": "5s",
+    "icon": 1156
+  },
+  "Amanita's Bind": {
+    "cooldown": "20s",
+    "icon": 5440
+  },
+  "Amanita's Decay": {
+    "cooldown": "8s",
+    "icon": 4380
+  },
+  "Ameliorating Melodies": {
+    "cooldown": "15:00 min",
+    "icon": 3021
+  },
+  "Amplified Celerity": {
+    "cooldown": "8s",
+    "icon": 3237
+  },
+  "Angel's Refreshment": {
+    "cooldown": "8s",
+    "icon": 1015
+  },
+  "Anger of the Gods": {
+    "cooldown": "10:00 min",
+    "icon": 3022
+  },
+  "Annihilate Evil": {
+    "cooldown": "20s",
+    "icon": 1666
+  },
+  "Annihilate Strength": {
+    "cooldown": "10s",
+    "icon": 2658
+  },
+  "Annihilation Bolt": {
+    "cooldown": "20s",
+    "icon": 4557
+  },
+  "Annoy": {
+    "cooldown": "30s",
+    "icon": 1752
+  },
+  "Annullling Aura": {
+    "cooldown": "8s",
+    "icon": 9643
+  },
+  "Arawn's Minor Curse": {
+    "cooldown": "20s",
+    "icon": 14960
+  },
+  "Arawn’s Curse": {
+    "cooldown": "20s",
+    "icon": 14962
+  },
+  "Arawn’s Greater Curse": {
+    "cooldown": "20s",
+    "icon": 14964
+  },
+  "Arawn’s Lesser Curse": {
+    "cooldown": "20s",
+    "icon": 14961
+  },
+  "Arawn’s Major Curse": {
+    "cooldown": "20s",
+    "icon": 14963
+  },
+  "Arch Demon's Imbalance": {
+    "cooldown": "5s",
+    "icon": 767
+  },
+  "Archangel's Allotment": {
+    "cooldown": "5s",
+    "icon": 1515
+  },
+  "Archangel's Apportioning": {
+    "cooldown": "5s",
+    "icon": 1516
+  },
+  "Archangel's Refreshment": {
+    "cooldown": "8s",
+    "icon": 1016
+  },
+  "Arm's Length": {
+    "cooldown": "10:00 min",
+    "icon": 3057
+  },
+  "Array of Scintillation": {
+    "cooldown": "10s",
+    "icon": 4272
+  },
+  "Arrow of Night": {
+    "cooldown": "20s",
+    "icon": 5515
+  },
+  "Arthritic Curse": {
+    "cooldown": "8s",
+    "icon": 9631
+  },
+  "Assailing Blow": {
+    "cooldown": "8s",
+    "icon": 10578
+  },
+  "Atony": {
+    "cooldown": "20s",
+    "icon": 5403
+  },
+  "Attack Unending": {
+    "cooldown": "8s",
+    "icon": 4931
+  },
+  "Attenuate Strength": {
+    "cooldown": "10s",
+    "icon": 2762
+  },
+  "Attracting Melodies": {
+    "cooldown": "5s",
+    "icon": 1153
+  },
+  "Audible Barrier": {
+    "cooldown": "8s",
+    "icon": 13551
+  },
+  "Aura of Darkness": {
+    "cooldown": "8s",
+    "icon": 9602
+  },
+  "Aura of Death": {
+    "cooldown": "8s",
+    "icon": 9605
+  },
+  "Aura of Destiny": {
+    "cooldown": "8s",
+    "icon": 9603
+  },
+  "Aura of Fate": {
+    "cooldown": "8s",
+    "icon": 9604
+  },
+  "Aura of Foreboding": {
+    "cooldown": "8s",
+    "icon": 9601
+  },
+  "Aura of Malice": {
+    "cooldown": "8s",
+    "icon": 9637
+  },
+  "Aura of the Inevitable": {
+    "cooldown": "8s",
+    "icon": 9606
+  },
+  "Avert Attack": {
+    "cooldown": "15s",
+    "icon": 13037
+  },
+  "Avert Magic ": {
+    "cooldown": "15s",
+    "icon": 13132
+  },
+  "Awareness of Magic": {
+    "cooldown": "1:00 min",
+    "icon": 15240
+  },
+  "Badge of Valor": {
+    "cooldown": "10:00 min",
+    "icon": 3056
+  },
+  "Ban Sight": {
+    "cooldown": "10s",
+    "icon": 2625
+  },
+  "Banish Confidence": {
+    "cooldown": "10s",
+    "icon": 966
+  },
+  "Banish Conviction": {
+    "cooldown": "10s",
+    "icon": 963
+  },
+  "Banish Dedication": {
+    "cooldown": "10s",
+    "icon": 964
+  },
+  "Banish Evil": {
+    "cooldown": "20s",
+    "icon": 1665
+  },
+  "Banish Faith": {
+    "cooldown": "10s",
+    "icon": 965
+  },
+  "Banish Hope": {
+    "cooldown": "10s",
+    "icon": 967
+  },
+  "Banish Motivation": {
+    "cooldown": "10s",
+    "icon": 962
+  },
+  "Banish Senses": {
+    "cooldown": "10s",
+    "icon": 13159
+  },
+  "Banish Will": {
+    "cooldown": "10s",
+    "icon": 961
+  },
+  "Barbs of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10503
+  },
+  "Barrier of Faith": {
+    "cooldown": "8s",
+    "icon": 14810
+  },
+  "Barrier of Fortitude": {
+    "cooldown": "10:00 min",
+    "icon": 3015
+  },
+  "Barrier of Sound": {
+    "cooldown": "8s",
+    "icon": 1198
+  },
+  "Barrier of Temperance": {
+    "cooldown": "8s",
+    "icon": 14812
+  },
+  "Barrier of Virtue": {
+    "cooldown": "8s",
+    "icon": 14811
+  },
+  "Bashing Aura": {
+    "cooldown": "8s",
+    "icon": 9641
+  },
+  "Battle Fervor": {
+    "cooldown": "8s",
+    "icon": 1021
+  },
+  "Battle Fury": {
+    "cooldown": "8s",
+    "icon": 1025
+  },
+  "Battle Howl": {
+    "cooldown": "15s",
+    "icon": 3628
+  },
+  "Battle Roar": {
+    "cooldown": "15s",
+    "icon": 3628
+  },
+  "Battle Scream": {
+    "cooldown": "15s",
+    "icon": 3627
+  },
+  "Battle Shout": {
+    "cooldown": "15s",
+    "icon": 3626
+  },
+  "Battle Vigor": {
+    "cooldown": "8s",
+    "icon": 1023
+  },
+  "Battle Whoop": {
+    "cooldown": "15s",
+    "icon": 3625
+  },
+  "Battle Zeal": {
+    "cooldown": "8s",
+    "icon": 1027
+  },
+  "Bear Blows": {
+    "cooldown": "5s",
+    "icon": 10514
+  },
+  "Bear Lacerations": {
+    "cooldown": "5s",
+    "icon": 10520
+  },
+  "Bear Punctures": {
+    "cooldown": "5s",
+    "icon": 10526
+  },
+  "Beautified Remedy": {
+    "cooldown": "10:00 min",
+    "icon": 1431
+  },
+  "Bedazzling Aura": {
+    "cooldown": "10:00 min",
+    "icon": 3029
+  },
+  "Benefactor's Encouragement": {
+    "cooldown": "8s",
+    "icon": 5132
+  },
+  "Benefit of the Archangel": {
+    "cooldown": "5s",
+    "icon": 1524
+  },
+  "Bestial Blows": {
+    "cooldown": "5s",
+    "icon": 10540
+  },
+  "Bith's Acclaimation": {
+    "cooldown": "10:00 min",
+    "icon": 4886
+  },
+  "Bith's Benediction": {
+    "cooldown": "10:00 min",
+    "icon": 4887
+  },
+  "Bith's Benison": {
+    "cooldown": "10:00 min",
+    "icon": 4885
+  },
+  "Blade Barrier": {
+    "cooldown": "5:00 min",
+    "icon": 3054
+  },
+  "Bladeturn": {
+    "cooldown": "30s",
+    "icon": 531
+  },
+  "Blank Coordination": {
+    "cooldown": "10s",
+    "icon": 4166
+  },
+  "Blanket of Darkness": {
+    "cooldown": "10s",
+    "icon": 2521
+  },
+  "Blast of Boldness": {
+    "cooldown": "10s",
+    "icon": 5430
+  },
+  "Blast of Bravery": {
+    "cooldown": "10s",
+    "icon": 5429
+  },
+  "Blast of Courage": {
+    "cooldown": "10s",
+    "icon": 5428
+  },
+  "Blast of Defiance": {
+    "cooldown": "10s",
+    "icon": 5432
+  },
+  "Blast of Galliance": {
+    "cooldown": "10s",
+    "icon": 5431
+  },
+  "Blast of Heroism": {
+    "cooldown": "10s",
+    "icon": 5434
+  },
+  "Blast of Valiance": {
+    "cooldown": "10s",
+    "icon": 5433
+  },
+  "Blast of the Champion": {
+    "cooldown": "10s",
+    "icon": 5435
+  },
+  "Bleed Might": {
+    "cooldown": "10s",
+    "icon": 11306
+  },
+  "Bleed Strength": {
+    "cooldown": "10s",
+    "icon": 11302
+  },
+  "Blessing of Nethuni": {
+    "cooldown": "30s",
+    "icon": 10675
+  },
+  "Blessing of the Heavens": {
+    "cooldown": "5:00 min",
+    "icon": 1424
+  },
+  "Blessing of the Night": {
+    "cooldown": "5:00 min",
+    "icon": 9128
+  },
+  "Blight Burst": {
+    "cooldown": "5:00 min",
+    "icon": 3482
+  },
+  "Blight Spores": {
+    "cooldown": "4s",
+    "icon": 4020
+  },
+  "Blinding Scintillation": {
+    "cooldown": "10s",
+    "icon": 4253
+  },
+  "Block Spirit": {
+    "cooldown": "10s",
+    "icon": 3355
+  },
+  "Blood Curdling Scream": {
+    "cooldown": "1:00 min",
+    "icon": 13645
+  },
+  "Blooddrinking": {
+    "cooldown": "5:00 min",
+    "icon": 1845
+  },
+  "Blunt Arrows": {
+    "cooldown": "1.00s",
+    "icon": 7460
+  },
+  "Boiling Cauldron": {
+    "cooldown": "15:00 min",
+    "icon": 3085
+  },
+  "Bolster Bonecaster": {
+    "cooldown": "5s",
+    "icon": 10033
+  },
+  "Bolt of Death": {
+    "cooldown": "20s",
+    "icon": 12073
+  },
+  "Bolt of Destruction": {
+    "cooldown": "20s",
+    "icon": 12070
+  },
+  "Bolt of Healing": {
+    "cooldown": "20s",
+    "icon": 1357
+  },
+  "Bolt of Lava": {
+    "cooldown": "20s",
+    "icon": 61
+  },
+  "Bolt of Lava (Enhanced)": {
+    "cooldown": "20s",
+    "icon": 62
+  },
+  "Bolt of Mending": {
+    "cooldown": "20s",
+    "icon": 1354
+  },
+  "Bolt of Renewal": {
+    "cooldown": "20s",
+    "icon": 1356
+  },
+  "Bolt of Uncreation": {
+    "cooldown": "20s",
+    "icon": 4559
+  },
+  "Bone Carapace": {
+    "cooldown": "1:00 h",
+    "icon": 10091
+  },
+  "Boon from Eir": {
+    "cooldown": "5:00 min",
+    "icon": 3082
+  },
+  "Boon of the Heavens": {
+    "cooldown": "5:00 min",
+    "icon": 1422
+  },
+  "Boost Bonecaster": {
+    "cooldown": "10s",
+    "icon": 10031
+  },
+  "Bounty of the Archangel": {
+    "cooldown": "5s",
+    "icon": 1525
+  },
+  "Brazen Stand": {
+    "cooldown": "30s",
+    "icon": 986
+  },
+  "Break Skeleton": {
+    "cooldown": "8s",
+    "icon": 10074
+  },
+  "Bringer of Death": {
+    "cooldown": "15:00 min",
+    "icon": 9407
+  },
+  "Brutal Blows": {
+    "cooldown": "5s",
+    "icon": 10536
+  },
+  "Burdening Embrace": {
+    "cooldown": "15s",
+    "icon": 13008
+  },
+  "Burdening Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10567
+  },
+  "Bursting Embers": {
+    "cooldown": "30s",
+    "icon": 14041
+  },
+  "Bursting Ivy": {
+    "cooldown": "10:00 min",
+    "icon": 5294
+  },
+  "Bursting Tangleweed": {
+    "cooldown": "10:00 min",
+    "icon": 5296
+  },
+  "Bursting Thornweed": {
+    "cooldown": "10:00 min",
+    "icon": 5297
+  },
+  "Bursting Undergrowth": {
+    "cooldown": "10:00 min",
+    "icon": 5292
+  },
+  "Bursting Vines": {
+    "cooldown": "10:00 min",
+    "icon": 5295
+  },
+  "Cacophony": {
+    "cooldown": "15s",
+    "icon": 1142
+  },
+  "Call of Darkness": {
+    "cooldown": "15:00 min",
+    "icon": 3050
+  },
+  "Call of the Hounds": {
+    "cooldown": "10:00 min",
+    "icon": 3589
+  },
+  "Call of the Raven": {
+    "cooldown": "1:00 min",
+    "icon": 13080
+  },
+  "Calm of the Grave": {
+    "cooldown": "5:00 min",
+    "icon": 979
+  },
+  "Calming Notes": {
+    "cooldown": "5:00 min",
+    "icon": 3044
+  },
+  "Cancel Defenses": {
+    "cooldown": "15s",
+    "icon": 13136
+  },
+  "Cancel Strength": {
+    "cooldown": "10s",
+    "icon": 4531
+  },
+  "Cant of Befuddling": {
+    "cooldown": "30s",
+    "icon": 1181
+  },
+  "Cant of Bewilderment": {
+    "cooldown": "30s",
+    "icon": 1182
+  },
+  "Cant of Confusion": {
+    "cooldown": "30s",
+    "icon": 1183
+  },
+  "Cant of Discord": {
+    "cooldown": "30s",
+    "icon": 1184
+  },
+  "Cant of Perplexity": {
+    "cooldown": "30s",
+    "icon": 1185
+  },
+  "Capitulation": {
+    "cooldown": "20s",
+    "icon": 5415
+  },
+  "Captivating Melodies": {
+    "cooldown": "5s",
+    "icon": 1151
+  },
+  "Celerity": {
+    "cooldown": "8s",
+    "icon": 3235
+  },
+  "Celerity of Kudzu": {
+    "cooldown": "2:00 min",
+    "icon": 11223
+  },
+  "Chain Lightning": {
+    "cooldown": "10:00 min",
+    "icon": 7067
+  },
+  "Chant of Blood": {
+    "cooldown": "8s",
+    "icon": 3607
+  },
+  "Chant of Energy": {
+    "cooldown": "8s",
+    "icon": 1082
+  },
+  "Chant of Persistence": {
+    "cooldown": "8s",
+    "icon": 1084
+  },
+  "Chant of Stamina": {
+    "cooldown": "8s",
+    "icon": 1083
+  },
+  "Chant of Tenacity": {
+    "cooldown": "8s",
+    "icon": 1085
+  },
+  "Chant of the Battle": {
+    "cooldown": "8s",
+    "icon": 3604
+  },
+  "Chant of the Brawl": {
+    "cooldown": "8s",
+    "icon": 3601
+  },
+  "Chant of the Charge": {
+    "cooldown": "8s",
+    "icon": 3603
+  },
+  "Chant of the Fight": {
+    "cooldown": "8s",
+    "icon": 3602
+  },
+  "Chant of the Siege": {
+    "cooldown": "8s",
+    "icon": 3605
+  },
+  "Chant of the War": {
+    "cooldown": "8s",
+    "icon": 3606
+  },
+  "Chaplain's Redemption": {
+    "cooldown": "30s",
+    "icon": 14402
+  },
+  "Chilling Ground": {
+    "cooldown": "1:30 min",
+    "icon": 15234
+  },
+  "Chilling Shriek": {
+    "cooldown": "2:00 min",
+    "icon": 13644
+  },
+  "Chilling Tendrils": {
+    "cooldown": "1:00 min",
+    "icon": 238
+  },
+  "Choking Undergrowth": {
+    "cooldown": "10:00 min",
+    "icon": 5293
+  },
+  "Chthonic Form": {
+    "cooldown": "20s",
+    "icon": 9404
+  },
+  "Clarity of the Deep": {
+    "cooldown": "5s",
+    "icon": 1537
+  },
+  "Claws of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10504
+  },
+  "Cleansing Light": {
+    "cooldown": "5:00 min",
+    "icon": 7011
+  },
+  "Close Path": {
+    "cooldown": "20s",
+    "icon": 11201
+  },
+  "Clouded Agony": {
+    "cooldown": "30s",
+    "icon": 556
+  },
+  "Clouded Destruction": {
+    "cooldown": "30s",
+    "icon": 562
+  },
+  "Clouded Distress": {
+    "cooldown": "30s",
+    "icon": 558
+  },
+  "Clouded Pain": {
+    "cooldown": "30s",
+    "icon": 560
+  },
+  "Collapse Skeleton": {
+    "cooldown": "8s",
+    "icon": 10071
+  },
+  "Combat Awareness": {
+    "cooldown": "15:00 min",
+    "icon": 3090
+  },
+  "Compel Captulation": {
+    "cooldown": "20s",
+    "icon": 3644
+  },
+  "Compel Defeat": {
+    "cooldown": "20s",
+    "icon": 3645
+  },
+  "Compel Resignation": {
+    "cooldown": "20s",
+    "icon": 3643
+  },
+  "Compel Submission": {
+    "cooldown": "20s",
+    "icon": 3642
+  },
+  "Compel Surrender": {
+    "cooldown": "20s",
+    "icon": 3641
+  },
+  "Conceal Path": {
+    "cooldown": "20s",
+    "icon": 11203
+  },
+  "Concussive Bellow": {
+    "cooldown": "15s",
+    "icon": 5362
+  },
+  "Concussive Holler": {
+    "cooldown": "15s",
+    "icon": 5364
+  },
+  "Concussive Roar": {
+    "cooldown": "15s",
+    "icon": 5368
+  },
+  "Concussive Scream": {
+    "cooldown": "15s",
+    "icon": 5365
+  },
+  "Concussive Shout": {
+    "cooldown": "15s",
+    "icon": 5361
+  },
+  "Concussive Shriek": {
+    "cooldown": "15s",
+    "icon": 5367
+  },
+  "Concussive Wail": {
+    "cooldown": "15s",
+    "icon": 5368
+  },
+  "Concussive Whoop": {
+    "cooldown": "15s",
+    "icon": 5366
+  },
+  "Concussive Yell": {
+    "cooldown": "15s",
+    "icon": 5363
+  },
+  "Confining Curse": {
+    "cooldown": "8s",
+    "icon": 9636
+  },
+  "Constricting Exhaustion": {
+    "cooldown": "1:00 min",
+    "icon": 9215
+  },
+  "Constricting Field": {
+    "cooldown": "10s",
+    "icon": 764
+  },
+  "Constricting Void": {
+    "cooldown": "10s",
+    "icon": 764
+  },
+  "Cooling Tendrils": {
+    "cooldown": "1:00 min",
+    "icon": 237
+  },
+  "Courageous Tendrils": {
+    "cooldown": "1:00 min",
+    "icon": 5297
+  },
+  "Cover Eyes": {
+    "cooldown": "10s",
+    "icon": 2621
+  },
+  "Cramping Curse": {
+    "cooldown": "8s",
+    "icon": 9634
+  },
+  "Crawl": {
+    "cooldown": "20s",
+    "icon": 5440
+  },
+  "Cripple Body": {
+    "cooldown": "10s",
+    "icon": 677
+  },
+  "Crippling Curse": {
+    "cooldown": "8s",
+    "icon": 9632
+  },
+  "Crippling Exhaustion": {
+    "cooldown": "1:00 min",
+    "icon": 9211
+  },
+  "Crippling Shout": {
+    "cooldown": "30s",
+    "icon": 3631
+  },
+  "Critical Imbalance": {
+    "cooldown": "10s",
+    "icon": 766
+  },
+  "Crumble Skeleton": {
+    "cooldown": "8s",
+    "icon": 10072
+  },
+  "Crumple Skeleton": {
+    "cooldown": "8s",
+    "icon": 10077
+  },
+  "Crunch Skeleton": {
+    "cooldown": "8s",
+    "icon": 10078
+  },
+  "Crusader's Barrier": {
+    "cooldown": "8s",
+    "icon": 1034
+  },
+  "Crusader's Defense": {
+    "cooldown": "8s",
+    "icon": 1035
+  },
+  "Crusader's Guard": {
+    "cooldown": "8s",
+    "icon": 1033
+  },
+  "Crusader's Mantle": {
+    "cooldown": "8s",
+    "icon": 1038
+  },
+  "Crusader's Protection": {
+    "cooldown": "8s",
+    "icon": 1037
+  },
+  "Crusader's Refreshment": {
+    "cooldown": "8s",
+    "icon": 1013
+  },
+  "Crusader's Shelter": {
+    "cooldown": "8s",
+    "icon": 1036
+  },
+  "Crusader's Shield": {
+    "cooldown": "8s",
+    "icon": 1032
+  },
+  "Crusader's Ward": {
+    "cooldown": "8s",
+    "icon": 1031
+  },
+  "Crush Skeleton": {
+    "cooldown": "8s",
+    "icon": 10075
+  },
+  "Crushing Aura": {
+    "cooldown": "8s",
+    "icon": 9644
+  },
+  "Curse of Blindness": {
+    "cooldown": "10s",
+    "icon": 2626
+  },
+  "Curse of Crawling": {
+    "cooldown": "20s",
+    "icon": 5440
+  },
+  "Curse of Languishing": {
+    "cooldown": "20s",
+    "icon": 5437
+  },
+  "Curse of Lumbering": {
+    "cooldown": "20s",
+    "icon": 5438
+  },
+  "Curse of Slowness": {
+    "cooldown": "20s",
+    "icon": 5436
+  },
+  "Curse of Sluggishness": {
+    "cooldown": "20s",
+    "icon": 5439
+  },
+  "Cursed Annihilation": {
+    "cooldown": "20s",
+    "icon": 12023
+  },
+  "Cursed Blast": {
+    "cooldown": "20s",
+    "icon": 12015
+  },
+  "Cursed Bomb": {
+    "cooldown": "20s",
+    "icon": 12019
+  },
+  "Cursed Burst": {
+    "cooldown": "20s",
+    "icon": 12016
+  },
+  "Cursed Destruction": {
+    "cooldown": "20s",
+    "icon": 12021
+  },
+  "Cursed Devastation": {
+    "cooldown": "20s",
+    "icon": 12022
+  },
+  "Cursed Explosion": {
+    "cooldown": "20s",
+    "icon": 12017
+  },
+  "Cursed Mortar": {
+    "cooldown": "20s",
+    "icon": 12018
+  },
+  "Cursed Ruination": {
+    "cooldown": "20s",
+    "icon": 12020
+  },
+  "Cursed Spores": {
+    "cooldown": "3s",
+    "icon": 4020
+  },
+  "Cursed Tendrils": {
+    "cooldown": "1:00 min",
+    "icon": 5297
+  },
+  "Dagger of Night": {
+    "cooldown": "20s",
+    "icon": 5512
+  },
+  "Daring Blow": {
+    "cooldown": "8s",
+    "icon": 10570
+  },
+  "Dark Empowerment": {
+    "cooldown": "5s",
+    "icon": 15229
+  },
+  "Darken Path": {
+    "cooldown": "20s",
+    "icon": 11207
+  },
+  "Darken Vision": {
+    "cooldown": "10s",
+    "icon": 2624
+  },
+  "Darkened Alacrity": {
+    "cooldown": "15s",
+    "icon": 13047
+  },
+  "Darkened Haste": {
+    "cooldown": "15s",
+    "icon": 13049
+  },
+  "Darkened Quickness": {
+    "cooldown": "15s",
+    "icon": 13046
+  },
+  "Darkened Swiftness": {
+    "cooldown": "15s",
+    "icon": 13045
+  },
+  "Darkened Urgency": {
+    "cooldown": "15s",
+    "icon": 13048
+  },
+  "Darkness Form": {
+    "cooldown": "15:00 min",
+    "icon": 3050
+  },
+  "Dart of Night": {
+    "cooldown": "20s",
+    "icon": 5511
+  },
+  "Dash": {
+    "cooldown": "1:00 min",
+    "icon": 5465
+  },
+  "Dashing Defense": {
+    "cooldown": "10:00 min",
+    "icon": 3032
+  },
+  "Daunt Servant": {
+    "cooldown": "30s",
+    "icon": 15200
+  },
+  "Dazing": {
+    "cooldown": "20s",
+    "icon": 14960
+  },
+  "Dazzling Flare": {
+    "cooldown": "5s",
+    "icon": 4282
+  },
+  "Dazzling Flash": {
+    "cooldown": "5s",
+    "icon": 4280
+  },
+  "Dazzling Strobe": {
+    "cooldown": "5s",
+    "icon": 4283
+  },
+  "Dazzling Torch": {
+    "cooldown": "5s",
+    "icon": 4281
+  },
+  "Dead Flesh Living": {
+    "cooldown": "30s",
+    "icon": 9416
+  },
+  "Deadly Empowerment": {
+    "cooldown": "5s",
+    "icon": 15230
+  },
+  "Deafening Cacophony": {
+    "cooldown": "15s",
+    "icon": 1145
+  },
+  "Deafening Cascade": {
+    "cooldown": "20s",
+    "icon": 13676
+  },
+  "Death Blast": {
+    "cooldown": "15s",
+    "icon": 3469
+  },
+  "Debilitate Body": {
+    "cooldown": "10s",
+    "icon": 672
+  },
+  "Debilitate Strength": {
+    "cooldown": "10s",
+    "icon": 2766
+  },
+  "Debilitating Exhaustion": {
+    "cooldown": "1:00 min",
+    "icon": 9218
+  },
+  "Debility": {
+    "cooldown": "20s",
+    "icon": 5401
+  },
+  "Decimating Aura": {
+    "cooldown": "8s",
+    "icon": 9647
+  },
+  "Decimation Trap": {
+    "cooldown": "15:00 min",
+    "icon": 3025
+  },
+  "Decrepit Form": {
+    "cooldown": "20s",
+    "icon": 9401
+  },
+  "Decrepit Ground": {
+    "cooldown": "1:30 min",
+    "icon": 731
+  },
+  "Deflect Attack": {
+    "cooldown": "15s",
+    "icon": 13036
+  },
+  "Deflect Blows": {
+    "cooldown": "5s",
+    "icon": 10513
+  },
+  "Deflect Lacerations": {
+    "cooldown": "5s",
+    "icon": 10519
+  },
+  "Deflect Magic ": {
+    "cooldown": "15s",
+    "icon": 13131
+  },
+  "Deflect Punctures": {
+    "cooldown": "5s",
+    "icon": 10525
+  },
+  "Degenerate Body": {
+    "cooldown": "10s",
+    "icon": 676
+  },
+  "Deluding Harmony": {
+    "cooldown": "10:00 min",
+    "icon": 5394
+  },
+  "Demand Awe": {
+    "cooldown": "45s",
+    "icon": 10589
+  },
+  "Demand Respect": {
+    "cooldown": "45s",
+    "icon": 10587
+  },
+  "Demand Reverence": {
+    "cooldown": "45s",
+    "icon": 10588
+  },
+  "Demand of Integrity": {
+    "cooldown": "8s",
+    "icon": 10631
+  },
+  "Demand of Perfection": {
+    "cooldown": "8s",
+    "icon": 10637
+  },
+  "Demand of Precision": {
+    "cooldown": "8s",
+    "icon": 10632
+  },
+  "Demand of Purity": {
+    "cooldown": "8s",
+    "icon": 10633
+  },
+  "Demand of Quality": {
+    "cooldown": "8s",
+    "icon": 10630
+  },
+  "Demand of Superiority": {
+    "cooldown": "8s",
+    "icon": 10634
+  },
+  "Demand of Supremacy": {
+    "cooldown": "8s",
+    "icon": 10635
+  },
+  "Demand of Transcendence": {
+    "cooldown": "8s",
+    "icon": 10636
+  },
+  "Demolishing Aura": {
+    "cooldown": "8s",
+    "icon": 9645
+  },
+  "Demoralization": {
+    "cooldown": "20s",
+    "icon": 5423
+  },
+  "Desecrated Ground": {
+    "cooldown": "1:30 min",
+    "icon": 734
+  },
+  "Desperate Bowman": {
+    "cooldown": "15:00 min",
+    "icon": 3060
+  },
+  "Destroy Coordination": {
+    "cooldown": "10s",
+    "icon": 4164
+  },
+  "Destroy Defenses": {
+    "cooldown": "15s",
+    "icon": 13139
+  },
+  "Destroy Magic ": {
+    "cooldown": "15s",
+    "icon": 13134
+  },
+  "Destructive Blow": {
+    "cooldown": "8s",
+    "icon": 10577
+  },
+  "Deter Attack": {
+    "cooldown": "15s",
+    "icon": 13039
+  },
+  "Deteriorate Body": {
+    "cooldown": "10s",
+    "icon": 674
+  },
+  "Devastate Senses": {
+    "cooldown": "10s",
+    "icon": 13160
+  },
+  "Diffuse Fervor": {
+    "cooldown": "10s",
+    "icon": 2752
+  },
+  "Diffuse Strength": {
+    "cooldown": "10s",
+    "icon": 2652
+  },
+  "Diffuse Zeal": {
+    "cooldown": "10s",
+    "icon": 2756
+  },
+  "Dilapidate Body": {
+    "cooldown": "10s",
+    "icon": 678
+  },
+  "Diminish Senses": {
+    "cooldown": "10s",
+    "icon": 13157
+  },
+  "Diminishing Bellow": {
+    "cooldown": "10s",
+    "icon": 765
+  },
+  "Diminishing Cadence": {
+    "cooldown": "10s",
+    "icon": 765
+  },
+  "Diminishing Scream": {
+    "cooldown": "10s",
+    "icon": 767
+  },
+  "Diminishing Screech": {
+    "cooldown": "10s",
+    "icon": 764
+  },
+  "Diminishing Shriek": {
+    "cooldown": "10s",
+    "icon": 766
+  },
+  "Diminishing Wail": {
+    "cooldown": "10s",
+    "icon": 764
+  },
+  "Diminishing Yell": {
+    "cooldown": "10s",
+    "icon": 761
+  },
+  "Disabling Exhaustion": {
+    "cooldown": "1:00 min",
+    "icon": 9216
+  },
+  "Disabling Shout": {
+    "cooldown": "30s",
+    "icon": 3630
+  },
+  "Dischordant Howl": {
+    "cooldown": "15s",
+    "icon": 1135
+  },
+  "Dischordant Note": {
+    "cooldown": "15s",
+    "icon": 1131
+  },
+  "Dischordant Shriek": {
+    "cooldown": "15s",
+    "icon": 1134
+  },
+  "Dischordant Tone": {
+    "cooldown": "15s",
+    "icon": 1132
+  },
+  "Dischordant Wail": {
+    "cooldown": "15s",
+    "icon": 1133
+  },
+  "Disconcerting Yell": {
+    "cooldown": "5:00 min",
+    "icon": 13641
+  },
+  "Disguise Path": {
+    "cooldown": "20s",
+    "icon": 11205
+  },
+  "Disintegrate Skeleton": {
+    "cooldown": "8s",
+    "icon": 10080
+  },
+  "Dispel Evil": {
+    "cooldown": "20s",
+    "icon": 1664
+  },
+  "Dispensation from Eir": {
+    "cooldown": "5:00 min",
+    "icon": 3083
+  },
+  "Dispersal of the Deep": {
+    "cooldown": "5s",
+    "icon": 1515
+  },
+  "Disperse Fervor": {
+    "cooldown": "10s",
+    "icon": 2753
+  },
+  "Disperse Health": {
+    "cooldown": "10s",
+    "icon": 4386
+  },
+  "Disperse Vigor": {
+    "cooldown": "10s",
+    "icon": 4384
+  },
+  "Disperse Zeal": {
+    "cooldown": "10s",
+    "icon": 2757
+  },
+  "Dissipate Fervor": {
+    "cooldown": "10s",
+    "icon": 2754
+  },
+  "Dissipate Zeal": {
+    "cooldown": "10s",
+    "icon": 2758
+  },
+  "Dissolute Swings": {
+    "cooldown": "10:00 min",
+    "icon": 3039
+  },
+  "Dissolve Skeleton": {
+    "cooldown": "8s",
+    "icon": 10073
+  },
+  "Distracting Scintillation": {
+    "cooldown": "10s",
+    "icon": 4251
+  },
+  "Disturbing Scintillation": {
+    "cooldown": "10s",
+    "icon": 4254
+  },
+  "Divert Attack": {
+    "cooldown": "15s",
+    "icon": 13038
+  },
+  "Divine Intervention": {
+    "cooldown": "10:00 min",
+    "icon": 3035
+  },
+  "Draining Embrace": {
+    "cooldown": "15s",
+    "icon": 13009
+  },
+  "Draining Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10568
+  },
+  "Dread Charge": {
+    "cooldown": "1:00 min",
+    "icon": 7035
+  },
+  "Dread Commander Bladeturn": {
+    "cooldown": "1:00 h",
+    "icon": 10305
+  },
+  "Dreamweaver": {
+    "cooldown": "10:00 min",
+    "icon": 3051
+  },
+  "Drive Evil": {
+    "cooldown": "20s",
+    "icon": 1661
+  },
+  "Drive of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10532
+  },
+  "Dull Sight": {
+    "cooldown": "10s",
+    "icon": 2622
+  },
+  "Dulling Embrace": {
+    "cooldown": "15s",
+    "icon": 13001
+  },
+  "Dulling Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10559
+  },
+  "Ear-splitting Cascade": {
+    "cooldown": "20s",
+    "icon": 13674
+  },
+  "Earth Eddies": {
+    "cooldown": "6s",
+    "icon": 81
+  },
+  "Earth Ripple": {
+    "cooldown": "6s",
+    "icon": 83
+  },
+  "Earth Splash": {
+    "cooldown": "6s",
+    "icon": 82
+  },
+  "Earth Wave": {
+    "cooldown": "6s",
+    "icon": 84
+  },
+  "Eir's Glorious Touch": {
+    "cooldown": "10:00 min",
+    "icon": 3085
+  },
+  "Eir's Heavenly Touch": {
+    "cooldown": "10:00 min",
+    "icon": 3087
+  },
+  "Eir's Magnificent Touch": {
+    "cooldown": "10:00 min",
+    "icon": 3086
+  },
+  "Elemental Deflection Chant": {
+    "cooldown": "8s",
+    "icon": 3657
+  },
+  "Elemental Deflection Song": {
+    "cooldown": "8s",
+    "icon": 3658
+  },
+  "Elemental Guarding Hymn": {
+    "cooldown": "8s",
+    "icon": 5387
+  },
+  "Elemental Protection Hymn": {
+    "cooldown": "8s",
+    "icon": 5388
+  },
+  "Elemental Shield": {
+    "cooldown": "8s",
+    "icon": 1058
+  },
+  "Elemental Ward": {
+    "cooldown": "8s",
+    "icon": 1057
+  },
+  "Eliminate Sight": {
+    "cooldown": "10s",
+    "icon": 13682
+  },
+  "Emasculate Strength": {
+    "cooldown": "10s",
+    "icon": 2767
+  },
+  "Emerald Disease Wrapper": {
+    "cooldown": "58:20 min",
+    "icon": 4020
+  },
+  "Emerald Poison Wrapper": {
+    "cooldown": "58:20 min",
+    "icon": 4018
+  },
+  "Enchanted Ground": {
+    "cooldown": "1:30 min",
+    "icon": 976
+  },
+  "Enchanting Melodies": {
+    "cooldown": "5s",
+    "icon": 1152
+  },
+  "Encoraching Blow": {
+    "cooldown": "8s",
+    "icon": 10572
+  },
+  "Endless Burden": {
+    "cooldown": "5s",
+    "icon": 10616
+  },
+  "Endure Blows": {
+    "cooldown": "5s",
+    "icon": 10516
+  },
+  "Endure Lacerations": {
+    "cooldown": "5s",
+    "icon": 10522
+  },
+  "Endure Punctures": {
+    "cooldown": "5s",
+    "icon": 10528
+  },
+  "Energy Siphon": {
+    "cooldown": "20s",
+    "icon": 9613
+  },
+  "Enervating Embrace": {
+    "cooldown": "15s",
+    "icon": 13007
+  },
+  "Enervating Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10566
+  },
+  "Enervation": {
+    "cooldown": "20s",
+    "icon": 5405
+  },
+  "Enfeeble Body": {
+    "cooldown": "10s",
+    "icon": 675
+  },
+  "Enfeeble Strength": {
+    "cooldown": "10s",
+    "icon": 2764
+  },
+  "Enhanced Celerity": {
+    "cooldown": "8s",
+    "icon": 3236
+  },
+  "Enrage": {
+    "cooldown": "20s",
+    "icon": 1072
+  },
+  "Enticing Melodies": {
+    "cooldown": "5s",
+    "icon": 1155
+  },
+  "Entrancing Harmony": {
+    "cooldown": "10:00 min",
+    "icon": 5395
+  },
+  "Entwining Snakes": {
+    "cooldown": "10:00 min",
+    "icon": 3071
+  },
+  "Envelope of Darkness": {
+    "cooldown": "10s",
+    "icon": 2523
+  },
+  "Epiphany": {
+    "cooldown": "10:00 min",
+    "icon": 7066
+  },
+  "Eradicating Aura": {
+    "cooldown": "8s",
+    "icon": 9646
+  },
+  "Essence Blast": {
+    "cooldown": "15s",
+    "icon": 3467
+  },
+  "Essence Siphon": {
+    "cooldown": "20s",
+    "icon": 9616
+  },
+  "Evasion of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10512
+  },
+  "Evil Empowerment": {
+    "cooldown": "5s",
+    "icon": 15228
+  },
+  "Exhaust Strength": {
+    "cooldown": "10s",
+    "icon": 11304
+  },
+  "Exhausting Embrace": {
+    "cooldown": "15s",
+    "icon": 13010
+  },
+  "Exhausting Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10569
+  },
+  "Expectancy of Magic": {
+    "cooldown": "1:00 min",
+    "icon": 15241
+  },
+  "Expel Servant": {
+    "cooldown": "30s",
+    "icon": 15198
+  },
+  "Expel Sight": {
+    "cooldown": "10s",
+    "icon": 13684
+  },
+  "Explosive Orb": {
+    "cooldown": "20s",
+    "icon": 13578
+  },
+  "Explosive Orb (Major)": {
+    "cooldown": "20s",
+    "icon": 13579
+  },
+  "Explosive Orb (Minor)": {
+    "cooldown": "20s",
+    "icon": 13577
+  },
+  "Extinguish Coordination": {
+    "cooldown": "10s",
+    "icon": 4168
+  },
+  "Extinguish Strength": {
+    "cooldown": "10s",
+    "icon": 2657
+  },
+  "Eyes of the Scout": {
+    "cooldown": "10s",
+    "icon": 10672
+  },
+  "Eyes of the Sentinel": {
+    "cooldown": "10s",
+    "icon": 10671
+  },
+  "Eyes of the Watchman": {
+    "cooldown": "10s",
+    "icon": 10670
+  },
+  "Facilitate Painworking": {
+    "cooldown": "30s",
+    "icon": 9221
+  },
+  "Fanatic's Redemption": {
+    "cooldown": "30s",
+    "icon": 14403
+  },
+  "Fanaticism": {
+    "cooldown": "10:00 min",
+    "icon": 3087
+  },
+  "Fangs of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10506
+  },
+  "Fatigue Body": {
+    "cooldown": "10s",
+    "icon": 671
+  },
+  "Fatiguing Embrace": {
+    "cooldown": "15s",
+    "icon": 13004
+  },
+  "Fatiguing Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10563
+  },
+  "Favor from Eir": {
+    "cooldown": "5:00 min",
+    "icon": 3081
+  },
+  "Favor of the Heavens": {
+    "cooldown": "5:00 min",
+    "icon": 1423
+  },
+  "Fear Servant": {
+    "cooldown": "30s",
+    "icon": 15197
+  },
+  "Feral Blows": {
+    "cooldown": "5s",
+    "icon": 10539
+  },
+  "Ferocious Will": {
+    "cooldown": "10:00 min",
+    "icon": 3064
+  },
+  "Fervor of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10534
+  },
+  "Field of Darkness": {
+    "cooldown": "10s",
+    "icon": 2525
+  },
+  "Field of Scintillation": {
+    "cooldown": "10s",
+    "icon": 4271
+  },
+  "Fierce Blows": {
+    "cooldown": "5s",
+    "icon": 10537
+  },
+  "Fiery Bolt": {
+    "cooldown": "20s",
+    "icon": 312
+  },
+  "Fiery Grapple": {
+    "cooldown": "20s",
+    "icon": 14089
+  },
+  "Fiery Grasp": {
+    "cooldown": "20s",
+    "icon": 14085
+  },
+  "Fiery Leglock": {
+    "cooldown": "20s",
+    "icon": 14088
+  },
+  "Fiery Stranglehold": {
+    "cooldown": "20s",
+    "icon": 14090
+  },
+  "Fiery Tangle": {
+    "cooldown": "20s",
+    "icon": 14086
+  },
+  "Fiery Wrap": {
+    "cooldown": "20s",
+    "icon": 14087
+  },
+  "Final Blast": {
+    "cooldown": "15s",
+    "icon": 3470
+  },
+  "Fire Bolt": {
+    "cooldown": "20s",
+    "icon": 311
+  },
+  "Fire Streak": {
+    "cooldown": "20s",
+    "icon": 372
+  },
+  "Fireball": {
+    "cooldown": "20s",
+    "icon": 313
+  },
+  "First Aid": {
+    "cooldown": "3:00 min",
+    "icon": 3000
+  },
+  "Flame Spear": {
+    "cooldown": "20s",
+    "icon": 378
+  },
+  "Flame Streak": {
+    "cooldown": "20s",
+    "icon": 374
+  },
+  "Flaming Embers": {
+    "cooldown": "30s",
+    "icon": 14040
+  },
+  "Flaming Rock": {
+    "cooldown": "20s",
+    "icon": 318
+  },
+  "Flaming Rocks (Greater)": {
+    "cooldown": "20s",
+    "icon": 319
+  },
+  "Flaming Rocks (Major)": {
+    "cooldown": "20s",
+    "icon": 320
+  },
+  "Flaming Rocks (Minor)": {
+    "cooldown": "20s",
+    "icon": 317
+  },
+  "Fleetness of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10510
+  },
+  "Flickering Embers": {
+    "cooldown": "30s",
+    "icon": 14036
+  },
+  "Focus Blast": {
+    "cooldown": "15s",
+    "icon": 3466
+  },
+  "Foil Attack": {
+    "cooldown": "15s",
+    "icon": 13040
+  },
+  "Force": {
+    "cooldown": "15s",
+    "icon": 13062
+  },
+  "Forest Phantom": {
+    "cooldown": "10:00 min",
+    "icon": 5465
+  },
+  "Forest Shadow": {
+    "cooldown": "10:00 min",
+    "icon": 5461
+  },
+  "Forest Spirit": {
+    "cooldown": "10:00 min",
+    "icon": 5463
+  },
+  "Fortified Skin": {
+    "cooldown": "15s",
+    "icon": 13123
+  },
+  "Freezing Clench": {
+    "cooldown": "30s",
+    "icon": 15195
+  },
+  "Freezing Grasp": {
+    "cooldown": "1:00 min",
+    "icon": 15193
+  },
+  "Freezing Ground": {
+    "cooldown": "1:30 min",
+    "icon": 15237
+  },
+  "Freezing Hold": {
+    "cooldown": "1:00 min",
+    "icon": 15192
+  },
+  "Freezing Howl": {
+    "cooldown": "20s",
+    "icon": 15196
+  },
+  "Freezing Tendrils": {
+    "cooldown": "1:00 min",
+    "icon": 241
+  },
+  "Freezing Terror": {
+    "cooldown": "30s",
+    "icon": 15194
+  },
+  "Friction": {
+    "cooldown": "10s",
+    "icon": 123
+  },
+  "Friend DoT Wrapper": {
+    "cooldown": "58:20 min",
+    "icon": 10590
+  },
+  "Frightening Hex": {
+    "cooldown": "30s",
+    "icon": 15198
+  },
+  "Frigid Ground": {
+    "cooldown": "1:30 min",
+    "icon": 15235
+  },
+  "Frosting Tendrils": {
+    "cooldown": "1:00 min",
+    "icon": 239
+  },
+  "Fueled by Rage": {
+    "cooldown": "10:00 min",
+    "icon": 1841
+  },
+  "Fungal Barb": {
+    "cooldown": "20s",
+    "icon": 3469
+  },
+  "Fungal Bramble": {
+    "cooldown": "20s",
+    "icon": 3464
+  },
+  "Fungal Burr": {
+    "cooldown": "20s",
+    "icon": 3462
+  },
+  "Fungal Needle": {
+    "cooldown": "20s",
+    "icon": 3468
+  },
+  "Fungal Pin": {
+    "cooldown": "20s",
+    "icon": 3461
+  },
+  "Fungal Spear": {
+    "cooldown": "20s",
+    "icon": 3470
+  },
+  "Fungal Spike": {
+    "cooldown": "20s",
+    "icon": 3463
+  },
+  "Fungal Spine": {
+    "cooldown": "20s",
+    "icon": 3470
+  },
+  "Fungal Spur": {
+    "cooldown": "20s",
+    "icon": 3465
+  },
+  "Fungal Thistle": {
+    "cooldown": "20s",
+    "icon": 3466
+  },
+  "Fungal Thorn": {
+    "cooldown": "20s",
+    "icon": 3467
+  },
+  "Fungal Union": {
+    "cooldown": "5:00 min",
+    "icon": 3061
+  },
+  "Fury of Nature": {
+    "cooldown": "10:00 min",
+    "icon": 7054
+  },
+  "Galaxy of Scintillation": {
+    "cooldown": "10s",
+    "icon": 4275
+  },
+  "Gift of Foresight": {
+    "cooldown": "15s",
+    "icon": 10643
+  },
+  "Gift of Form": {
+    "cooldown": "15s",
+    "icon": 13041
+  },
+  "Gift of Nethuni": {
+    "cooldown": "30s",
+    "icon": 10673
+  },
+  "Gift of Perizor": {
+    "cooldown": "0.00s",
+    "icon": 3081
+  },
+  "Gift of Precision": {
+    "cooldown": "15s",
+    "icon": 13065
+  },
+  "Gift of Renewal": {
+    "cooldown": "15s",
+    "icon": 14411
+  },
+  "Gift of the Heavens": {
+    "cooldown": "5:00 min",
+    "icon": 1421
+  },
+  "Globe of Darkness": {
+    "cooldown": "10s",
+    "icon": 2524
+  },
+  "Glorious Remedy": {
+    "cooldown": "10:00 min",
+    "icon": 1432
+  },
+  "Glorious Song of Rest": {
+    "cooldown": "8s",
+    "icon": 3617
+  },
+  "Golden Renewal": {
+    "cooldown": "3:00 min",
+    "icon": 7011
+  },
+  "Grace of Nethuni": {
+    "cooldown": "30s",
+    "icon": 10674
+  },
+  "Grasping Creepers": {
+    "cooldown": "1:00 min",
+    "icon": 5221
+  },
+  "Grasping Ivy": {
+    "cooldown": "1:00 min",
+    "icon": 5219
+  },
+  "Grasping Tangleweed": {
+    "cooldown": "1:00 min",
+    "icon": 5222
+  },
+  "Grasping Tendrils": {
+    "cooldown": "1:00 min",
+    "icon": 5220
+  },
+  "Grasping Thornweed": {
+    "cooldown": "1:00 min",
+    "icon": 5223
+  },
+  "Greater Atony": {
+    "cooldown": "20s",
+    "icon": 5404
+  },
+  "Greater Battle Fervor": {
+    "cooldown": "8s",
+    "icon": 1022
+  },
+  "Greater Battle Fury": {
+    "cooldown": "8s",
+    "icon": 1026
+  },
+  "Greater Battle Vigor": {
+    "cooldown": "8s",
+    "icon": 1024
+  },
+  "Greater Battle Zeal": {
+    "cooldown": "8s",
+    "icon": 1028
+  },
+  "Greater Bolt of Death": {
+    "cooldown": "20s",
+    "icon": 12074
+  },
+  "Greater Bolt of Destruction": {
+    "cooldown": "20s",
+    "icon": 12071
+  },
+  "Greater Bolt of Havoc": {
+    "cooldown": "20s",
+    "icon": 12068
+  },
+  "Greater Bolt of Healing": {
+    "cooldown": "20s",
+    "icon": 1358
+  },
+  "Greater Bolt of Ruin": {
+    "cooldown": "20s",
+    "icon": 12066
+  },
+  "Greater Burden": {
+    "cooldown": "5:00 min",
+    "icon": 10608
+  },
+  "Greater Cacophony": {
+    "cooldown": "15s",
+    "icon": 1143
+  },
+  "Greater Capitulation": {
+    "cooldown": "20s",
+    "icon": 5416
+  },
+  "Greater Curse of Blindness": {
+    "cooldown": "10s",
+    "icon": 2627
+  },
+  "Greater Dazing": {
+    "cooldown": "20s",
+    "icon": 14962
+  },
+  "Greater Debility": {
+    "cooldown": "20s",
+    "icon": 5402
+  },
+  "Greater Demoralization": {
+    "cooldown": "20s",
+    "icon": 5425
+  },
+  "Greater Enervation": {
+    "cooldown": "20s",
+    "icon": 5406
+  },
+  "Greater Force": {
+    "cooldown": "15s",
+    "icon": 13063
+  },
+  "Greater Forest Shadow": {
+    "cooldown": "10:00 min",
+    "icon": 5462
+  },
+  "Greater Forest Spirit": {
+    "cooldown": "10:00 min",
+    "icon": 5464
+  },
+  "Greater Friction": {
+    "cooldown": "10s",
+    "icon": 125
+  },
+  "Greater Gift of Foresight": {
+    "cooldown": "15s",
+    "icon": 10645
+  },
+  "Greater Imbalance": {
+    "cooldown": "10s",
+    "icon": 764
+  },
+  "Greater Infirmity": {
+    "cooldown": "20s",
+    "icon": 5408
+  },
+  "Greater Lullaby": {
+    "cooldown": "10s",
+    "icon": 5304
+  },
+  "Greater Refreshment": {
+    "cooldown": "8s",
+    "icon": 1012
+  },
+  "Greater Regeneration": {
+    "cooldown": "15s",
+    "icon": 13019
+  },
+  "Greater Renewal": {
+    "cooldown": "15s",
+    "icon": 13017
+  },
+  "Greater Resignation": {
+    "cooldown": "20s",
+    "icon": 5418
+  },
+  "Greater Runebolt": {
+    "cooldown": "20s",
+    "icon": 2906
+  },
+  "Greater Submission": {
+    "cooldown": "20s",
+    "icon": 5412
+  },
+  "Greater Surrender": {
+    "cooldown": "20s",
+    "icon": 5414
+  },
+  "Greater Thunder Bellow": {
+    "cooldown": "20s",
+    "icon": 3526
+  },
+  "Greater Thunder Howl": {
+    "cooldown": "20s",
+    "icon": 3524
+  },
+  "Greater Thunder Roar": {
+    "cooldown": "20s",
+    "icon": 3528
+  },
+  "Greater Thunder Shout": {
+    "cooldown": "20s",
+    "icon": 3522
+  },
+  "Greater Vitality Dispersal": {
+    "cooldown": "10s",
+    "icon": 4387
+  },
+  "Grind Skeleton": {
+    "cooldown": "8s",
+    "icon": 10076
+  },
+  "Grueling Embrace": {
+    "cooldown": "15s",
+    "icon": 13006
+  },
+  "Grueling Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10565
+  },
+  "Guardian's Encouragement": {
+    "cooldown": "8s",
+    "icon": 5131
+  },
+  "Hardened Skin": {
+    "cooldown": "15s",
+    "icon": 13121
+  },
+  "Harmonic Song of Rest": {
+    "cooldown": "8s",
+    "icon": 3615
+  },
+  "Harmonic Song of Travel": {
+    "cooldown": "8s",
+    "icon": 3610
+  },
+  "Harry Spirit": {
+    "cooldown": "10s",
+    "icon": 3352
+  },
+  "Haste of Kudzu": {
+    "cooldown": "2:00 min",
+    "icon": 11221
+  },
+  "Haste of the Angel": {
+    "cooldown": "3:00 min",
+    "icon": 1722
+  },
+  "Haste of the Archangel": {
+    "cooldown": "3:00 min",
+    "icon": 1725
+  },
+  "Health Siphon": {
+    "cooldown": "20s",
+    "icon": 9614
+  },
+  "Heat Chains": {
+    "cooldown": "10s",
+    "icon": 4526
+  },
+  "Heat Clamp": {
+    "cooldown": "10s",
+    "icon": 4524
+  },
+  "Heat Lock": {
+    "cooldown": "10s",
+    "icon": 4525
+  },
+  "Heat Net": {
+    "cooldown": "10s",
+    "icon": 4522
+  },
+  "Heat Snare": {
+    "cooldown": "10s",
+    "icon": 4521
+  },
+  "Heat Web": {
+    "cooldown": "10s",
+    "icon": 4523
+  },
+  "Heated Embers": {
+    "cooldown": "30s",
+    "icon": 14038
+  },
+  "Heavenly Dreams": {
+    "cooldown": "5:00 min",
+    "icon": 1684
+  },
+  "Heavenly Images": {
+    "cooldown": "5:00 min",
+    "icon": 1682
+  },
+  "Heavenly Imagination": {
+    "cooldown": "5:00 min",
+    "icon": 1685
+  },
+  "Heavenly Mirage": {
+    "cooldown": "5:00 min",
+    "icon": 1683
+  },
+  "Heavenly Song of Rest": {
+    "cooldown": "8s",
+    "icon": 3618
+  },
+  "Heavenly Song of Travel": {
+    "cooldown": "8s",
+    "icon": 3612
+  },
+  "Heavenly Visions": {
+    "cooldown": "5:00 min",
+    "icon": 1681
+  },
+  "Hexed Bonding Root": {
+    "cooldown": "20s",
+    "icon": 12086
+  },
+  "Hexed Clutching Root": {
+    "cooldown": "20s",
+    "icon": 12088
+  },
+  "Hexed Detaining Root": {
+    "cooldown": "20s",
+    "icon": 12092
+  },
+  "Hexed Grasping Root": {
+    "cooldown": "20s",
+    "icon": 12085
+  },
+  "Hexed Holding Root": {
+    "cooldown": "20s",
+    "icon": 12089
+  },
+  "Hexed Tangling Root": {
+    "cooldown": "20s",
+    "icon": 12090
+  },
+  "Hexed Tenacious Root": {
+    "cooldown": "20s",
+    "icon": 12091
+  },
+  "Hexed Webbing Root": {
+    "cooldown": "20s",
+    "icon": 12087
+  },
+  "Hide Path": {
+    "cooldown": "20s",
+    "icon": 11202
+  },
+  "Hinder Senses": {
+    "cooldown": "10s",
+    "icon": 13155
+  },
+  "Hinder Spirit": {
+    "cooldown": "10s",
+    "icon": 3351
+  },
+  "Hooks of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10502
+  },
+  "Horrifying Hex": {
+    "cooldown": "30s",
+    "icon": 15200
+  },
+  "Hostile Blow": {
+    "cooldown": "8s",
+    "icon": 10571
+  },
+  "Humming Spike": {
+    "cooldown": "20s",
+    "icon": 13576
+  },
+  "Hunter's Ally": {
+    "cooldown": "2:00 min",
+    "icon": 3588
+  },
+  "Hunter's Avatar": {
+    "cooldown": "2:00 min",
+    "icon": 3590
+  },
+  "Hunter's Companion": {
+    "cooldown": "2:00 min",
+    "icon": 3586
+  },
+  "Hunter's Elder Avatar": {
+    "cooldown": "2:00 min",
+    "icon": 3590
+  },
+  "Hunter's Elder Protector": {
+    "cooldown": "2:00 min",
+    "icon": 3590
+  },
+  "Hunter's Pet": {
+    "cooldown": "2:00 min",
+    "icon": 3587
+  },
+  "Hunter's Protector": {
+    "cooldown": "2:00 min",
+    "icon": 3589
+  },
+  "Hurricane's Dance": {
+    "cooldown": "5s",
+    "icon": 1524
+  },
+  "Hymn of Soul Guarding": {
+    "cooldown": "8s",
+    "icon": 5381
+  },
+  "Hymn of Soul Protection": {
+    "cooldown": "8s",
+    "icon": 5382
+  },
+  "Hypnotic Harmony": {
+    "cooldown": "10:00 min",
+    "icon": 5393
+  },
+  "Ice Bond": {
+    "cooldown": "1:00 min",
+    "icon": 5437
+  },
+  "Ice Bracelet": {
+    "cooldown": "1:00 min",
+    "icon": 5440
+  },
+  "Ice Cable": {
+    "cooldown": "1:00 min",
+    "icon": 5438
+  },
+  "Ice Chain": {
+    "cooldown": "1:00 min",
+    "icon": 5439
+  },
+  "Ichor of the Deep": {
+    "cooldown": "10:00 min",
+    "icon": 3028
+  },
+  "Icy Ground": {
+    "cooldown": "1:30 min",
+    "icon": 15233
+  },
+  "Ignore Blows": {
+    "cooldown": "5s",
+    "icon": 10518
+  },
+  "Ignore Debilitation": {
+    "cooldown": "1:30 min",
+    "icon": 15187
+  },
+  "Ignore Depletion": {
+    "cooldown": "1:30 min",
+    "icon": 15190
+  },
+  "Ignore Impunities": {
+    "cooldown": "1:30 min",
+    "icon": 15189
+  },
+  "Ignore Infirmity": {
+    "cooldown": "1:30 min",
+    "icon": 15188
+  },
+  "Ignore Lacerations": {
+    "cooldown": "5s",
+    "icon": 10524
+  },
+  "Ignore Pain": {
+    "cooldown": "15:00 min",
+    "icon": 3003
+  },
+  "Ignore Punctures": {
+    "cooldown": "5s",
+    "icon": 10530
+  },
+  "Ignore Weakness": {
+    "cooldown": "1:30 min",
+    "icon": 15186
+  },
+  "Illusion of Guarding": {
+    "cooldown": "8s",
+    "icon": 1198
+  },
+  "Illusion of Protection": {
+    "cooldown": "8s",
+    "icon": 1200
+  },
+  "Illusion of Shielding": {
+    "cooldown": "8s",
+    "icon": 1199
+  },
+  "Imbalance": {
+    "cooldown": "10s",
+    "icon": 763
+  },
+  "Imbue the Abyss": {
+    "cooldown": "30s",
+    "icon": 9417
+  },
+  "Impair Strength": {
+    "cooldown": "10s",
+    "icon": 2765
+  },
+  "Impede Spirit": {
+    "cooldown": "10s",
+    "icon": 3356
+  },
+  "Impenetrable Skin": {
+    "cooldown": "15s",
+    "icon": 13124
+  },
+  "Impervious Skin": {
+    "cooldown": "15s",
+    "icon": 13125
+  },
+  "Impress Ambiguity": {
+    "cooldown": "30s",
+    "icon": 13151
+  },
+  "Impress Amnesia": {
+    "cooldown": "30s",
+    "icon": 13153
+  },
+  "Impress Confusion": {
+    "cooldown": "30s",
+    "icon": 13152
+  },
+  "Impress Dread ": {
+    "cooldown": "30s",
+    "icon": 13150
+  },
+  "Incandescent Clarity": {
+    "cooldown": "1:00 min",
+    "icon": 7011
+  },
+  "Incapacitating Shout": {
+    "cooldown": "30s",
+    "icon": 3632
+  },
+  "Incendiary Lance": {
+    "cooldown": "20s",
+    "icon": 376
+  },
+  "Incense": {
+    "cooldown": "30s",
+    "icon": 1754
+  },
+  "Incinerating Embers": {
+    "cooldown": "30s",
+    "icon": 14042
+  },
+  "Ineluctable Hindrance": {
+    "cooldown": "8s",
+    "icon": 10622
+  },
+  "Ineludible Encumberance": {
+    "cooldown": "8s",
+    "icon": 10626
+  },
+  "Ineludible Hindrance": {
+    "cooldown": "8s",
+    "icon": 10623
+  },
+  "Inescapable Encumberance": {
+    "cooldown": "8s",
+    "icon": 10628
+  },
+  "Inevitable Encumberance": {
+    "cooldown": "8s",
+    "icon": 10627
+  },
+  "Inevitable Hindrance": {
+    "cooldown": "8s",
+    "icon": 10624
+  },
+  "Infirmity": {
+    "cooldown": "20s",
+    "icon": 5407
+  },
+  "Inflame": {
+    "cooldown": "30s",
+    "icon": 1753
+  },
+  "Inflexible Armor": {
+    "cooldown": "10:00 min",
+    "icon": 10612
+  },
+  "Inflict Excruciation": {
+    "cooldown": "10s",
+    "icon": 727
+  },
+  "Inflict Greater Excruciation": {
+    "cooldown": "10s",
+    "icon": 728
+  },
+  "Inflict Greater Malaise": {
+    "cooldown": "10s",
+    "icon": 722
+  },
+  "Inflict Greater Misery": {
+    "cooldown": "10s",
+    "icon": 726
+  },
+  "Inflict Greater Suffering": {
+    "cooldown": "10s",
+    "icon": 724
+  },
+  "Inflict Malaise": {
+    "cooldown": "10s",
+    "icon": 721
+  },
+  "Inflict Misery": {
+    "cooldown": "10s",
+    "icon": 725
+  },
+  "Inflict Suffering": {
+    "cooldown": "10s",
+    "icon": 723
+  },
+  "Infurating Gesture": {
+    "cooldown": "30s",
+    "icon": 10548
+  },
+  "Infuriate": {
+    "cooldown": "20s",
+    "icon": 1073
+  },
+  "Infused Ground": {
+    "cooldown": "1:30 min",
+    "icon": 977
+  },
+  "Inquisitor's Redemption": {
+    "cooldown": "30s",
+    "icon": 14404
+  },
+  "Insulting Gesture": {
+    "cooldown": "30s",
+    "icon": 10546
+  },
+  "Intimidate Servant": {
+    "cooldown": "30s",
+    "icon": 15199
+  },
+  "Intimidating Hex": {
+    "cooldown": "30s",
+    "icon": 15197
+  },
+  "Intoning Aura ": {
+    "cooldown": "5s",
+    "icon": 13604
+  },
+  "Intruding Blow": {
+    "cooldown": "8s",
+    "icon": 10575
+  },
+  "Intrusive Blow": {
+    "cooldown": "8s",
+    "icon": 10574
+  },
+  "Irreverant Gesture": {
+    "cooldown": "30s",
+    "icon": 10545
+  },
+  "Irreverent Gesture": {
+    "cooldown": "30s",
+    "icon": 10545
+  },
+  "Jade Ablative": {
+    "cooldown": "1:00 h",
+    "icon": 8089
+  },
+  "Juggernaut": {
+    "cooldown": "15:00 min",
+    "icon": 3030
+  },
+  "Kelgor's Boon": {
+    "cooldown": "5s",
+    "icon": 10543
+  },
+  "Kelgor's Gift": {
+    "cooldown": "5s",
+    "icon": 10542
+  },
+  "Kelgor's Guard": {
+    "cooldown": "10:00 min",
+    "icon": 7307
+  },
+  "Kelgor's Reward": {
+    "cooldown": "5s",
+    "icon": 10544
+  },
+  "Knife of Night": {
+    "cooldown": "20s",
+    "icon": 5513
+  },
+  "Lance of Night": {
+    "cooldown": "20s",
+    "icon": 5518
+  },
+  "Languor": {
+    "cooldown": "20s",
+    "icon": 5437
+  },
+  "Last Stand": {
+    "cooldown": "30s",
+    "icon": 987
+  },
+  "Lava Force": {
+    "cooldown": "20s",
+    "icon": 65
+  },
+  "Lava Force (Enhanced)": {
+    "cooldown": "20s",
+    "icon": 66
+  },
+  "Lava Streak": {
+    "cooldown": "20s",
+    "icon": 67
+  },
+  "Lava Streak (Enhanced)": {
+    "cooldown": "20s",
+    "icon": 68
+  },
+  "Lava Strike": {
+    "cooldown": "20s",
+    "icon": 63
+  },
+  "Lava Strike (Enhanced)": {
+    "cooldown": "20s",
+    "icon": 64
+  },
+  "Lava's Fury": {
+    "cooldown": "20s",
+    "icon": 69
+  },
+  "Lessen Strength": {
+    "cooldown": "10s",
+    "icon": 2651
+  },
+  "Lesser Bolt of Death": {
+    "cooldown": "20s",
+    "icon": 12072
+  },
+  "Lesser Bolt of Destruction": {
+    "cooldown": "20s",
+    "icon": 12069
+  },
+  "Lesser Bolt of Havoc": {
+    "cooldown": "20s",
+    "icon": 12067
+  },
+  "Lesser Bolt of Healing": {
+    "cooldown": "20s",
+    "icon": 1356
+  },
+  "Lesser Bolt of Mending": {
+    "cooldown": "20s",
+    "icon": 1352
+  },
+  "Lesser Bolt of Renewal": {
+    "cooldown": "20s",
+    "icon": 1354
+  },
+  "Lesser Bolt of Ruin": {
+    "cooldown": "20s",
+    "icon": 12065
+  },
+  "Lesser Burden": {
+    "cooldown": "5:00 min",
+    "icon": 10606
+  },
+  "Lesser Cacophony": {
+    "cooldown": "15s",
+    "icon": 1141
+  },
+  "Lesser Deliverance": {
+    "cooldown": "5:00 min",
+    "icon": 14869
+  },
+  "Lesser Demoralization": {
+    "cooldown": "20s",
+    "icon": 5422
+  },
+  "Lesser Friction": {
+    "cooldown": "10s",
+    "icon": 122
+  },
+  "Lesser Gift of Foresight": {
+    "cooldown": "15s",
+    "icon": 10642
+  },
+  "Lesser Health Dispersal": {
+    "cooldown": "10s",
+    "icon": 4385
+  },
+  "Lesser Imbalance": {
+    "cooldown": "10s",
+    "icon": 762
+  },
+  "Lesser Lullaby": {
+    "cooldown": "10s",
+    "icon": 5302
+  },
+  "Lesser Nature's Favor": {
+    "cooldown": "30s",
+    "icon": 14396
+  },
+  "Lesser Nature's Gift": {
+    "cooldown": "30s",
+    "icon": 14395
+  },
+  "Lesser Nature's Token": {
+    "cooldown": "30s",
+    "icon": 14397
+  },
+  "Lesser Refreshment": {
+    "cooldown": "8s",
+    "icon": 1009
+  },
+  "Lesser Runebolt": {
+    "cooldown": "20s",
+    "icon": 2903
+  },
+  "Lesser Sigil of Destruction": {
+    "cooldown": "20s",
+    "icon": 2965
+  },
+  "Lesser Sigil of Devastation": {
+    "cooldown": "20s",
+    "icon": 2967
+  },
+  "Lesser Sigil of Havoc": {
+    "cooldown": "20s",
+    "icon": 2963
+  },
+  "Lesser Sigil of Ruin": {
+    "cooldown": "20s",
+    "icon": 2961
+  },
+  "Lesser Sigil of Undoing": {
+    "cooldown": "20s",
+    "icon": 2969
+  },
+  "Lesser Strength Dispersal": {
+    "cooldown": "10s",
+    "icon": 4381
+  },
+  "Lesser Vigor Dispersal": {
+    "cooldown": "10s",
+    "icon": 4383
+  },
+  "Life Siphon": {
+    "cooldown": "20s",
+    "icon": 9618
+  },
+  "Lullaby": {
+    "cooldown": "10s",
+    "icon": 5303
+  },
+  "Lumber": {
+    "cooldown": "20s",
+    "icon": 5438
+  },
+  "Magic Empowerment": {
+    "cooldown": "5s",
+    "icon": 15227
+  },
+  "Magical Net": {
+    "cooldown": "10s",
+    "icon": 540
+  },
+  "Magical Trap": {
+    "cooldown": "10s",
+    "icon": 539
+  },
+  "Magical Web": {
+    "cooldown": "10s",
+    "icon": 538
+  },
+  "Magnificent Remedy": {
+    "cooldown": "10:00 min",
+    "icon": 1433
+  },
+  "Magnificent Song of Rest": {
+    "cooldown": "8s",
+    "icon": 3616
+  },
+  "Magnificent Song of Travel": {
+    "cooldown": "8s",
+    "icon": 3611
+  },
+  "Majestic Ground": {
+    "cooldown": "1:30 min",
+    "icon": 978
+  },
+  "Major Cacophony": {
+    "cooldown": "15s",
+    "icon": 1144
+  },
+  "Major Constricting Field": {
+    "cooldown": "10s",
+    "icon": 766
+  },
+  "Major Constricting Void": {
+    "cooldown": "10s",
+    "icon": 766
+  },
+  "Major Dazing": {
+    "cooldown": "20s",
+    "icon": 14961
+  },
+  "Major Demoralization": {
+    "cooldown": "20s",
+    "icon": 5424
+  },
+  "Major Force": {
+    "cooldown": "15s",
+    "icon": 13064
+  },
+  "Major Friction": {
+    "cooldown": "10s",
+    "icon": 124
+  },
+  "Major Gift of Foresight": {
+    "cooldown": "15s",
+    "icon": 10644
+  },
+  "Major Imbalance": {
+    "cooldown": "10s",
+    "icon": 765
+  },
+  "Major Refreshment": {
+    "cooldown": "8s",
+    "icon": 1011
+  },
+  "Major Restraining Field": {
+    "cooldown": "10s",
+    "icon": 767
+  },
+  "Major Restraining Void": {
+    "cooldown": "10s",
+    "icon": 767
+  },
+  "Major Runebolt": {
+    "cooldown": "20s",
+    "icon": 2905
+  },
+  "Mania of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10533
+  },
+  "Mark of Devastation": {
+    "cooldown": "6s",
+    "icon": 2993
+  },
+  "Mark of Havoc": {
+    "cooldown": "6s",
+    "icon": 2992
+  },
+  "Mark of Prey": {
+    "cooldown": "10:00 min",
+    "icon": 3089
+  },
+  "Mark of Ruin": {
+    "cooldown": "6s",
+    "icon": 2991
+  },
+  "Mark of Undoing": {
+    "cooldown": "6s",
+    "icon": 2994
+  },
+  "Mask Path": {
+    "cooldown": "20s",
+    "icon": 11208
+  },
+  "Mastery of Concentration": {
+    "cooldown": "10:00 min",
+    "icon": 3006
+  },
+  "Maximum Force": {
+    "cooldown": "15s",
+    "icon": 13065
+  },
+  "Mesmerizing Glare ": {
+    "cooldown": "5s",
+    "icon": 13145
+  },
+  "Mesmerizing Glower": {
+    "cooldown": "5s",
+    "icon": 13147
+  },
+  "Mesmerizing Scowl": {
+    "cooldown": "5s",
+    "icon": 13146
+  },
+  "Minion Rescue": {
+    "cooldown": "15:00 min",
+    "icon": 3048
+  },
+  "Minor Burden": {
+    "cooldown": "5:00 min",
+    "icon": 10605
+  },
+  "Minor Deliverance": {
+    "cooldown": "5:00 min",
+    "icon": 14805
+  },
+  "Minor Demoralization": {
+    "cooldown": "20s",
+    "icon": 5421
+  },
+  "Minor Fire Streak": {
+    "cooldown": "20s",
+    "icon": 371
+  },
+  "Minor Flame Spear": {
+    "cooldown": "20s",
+    "icon": 377
+  },
+  "Minor Flame Streak": {
+    "cooldown": "20s",
+    "icon": 373
+  },
+  "Minor Force": {
+    "cooldown": "15s",
+    "icon": 13061
+  },
+  "Minor Friction": {
+    "cooldown": "10s",
+    "icon": 121
+  },
+  "Minor Gift of Foresight": {
+    "cooldown": "15s",
+    "icon": 10641
+  },
+  "Minor Imbalance": {
+    "cooldown": "10s",
+    "icon": 761
+  },
+  "Minor Incendiary Lance": {
+    "cooldown": "20s",
+    "icon": 375
+  },
+  "Minor Lullaby": {
+    "cooldown": "5s",
+    "icon": 5301
+  },
+  "Minor Refreshment": {
+    "cooldown": "8s",
+    "icon": 1009
+  },
+  "Minor Runebolt": {
+    "cooldown": "20s",
+    "icon": 2902
+  },
+  "Mjollnir's Protection": {
+    "cooldown": "10:00 min",
+    "icon": 3066
+  },
+  "Modest Burden": {
+    "cooldown": "5:00 min",
+    "icon": 10607
+  },
+  "Mold Burst": {
+    "cooldown": "8s",
+    "icon": 3481
+  },
+  "Mold Cloud": {
+    "cooldown": "8s",
+    "icon": 3480
+  },
+  "Mold Explosion": {
+    "cooldown": "8s",
+    "icon": 3482
+  },
+  "Molten Embers": {
+    "cooldown": "30s",
+    "icon": 14039
+  },
+  "Murder Aura": {
+    "cooldown": "8s",
+    "icon": 9649
+  },
+  "Mystic Crystal Lore": {
+    "cooldown": "3:00 min",
+    "icon": 3008
+  },
+  "Mystic Ground": {
+    "cooldown": "1:30 min",
+    "icon": 980
+  },
+  "Mystic Net": {
+    "cooldown": "10s",
+    "icon": 537
+  },
+  "Mystic Trap": {
+    "cooldown": "10s",
+    "icon": 536
+  },
+  "Mystic Web": {
+    "cooldown": "10s",
+    "icon": 535
+  },
+  "Nails of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10501
+  },
+  "Nature's Appreciation": {
+    "cooldown": "5:00 min",
+    "icon": 4881
+  },
+  "Nature's Bane": {
+    "cooldown": "30s",
+    "icon": 11217
+  },
+  "Nature's Barrier": {
+    "cooldown": "8s",
+    "icon": 5125
+  },
+  "Nature's Bellow": {
+    "cooldown": "5:00 min",
+    "icon": 2602
+  },
+  "Nature's Blessing": {
+    "cooldown": "5:00 min",
+    "icon": 4882
+  },
+  "Nature's Blight": {
+    "cooldown": "30s",
+    "icon": 11214
+  },
+  "Nature's Curator": {
+    "cooldown": "30s",
+    "icon": 14401
+  },
+  "Nature's Deacon": {
+    "cooldown": "30s",
+    "icon": 14402
+  },
+  "Nature's Decay": {
+    "cooldown": "30s",
+    "icon": 11212
+  },
+  "Nature's Enlightenment": {
+    "cooldown": "5s",
+    "icon": 1536
+  },
+  "Nature's Esteem": {
+    "cooldown": "5:00 min",
+    "icon": 4883
+  },
+  "Nature's Favor": {
+    "cooldown": "30s",
+    "icon": 14399
+  },
+  "Nature's Feud": {
+    "cooldown": "8s",
+    "icon": 5116
+  },
+  "Nature's Gift": {
+    "cooldown": "30s",
+    "icon": 14398
+  },
+  "Nature's Guard": {
+    "cooldown": "8s",
+    "icon": 5124
+  },
+  "Nature's Ill": {
+    "cooldown": "30s",
+    "icon": 11210
+  },
+  "Nature's Keeper": {
+    "cooldown": "30s",
+    "icon": 14403
+  },
+  "Nature's Nausea": {
+    "cooldown": "30s",
+    "icon": 11209
+  },
+  "Nature's Poison": {
+    "cooldown": "30s",
+    "icon": 11216
+  },
+  "Nature's Reckoning": {
+    "cooldown": "8s",
+    "icon": 5117
+  },
+  "Nature's Retaliation": {
+    "cooldown": "8s",
+    "icon": 5114
+  },
+  "Nature's Retribution": {
+    "cooldown": "8s",
+    "icon": 5115
+  },
+  "Nature's Revenge": {
+    "cooldown": "8s",
+    "icon": 5111
+  },
+  "Nature's Rot": {
+    "cooldown": "30s",
+    "icon": 11211
+  },
+  "Nature's Sanction": {
+    "cooldown": "5:00 min",
+    "icon": 4884
+  },
+  "Nature's Sapience": {
+    "cooldown": "5s",
+    "icon": 1537
+  },
+  "Nature's Sentinel": {
+    "cooldown": "30s",
+    "icon": 14405
+  },
+  "Nature's Steward": {
+    "cooldown": "30s",
+    "icon": 14404
+  },
+  "Nature's Token": {
+    "cooldown": "30s",
+    "icon": 14400
+  },
+  "Nature's Toxin": {
+    "cooldown": "30s",
+    "icon": 11213
+  },
+  "Nature's Vendetta": {
+    "cooldown": "8s",
+    "icon": 5112
+  },
+  "Nature's Vengeance": {
+    "cooldown": "8s",
+    "icon": 5113
+  },
+  "Nature's Venom": {
+    "cooldown": "30s",
+    "icon": 11215
+  },
+  "Nature's Wall": {
+    "cooldown": "8s",
+    "icon": 5126
+  },
+  "Nature's Womb": {
+    "cooldown": "10:00 min",
+    "icon": 3052
+  },
+  "Necrotic Empowerment": {
+    "cooldown": "5s",
+    "icon": 15231
+  },
+  "Negate Attack": {
+    "cooldown": "15s",
+    "icon": 13041
+  },
+  "Negate Coordination": {
+    "cooldown": "10s",
+    "icon": 4161
+  },
+  "Negate Defenses": {
+    "cooldown": "15s",
+    "icon": 13137
+  },
+  "Negate Magic ": {
+    "cooldown": "15s",
+    "icon": 13133
+  },
+  "Negate Strength": {
+    "cooldown": "10s",
+    "icon": 4532
+  },
+  "Negative Bolt": {
+    "cooldown": "20s",
+    "icon": 4553
+  },
+  "Negative Maelstrom": {
+    "cooldown": "10:00 min",
+    "icon": 3026
+  },
+  "Nethuni's Recuperating Waters": {
+    "cooldown": "30s",
+    "icon": 10677
+  },
+  "Nethuni's Refreshing Waters": {
+    "cooldown": "30s",
+    "icon": 10676
+  },
+  "Nethuni's Renewing Waters": {
+    "cooldown": "30s",
+    "icon": 10678
+  },
+  "Neutralize": {
+    "cooldown": "10s",
+    "icon": 13117
+  },
+  "Nil Bolt": {
+    "cooldown": "20s",
+    "icon": 4551
+  },
+  "Null Bolt": {
+    "cooldown": "20s",
+    "icon": 4555
+  },
+  "Null Strength": {
+    "cooldown": "10s",
+    "icon": 4537
+  },
+  "Nullify Coordination": {
+    "cooldown": "10s",
+    "icon": 4162
+  },
+  "Numbing Ground": {
+    "cooldown": "1:30 min",
+    "icon": 15236
+  },
+  "Numbing Tendrils": {
+    "cooldown": "1:00 min",
+    "icon": 240
+  },
+  "Nurizane's Blinding Cyclone": {
+    "cooldown": "1:00 min",
+    "icon": 10581
+  },
+  "Nurizane's Blinding Gale": {
+    "cooldown": "1:00 min",
+    "icon": 10580
+  },
+  "Nurizane's Blinding Wind": {
+    "cooldown": "1:00 min",
+    "icon": 10579
+  },
+  "Obliterate Coordination": {
+    "cooldown": "10s",
+    "icon": 4167
+  },
+  "Obliteration Bolt": {
+    "cooldown": "20s",
+    "icon": 4558
+  },
+  "Obliviate Coordination": {
+    "cooldown": "10s",
+    "icon": 4163
+  },
+  "Oblivion Bolt": {
+    "cooldown": "20s",
+    "icon": 4556
+  },
+  "Obscure Path": {
+    "cooldown": "20s",
+    "icon": 11204
+  },
+  "Obscure View": {
+    "cooldown": "10s",
+    "icon": 2623
+  },
+  "Obstruct Spirit": {
+    "cooldown": "10s",
+    "icon": 3354
+  },
+  "Odin's Ambrosia": {
+    "cooldown": "10s",
+    "icon": 4414
+  },
+  "Odin's Amelioration": {
+    "cooldown": "15s",
+    "icon": 14401
+  },
+  "Odin's Antidote": {
+    "cooldown": "10s",
+    "icon": 4411
+  },
+  "Odin's Claw": {
+    "cooldown": "30s",
+    "icon": 12503
+  },
+  "Odin's Cure": {
+    "cooldown": "10s",
+    "icon": 4412
+  },
+  "Odin's Elixir": {
+    "cooldown": "10s",
+    "icon": 4412
+  },
+  "Odin's Emendation": {
+    "cooldown": "15s",
+    "icon": 14405
+  },
+  "Odin's Faith": {
+    "cooldown": "8s",
+    "icon": 14810
+  },
+  "Odin's Grasp": {
+    "cooldown": "35s",
+    "icon": 12542
+  },
+  "Odin's Greater Claw": {
+    "cooldown": "30s",
+    "icon": 12504
+  },
+  "Odin's Greater Hoof": {
+    "cooldown": "30s",
+    "icon": 12502
+  },
+  "Odin's Greater Horn": {
+    "cooldown": "25s",
+    "icon": 12506
+  },
+  "Odin's Greater Ram": {
+    "cooldown": "20s",
+    "icon": 12508
+  },
+  "Odin's Greater Retribution": {
+    "cooldown": "12s",
+    "icon": 12513
+  },
+  "Odin's Heel": {
+    "cooldown": "30s",
+    "icon": 12509
+  },
+  "Odin's Hoof": {
+    "cooldown": "30s",
+    "icon": 12501
+  },
+  "Odin's Horn": {
+    "cooldown": "25s",
+    "icon": 12505
+  },
+  "Odin's Infusion": {
+    "cooldown": "10s",
+    "icon": 4413
+  },
+  "Odin's Lesser Retribution": {
+    "cooldown": "20s",
+    "icon": 12511
+  },
+  "Odin's Lock": {
+    "cooldown": "30s",
+    "icon": 12543
+  },
+  "Odin's Major Retribution": {
+    "cooldown": "8s",
+    "icon": 12514
+  },
+  "Odin's Medicant": {
+    "cooldown": "10s",
+    "icon": 4411
+  },
+  "Odin's Minor Retribution": {
+    "cooldown": "24s",
+    "icon": 12510
+  },
+  "Odin's Purification": {
+    "cooldown": "15s",
+    "icon": 14401
+  },
+  "Odin's Ram": {
+    "cooldown": "25s",
+    "icon": 12507
+  },
+  "Odin's Reconstruction": {
+    "cooldown": "15s",
+    "icon": 14404
+  },
+  "Odin's Recovery": {
+    "cooldown": "15s",
+    "icon": 14402
+  },
+  "Odin's Reparation": {
+    "cooldown": "15s",
+    "icon": 14402
+  },
+  "Odin's Restoration": {
+    "cooldown": "15s",
+    "icon": 14403
+  },
+  "Odin's Restraint": {
+    "cooldown": "45s",
+    "icon": 12540
+  },
+  "Odin's Restriction": {
+    "cooldown": "40s",
+    "icon": 12541
+  },
+  "Odin's Retribution": {
+    "cooldown": "16s",
+    "icon": 12512
+  },
+  "Odin's Temperance": {
+    "cooldown": "8s",
+    "icon": 14812
+  },
+  "Odin's Virtue": {
+    "cooldown": "8s",
+    "icon": 14811
+  },
+  "Ominous Hex": {
+    "cooldown": "30s",
+    "icon": 15199
+  },
+  "Oscillating Aura ": {
+    "cooldown": "5s",
+    "icon": 13603
+  },
+  "Overwhelm": {
+    "cooldown": "5:00 min",
+    "icon": 1842
+  },
+  "Overwhelming Burden": {
+    "cooldown": "5:00 min",
+    "icon": 10609
+  },
+  "PBAE Cure Disease": {
+    "cooldown": "5:00 min",
+    "icon": 14379
+  },
+  "PBAE Cure Disease II": {
+    "cooldown": "1:00 min",
+    "icon": 14381
+  },
+  "PBAE Cure Poison": {
+    "cooldown": "5:00 min",
+    "icon": 14378
+  },
+  "PBAE Cure Poison II": {
+    "cooldown": "1:00 min",
+    "icon": 14380
+  },
+  "Pace of Kudzu": {
+    "cooldown": "2:00 min",
+    "icon": 11222
+  },
+  "Pacifying Gaze": {
+    "cooldown": "10:00 min",
+    "icon": 3393
+  },
+  "Pacifying Glance": {
+    "cooldown": "10:00 min",
+    "icon": 3391
+  },
+  "Pacifying Glare": {
+    "cooldown": "10:00 min",
+    "icon": 3392
+  },
+  "Paragon's Encouragement": {
+    "cooldown": "8s",
+    "icon": 5135
+  },
+  "Paralyzing Curse": {
+    "cooldown": "8s",
+    "icon": 9633
+  },
+  "Paralyzing Friction": {
+    "cooldown": "10s",
+    "icon": 127
+  },
+  "Paralyzing Gaze": {
+    "cooldown": "10:00 min",
+    "icon": 3396
+  },
+  "Paralyzing Glance": {
+    "cooldown": "10:00 min",
+    "icon": 3394
+  },
+  "Paralyzing Glare": {
+    "cooldown": "10:00 min",
+    "icon": 3395
+  },
+  "Paralyzing Shout": {
+    "cooldown": "30s",
+    "icon": 3633
+  },
+  "Partitioning of the Deep": {
+    "cooldown": "5s",
+    "icon": 1516
+  },
+  "Passion of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10531
+  },
+  "Perfect Gift of Foresight": {
+    "cooldown": "15s",
+    "icon": 10647
+  },
+  "Perfect Recovery": {
+    "cooldown": "5:00 min",
+    "icon": 3018
+  },
+  "Perfection of Form": {
+    "cooldown": "15s",
+    "icon": 10592
+  },
+  "Perfection of Method": {
+    "cooldown": "15s",
+    "icon": 10590
+  },
+  "Perfection of Style": {
+    "cooldown": "15s",
+    "icon": 10591
+  },
+  "Perizor's Disarming Bash": {
+    "cooldown": "45s",
+    "icon": 10595
+  },
+  "Perizor's Disarming Blow": {
+    "cooldown": "45s",
+    "icon": 10596
+  },
+  "Perizor's Disarming Strike": {
+    "cooldown": "45s",
+    "icon": 10594
+  },
+  "Perturbing Scintillation": {
+    "cooldown": "10s",
+    "icon": 4255
+  },
+  "Pet Amber Simulacrum Stun": {
+    "cooldown": "2s",
+    "icon": 3326
+  },
+  "Pet Cure NS": {
+    "cooldown": "4s",
+    "icon": 14382
+  },
+  "Pet Cure RS": {
+    "cooldown": "8.50s",
+    "icon": 7246
+  },
+  "Pet Group Disease Cure": {
+    "cooldown": "3.10s",
+    "icon": 3071
+  },
+  "Pet Group Poison Cure": {
+    "cooldown": "10s",
+    "icon": 1371
+  },
+  "Pet Nature Spirit Stun": {
+    "cooldown": "2s",
+    "icon": 3379
+  },
+  "Pet Necromancer Stun": {
+    "cooldown": "2s",
+    "icon": 3326
+  },
+  "Pet Sapphire Simulacrum Lifedrain Wrapper": {
+    "cooldown": "58:20 min",
+    "icon": 2610
+  },
+  "Pet Simulacrum DD Wrapper": {
+    "cooldown": "1:00 h",
+    "icon": 10570
+  },
+  "Pet Simulacrum Resist Wrapper": {
+    "cooldown": "1:00 h",
+    "icon": 10590
+  },
+  "Pet Spirit Thrall Bladeturn Wrapper": {
+    "cooldown": "1:00 h",
+    "icon": 531
+  },
+  "Pet Spirit Thrall DD Wrapper": {
+    "cooldown": "1:00 h",
+    "icon": 151
+  },
+  "Pet Spirit Thrall Lifedrain Wrapper": {
+    "cooldown": "1:00 h",
+    "icon": 2610
+  },
+  "Pet Spirit Thrall Stun": {
+    "cooldown": "2s",
+    "icon": 3326
+  },
+  "Pet Underhill DD Wrapper": {
+    "cooldown": "1:00 h",
+    "icon": 151
+  },
+  "Petrifying Cry ": {
+    "cooldown": "4:00 min",
+    "icon": 13642
+  },
+  "Piercing Cascade": {
+    "cooldown": "20s",
+    "icon": 13675
+  },
+  "Plated Fiend's Touch": {
+    "cooldown": "1:00 h",
+    "icon": 9004
+  },
+  "Pleasurable Melodies": {
+    "cooldown": "5s",
+    "icon": 1154
+  },
+  "Powder Skeleton": {
+    "cooldown": "8s",
+    "icon": 10079
+  },
+  "Power Absorb": {
+    "cooldown": "20s",
+    "icon": 9118
+  },
+  "Power Blast": {
+    "cooldown": "15s",
+    "icon": 3461
+  },
+  "Power Drain": {
+    "cooldown": "20s",
+    "icon": 9111
+  },
+  "Power Leech": {
+    "cooldown": "20s",
+    "icon": 9116
+  },
+  "Power Shield": {
+    "cooldown": "1.00s",
+    "icon": 12031
+  },
+  "Power Shot 1": {
+    "cooldown": "20s",
+    "icon": 7410
+  },
+  "Power Shot 2": {
+    "cooldown": "20s",
+    "icon": 7411
+  },
+  "Power Shot 3": {
+    "cooldown": "20s",
+    "icon": 7411
+  },
+  "Power Shot 4": {
+    "cooldown": "20s",
+    "icon": 7412
+  },
+  "Power Shot 5": {
+    "cooldown": "20s",
+    "icon": 7412
+  },
+  "Power Shot 6": {
+    "cooldown": "20s",
+    "icon": 7413
+  },
+  "Power Shot 7": {
+    "cooldown": "20s",
+    "icon": 7413
+  },
+  "Power Shot 8": {
+    "cooldown": "20s",
+    "icon": 7414
+  },
+  "Power Siphon": {
+    "cooldown": "20s",
+    "icon": 9117
+  },
+  "Power Vacuum": {
+    "cooldown": "20s",
+    "icon": 9115
+  },
+  "Power Vortex": {
+    "cooldown": "30s",
+    "icon": 15245
+  },
+  "Prophet's Conviction": {
+    "cooldown": "30s",
+    "icon": 14398
+  },
+  "Prophet's Dogma": {
+    "cooldown": "30s",
+    "icon": 14400
+  },
+  "Prophet's Faith": {
+    "cooldown": "30s",
+    "icon": 14396
+  },
+  "Prophet's Fidelity": {
+    "cooldown": "30s",
+    "icon": 14399
+  },
+  "Prophet's Penitence": {
+    "cooldown": "30s",
+    "icon": 14395
+  },
+  "Prophet's Piety": {
+    "cooldown": "30s",
+    "icon": 14397
+  },
+  "Protection of the Underhill": {
+    "cooldown": "10:00 min",
+    "icon": 3063
+  },
+  "Protector's Encouragement": {
+    "cooldown": "8s",
+    "icon": 5133
+  },
+  "Provoke": {
+    "cooldown": "20s",
+    "icon": 1070
+  },
+  "Pugnacious Blow": {
+    "cooldown": "8s",
+    "icon": 10576
+  },
+  "Puissance Siphon": {
+    "cooldown": "20s",
+    "icon": 9612
+  },
+  "Pulverize Skeleton": {
+    "cooldown": "8s",
+    "icon": 10081
+  },
+  "Pure Celerity": {
+    "cooldown": "8s",
+    "icon": 3238
+  },
+  "Purge Sight": {
+    "cooldown": "10s",
+    "icon": 13683
+  },
+  "Quell Strength": {
+    "cooldown": "10s",
+    "icon": 2655
+  },
+  "Quickness of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10511
+  },
+  "Rabies 10%": {
+    "cooldown": "58:20 min",
+    "icon": 4020
+  },
+  "Rabies 15%": {
+    "cooldown": "58:20 min",
+    "icon": 4020
+  },
+  "Rabies 20%": {
+    "cooldown": "58:20 min",
+    "icon": 4020
+  },
+  "Rabies 25%": {
+    "cooldown": "58:20 min",
+    "icon": 4020
+  },
+  "Radiant Absolution": {
+    "cooldown": "2:00 min",
+    "icon": 7011
+  },
+  "Raging Power": {
+    "cooldown": "10:00 min",
+    "icon": 3009
+  },
+  "Rampant Speed": {
+    "cooldown": "2:00 min",
+    "icon": 11224
+  },
+  "Rapier of Night": {
+    "cooldown": "20s",
+    "icon": 5516
+  },
+  "Recuperation": {
+    "cooldown": "15s",
+    "icon": 13015
+  },
+  "Redeem from Valhalla": {
+    "cooldown": "5:00 min",
+    "icon": 1441
+  },
+  "Refreshment": {
+    "cooldown": "8s",
+    "icon": 1010
+  },
+  "Regenerate Blood": {
+    "cooldown": "30s",
+    "icon": 9412
+  },
+  "Regenerate Body": {
+    "cooldown": "30s",
+    "icon": 9416
+  },
+  "Regenerate Flesh": {
+    "cooldown": "30s",
+    "icon": 9411
+  },
+  "Regenerate Muscle": {
+    "cooldown": "30s",
+    "icon": 9414
+  },
+  "Regeneration": {
+    "cooldown": "15s",
+    "icon": 13018
+  },
+  "Reign of Fire": {
+    "cooldown": "20s",
+    "icon": 315
+  },
+  "Reign of Fire (Major)": {
+    "cooldown": "20s",
+    "icon": 316
+  },
+  "Reign of Fire (Minor)": {
+    "cooldown": "20s",
+    "icon": 314
+  },
+  "Reincarnate": {
+    "cooldown": "5:00 min",
+    "icon": 1441
+  },
+  "Relentless Blows": {
+    "cooldown": "5s",
+    "icon": 10538
+  },
+  "Remove Defenses": {
+    "cooldown": "15s",
+    "icon": 13138
+  },
+  "Renewal": {
+    "cooldown": "15s",
+    "icon": 13017
+  },
+  "Repel Evil": {
+    "cooldown": "20s",
+    "icon": 1662
+  },
+  "Repulse Evil": {
+    "cooldown": "20s",
+    "icon": 1663
+  },
+  "Resignation": {
+    "cooldown": "20s",
+    "icon": 5417
+  },
+  "Resist Attack": {
+    "cooldown": "15s",
+    "icon": 13035
+  },
+  "Resist Magic ": {
+    "cooldown": "15s",
+    "icon": 13130
+  },
+  "Resolute Minion": {
+    "cooldown": "10:00 min",
+    "icon": 3046
+  },
+  "Resonating Aura ": {
+    "cooldown": "5s",
+    "icon": 13602
+  },
+  "Resounding Barrier": {
+    "cooldown": "8s",
+    "icon": 13553
+  },
+  "Restoration": {
+    "cooldown": "15s",
+    "icon": 13016
+  },
+  "Restorative Mend": {
+    "cooldown": "10:00 min",
+    "icon": 3070
+  },
+  "Restrain Spirit": {
+    "cooldown": "10s",
+    "icon": 3353
+  },
+  "Restraining Field": {
+    "cooldown": "10s",
+    "icon": 765
+  },
+  "Restraining Void": {
+    "cooldown": "10s",
+    "icon": 765
+  },
+  "Retribution of the Faithful": {
+    "cooldown": "5:00 min",
+    "icon": 3041
+  },
+  "Reverberating Aura ": {
+    "cooldown": "5s",
+    "icon": 13605
+  },
+  "Rigid Armor": {
+    "cooldown": "10:00 min",
+    "icon": 10610
+  },
+  "Rotting Ground": {
+    "cooldown": "1:30 min",
+    "icon": 733
+  },
+  "Rude Gesture": {
+    "cooldown": "30s",
+    "icon": 10547
+  },
+  "Rune of Utter Agility": {
+    "cooldown": "10:00 min",
+    "icon": 3073
+  },
+  "Runebolt": {
+    "cooldown": "20s",
+    "icon": 2904
+  },
+  "Rushing Kudzu": {
+    "cooldown": "2:00 min",
+    "icon": 11219
+  },
+  "Saint's Refreshment": {
+    "cooldown": "8s",
+    "icon": 1014
+  },
+  "Sap Might": {
+    "cooldown": "10s",
+    "icon": 11305
+  },
+  "Sap Strength": {
+    "cooldown": "10s",
+    "icon": 11301
+  },
+  "Savage Blows": {
+    "cooldown": "5s",
+    "icon": 10541
+  },
+  "Scatter Fervor": {
+    "cooldown": "10s",
+    "icon": 2751
+  },
+  "Scatter Zeal": {
+    "cooldown": "10s",
+    "icon": 2755
+  },
+  "Scourge Spores": {
+    "cooldown": "3s",
+    "icon": 4020
+  },
+  "Screaming Cascade": {
+    "cooldown": "20s",
+    "icon": 13672
+  },
+  "Screeching Howl": {
+    "cooldown": "15s",
+    "icon": 14924
+  },
+  "Screeching Note": {
+    "cooldown": "15s",
+    "icon": 14920
+  },
+  "Screeching Scream": {
+    "cooldown": "15s",
+    "icon": 14923
+  },
+  "Screeching Shout": {
+    "cooldown": "15s",
+    "icon": 14922
+  },
+  "Screeching Tone": {
+    "cooldown": "15s",
+    "icon": 14921
+  },
+  "Screen of Darkness": {
+    "cooldown": "10s",
+    "icon": 2522
+  },
+  "Sea of Scintillation": {
+    "cooldown": "10s",
+    "icon": 4273
+  },
+  "Selective Blindness": {
+    "cooldown": "10:00 min",
+    "icon": 3058
+  },
+  "Self Destruction": {
+    "cooldown": "15s",
+    "icon": 13165
+  },
+  "Selfless Devotion": {
+    "cooldown": "15:00 min",
+    "icon": 3038
+  },
+  "Sense of Magic": {
+    "cooldown": "1:00 min",
+    "icon": 15239
+  },
+  "Shackling Curse": {
+    "cooldown": "8s",
+    "icon": 9635
+  },
+  "Shadow Dance": {
+    "cooldown": "3:00 min",
+    "icon": 15011
+  },
+  "Shadow Shroud": {
+    "cooldown": "5:00 min",
+    "icon": 1843
+  },
+  "Shadow's Acuteness": {
+    "cooldown": "15s",
+    "icon": 13073
+  },
+  "Shadow's Agility": {
+    "cooldown": "15s",
+    "icon": 13072
+  },
+  "Shadow's Blessing": {
+    "cooldown": "5s",
+    "icon": 1524
+  },
+  "Shadow's Endowment": {
+    "cooldown": "5s",
+    "icon": 1525
+  },
+  "Shadow's Fleetness": {
+    "cooldown": "15s",
+    "icon": 13075
+  },
+  "Shadow's Nimbleness": {
+    "cooldown": "15s",
+    "icon": 13074
+  },
+  "Shadow's Quickness": {
+    "cooldown": "15s",
+    "icon": 13071
+  },
+  "Shadow's Reflex": {
+    "cooldown": "15s",
+    "icon": 13070
+  },
+  "Shadow's Swiftness": {
+    "cooldown": "15s",
+    "icon": 13076
+  },
+  "Shadowstep": {
+    "cooldown": "1:00 min",
+    "icon": 15012
+  },
+  "Shatter Empowerment": {
+    "cooldown": "1:00 min",
+    "icon": 13165
+  },
+  "Shattering Aura": {
+    "cooldown": "8s",
+    "icon": 9648
+  },
+  "Shattering Cascade": {
+    "cooldown": "20s",
+    "icon": 13673
+  },
+  "Shield Trip": {
+    "cooldown": "15:00 min",
+    "icon": 3045
+  },
+  "Shield of Immunity": {
+    "cooldown": "15:00 min",
+    "icon": 3047
+  },
+  "Shield of Melody": {
+    "cooldown": "8s",
+    "icon": 1199
+  },
+  "Shrieking Cascade": {
+    "cooldown": "20s",
+    "icon": 13670
+  },
+  "Shrill Aura ": {
+    "cooldown": "5s",
+    "icon": 13601
+  },
+  "Shroud of Clumsiness": {
+    "cooldown": "10s",
+    "icon": 764
+  },
+  "Shroud of Darkness": {
+    "cooldown": "10s",
+    "icon": 2528
+  },
+  "Shroud of Imbalance": {
+    "cooldown": "10s",
+    "icon": 767
+  },
+  "Shroud of Instability": {
+    "cooldown": "10s",
+    "icon": 766
+  },
+  "Shroud of Unsteadiness": {
+    "cooldown": "10s",
+    "icon": 765
+  },
+  "Siege Shot 1": {
+    "cooldown": "15s",
+    "icon": 7455
+  },
+  "Siege Shot 2": {
+    "cooldown": "15s",
+    "icon": 7456
+  },
+  "Siege Shot 3": {
+    "cooldown": "15s",
+    "icon": 7456
+  },
+  "Siege Shot 4": {
+    "cooldown": "15s",
+    "icon": 7457
+  },
+  "Siege Shot 5": {
+    "cooldown": "15s",
+    "icon": 7457
+  },
+  "Siege Shot 6": {
+    "cooldown": "15s",
+    "icon": 7458
+  },
+  "Siege Shot 7": {
+    "cooldown": "15s",
+    "icon": 7458
+  },
+  "Siege Shot 8": {
+    "cooldown": "15s",
+    "icon": 7459
+  },
+  "Sigil of Destruction": {
+    "cooldown": "20s",
+    "icon": 2966
+  },
+  "Sigil of Devastation": {
+    "cooldown": "20s",
+    "icon": 2968
+  },
+  "Sigil of Havoc": {
+    "cooldown": "20s",
+    "icon": 2964
+  },
+  "Sigil of Ruin": {
+    "cooldown": "20s",
+    "icon": 2962
+  },
+  "Sigil of Undoing": {
+    "cooldown": "20s",
+    "icon": 2970
+  },
+  "Simple Runebolt": {
+    "cooldown": "20s",
+    "icon": 2901
+  },
+  "Simple Song of Rest": {
+    "cooldown": "8s",
+    "icon": 3613
+  },
+  "Simple Song of Travel": {
+    "cooldown": "8s",
+    "icon": 3608
+  },
+  "Sky of Scintillation": {
+    "cooldown": "10s",
+    "icon": 4274
+  },
+  "Slashing Arrows": {
+    "cooldown": "1.00s",
+    "icon": 7462
+  },
+  "Slowness": {
+    "cooldown": "20s",
+    "icon": 5436
+  },
+  "Sluggishness": {
+    "cooldown": "20s",
+    "icon": 5439
+  },
+  "Smoldering Embers": {
+    "cooldown": "30s",
+    "icon": 14037
+  },
+  "Snaring Exhaustion": {
+    "cooldown": "1:00 min",
+    "icon": 9219
+  },
+  "Solar Balm": {
+    "cooldown": "4:00 min",
+    "icon": 7011
+  },
+  "Soldier's Barricade": {
+    "cooldown": "10:00 min",
+    "icon": 3014
+  },
+  "Soldier's Citadel": {
+    "cooldown": "15:00 min",
+    "icon": 3091
+  },
+  "Solidified Skin": {
+    "cooldown": "15s",
+    "icon": 13122
+  },
+  "Song of Clarity": {
+    "cooldown": "8s",
+    "icon": 978
+  },
+  "Song of Empowering": {
+    "cooldown": "8s",
+    "icon": 980
+  },
+  "Song of Energy": {
+    "cooldown": "8s",
+    "icon": 977
+  },
+  "Song of Power": {
+    "cooldown": "8s",
+    "icon": 976
+  },
+  "Song of Rest": {
+    "cooldown": "8s",
+    "icon": 3614
+  },
+  "Song of Travel": {
+    "cooldown": "8s",
+    "icon": 3609
+  },
+  "Song of the Mind": {
+    "cooldown": "8s",
+    "icon": 979
+  },
+  "Sonic Barrier": {
+    "cooldown": "10:00 min",
+    "icon": 3088
+  },
+  "Sonorous Aura ": {
+    "cooldown": "5s",
+    "icon": 13605
+  },
+  "Soporific Scintillation": {
+    "cooldown": "10s",
+    "icon": 4252
+  },
+  "Sorcerous Web": {
+    "cooldown": "10s",
+    "icon": 541
+  },
+  "Soul Bane": {
+    "cooldown": "30s",
+    "icon": 9676
+  },
+  "Soul Blight": {
+    "cooldown": "30s",
+    "icon": 9673
+  },
+  "Soul Bolstering Chant": {
+    "cooldown": "8s",
+    "icon": 3651
+  },
+  "Soul Bolstering Song": {
+    "cooldown": "8s",
+    "icon": 3652
+  },
+  "Soul Poison": {
+    "cooldown": "30s",
+    "icon": 9675
+  },
+  "Soul Quench": {
+    "cooldown": "10:00 min",
+    "icon": 3040
+  },
+  "Soul Shield": {
+    "cooldown": "8s",
+    "icon": 1052
+  },
+  "Soul Siphon": {
+    "cooldown": "20s",
+    "icon": 9619
+  },
+  "Soul Toxin": {
+    "cooldown": "30s",
+    "icon": 9672
+  },
+  "Soul Venom": {
+    "cooldown": "30s",
+    "icon": 9674
+  },
+  "Soul Ward": {
+    "cooldown": "8s",
+    "icon": 1051
+  },
+  "Soul of Magic": {
+    "cooldown": "1:00 min",
+    "icon": 15238
+  },
+  "Sovereign Runebolt": {
+    "cooldown": "20s",
+    "icon": 2909
+  },
+  "Spear of Night": {
+    "cooldown": "20s",
+    "icon": 5517
+  },
+  "Speed of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10509
+  },
+  "Speed of Kudzu": {
+    "cooldown": "2:00 min",
+    "icon": 11218
+  },
+  "Speed of Sound": {
+    "cooldown": "10:00 min",
+    "icon": 3020
+  },
+  "Speed of the Angel": {
+    "cooldown": "3:00 min",
+    "icon": 1721
+  },
+  "Speed of the Archangel": {
+    "cooldown": "3:00 min",
+    "icon": 1724
+  },
+  "Spellbound Ground": {
+    "cooldown": "1:30 min",
+    "icon": 979
+  },
+  "Sphere of Annihilation": {
+    "cooldown": "6s",
+    "icon": 4593
+  },
+  "Sphere of Negation": {
+    "cooldown": "6s",
+    "icon": 4591
+  },
+  "Sphere of Oblivion": {
+    "cooldown": "6s",
+    "icon": 4592
+  },
+  "Sphere of Unmaking": {
+    "cooldown": "6s",
+    "icon": 4594
+  },
+  "Spirit Decay": {
+    "cooldown": "30s",
+    "icon": 9671
+  },
+  "Spirit Form": {
+    "cooldown": "20s",
+    "icon": 9405
+  },
+  "Spirit Ill": {
+    "cooldown": "30s",
+    "icon": 9669
+  },
+  "Spirit Martyr": {
+    "cooldown": "10:00 min",
+    "icon": 3074
+  },
+  "Spirit Rot": {
+    "cooldown": "30s",
+    "icon": 9670
+  },
+  "Spirit Siphon": {
+    "cooldown": "20s",
+    "icon": 9617
+  },
+  "Spirit Wrench": {
+    "cooldown": "30s",
+    "icon": 9668
+  },
+  "Sprouting Undergrowth": {
+    "cooldown": "10:00 min",
+    "icon": 5206
+  },
+  "Sputin's Legacy": {
+    "cooldown": "15:00 min",
+    "icon": 3069
+  },
+  "Static Tempest": {
+    "cooldown": "10:00 min",
+    "icon": 3031
+  },
+  "Stiletto of Night": {
+    "cooldown": "20s",
+    "icon": 5514
+  },
+  "Stoic Stand": {
+    "cooldown": "30s",
+    "icon": 985
+  },
+  "Strength of the Hinterland": {
+    "cooldown": "5s",
+    "icon": 1516
+  },
+  "Strength of the Wildwood": {
+    "cooldown": "5s",
+    "icon": 1515
+  },
+  "Strike Prediction": {
+    "cooldown": "10:00 min",
+    "icon": 3036
+  },
+  "Stunning Bellow": {
+    "cooldown": "10s",
+    "icon": 1164
+  },
+  "Stunning Screech": {
+    "cooldown": "10s",
+    "icon": 1163
+  },
+  "Stunning Yell": {
+    "cooldown": "20s",
+    "icon": 1161
+  },
+  "Subdue": {
+    "cooldown": "10s",
+    "icon": 13116
+  },
+  "Submission": {
+    "cooldown": "20s",
+    "icon": 5411
+  },
+  "Subvert Strength": {
+    "cooldown": "10s",
+    "icon": 11303
+  },
+  "Succubus NS Cure": {
+    "cooldown": "4s",
+    "icon": 14382
+  },
+  "Superior Dazing": {
+    "cooldown": "20s",
+    "icon": 14963
+  },
+  "Superior Demoralization": {
+    "cooldown": "20s",
+    "icon": 5426
+  },
+  "Superior Friction": {
+    "cooldown": "10s",
+    "icon": 126
+  },
+  "Superior Gift of Foresight": {
+    "cooldown": "15s",
+    "icon": 10646
+  },
+  "Superior Imbalance": {
+    "cooldown": "10s",
+    "icon": 767
+  },
+  "Superior Lullaby": {
+    "cooldown": "10s",
+    "icon": 5305
+  },
+  "Superior Runebolt": {
+    "cooldown": "20s",
+    "icon": 2907
+  },
+  "Support Bonecaster": {
+    "cooldown": "8s",
+    "icon": 10032
+  },
+  "Suppress Strength": {
+    "cooldown": "10s",
+    "icon": 2654
+  },
+  "Supreme Runebolt": {
+    "cooldown": "20s",
+    "icon": 2908
+  },
+  "Supress": {
+    "cooldown": "10s",
+    "icon": 13115
+  },
+  "Surge of Cataclysm": {
+    "cooldown": "2:30 min",
+    "icon": 9657
+  },
+  "Surge of Destruction": {
+    "cooldown": "2:30 min",
+    "icon": 9652
+  },
+  "Surge of Infliction": {
+    "cooldown": "2:30 min",
+    "icon": 9651
+  },
+  "Surge of Maiming": {
+    "cooldown": "2:30 min",
+    "icon": 9654
+  },
+  "Surge of Mutilation": {
+    "cooldown": "2:30 min",
+    "icon": 9653
+  },
+  "Surge of Ruin": {
+    "cooldown": "2:30 min",
+    "icon": 9655
+  },
+  "Surge of Wrecking": {
+    "cooldown": "2:30 min",
+    "icon": 9656
+  },
+  "Surrender": {
+    "cooldown": "20s",
+    "icon": 5413
+  },
+  "Swift Reconstitution": {
+    "cooldown": "5:00 min",
+    "icon": 1441
+  },
+  "Swiftness of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10507
+  },
+  "Talons of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10505
+  },
+  "Taxing Embrace": {
+    "cooldown": "15s",
+    "icon": 13002
+  },
+  "Taxing Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10560
+  },
+  "Tease": {
+    "cooldown": "30s",
+    "icon": 1751
+  },
+  "Tegashrig's Accommodation": {
+    "cooldown": "15s",
+    "icon": 10617
+  },
+  "Tegashrig's Arbitration": {
+    "cooldown": "15s",
+    "icon": 10620
+  },
+  "Tegashrig's Mediation": {
+    "cooldown": "15s",
+    "icon": 10618
+  },
+  "Tegashrig's Negotiation": {
+    "cooldown": "15s",
+    "icon": 10619
+  },
+  "Teragani's Fury": {
+    "cooldown": "15s",
+    "icon": 10639
+  },
+  "Teragani's Ire": {
+    "cooldown": "15s",
+    "icon": 10638
+  },
+  "Teragani's Rage": {
+    "cooldown": "15s",
+    "icon": 10640
+  },
+  "Terrify Servant": {
+    "cooldown": "30s",
+    "icon": 15201
+  },
+  "Terrifying Hex": {
+    "cooldown": "30s",
+    "icon": 15201
+  },
+  "Test of Courage": {
+    "cooldown": "15s",
+    "icon": 10603
+  },
+  "Test of Honor": {
+    "cooldown": "15s",
+    "icon": 10604
+  },
+  "Test of Mettle": {
+    "cooldown": "15s",
+    "icon": 10600
+  },
+  "Test of Mind": {
+    "cooldown": "15s",
+    "icon": 10598
+  },
+  "Test of Nerve": {
+    "cooldown": "15s",
+    "icon": 10597
+  },
+  "Test of Power": {
+    "cooldown": "15s",
+    "icon": 10602
+  },
+  "Test of Spirit": {
+    "cooldown": "15s",
+    "icon": 10599
+  },
+  "Test of Strength": {
+    "cooldown": "15s",
+    "icon": 10601
+  },
+  "Testudo": {
+    "cooldown": "15:00 min",
+    "icon": 3067
+  },
+  "The Empty Mind": {
+    "cooldown": "10:00 min",
+    "icon": 3007
+  },
+  "Theophany": {
+    "cooldown": "5:00 min",
+    "icon": 1686
+  },
+  "Thornweed Field": {
+    "cooldown": "10:00 min",
+    "icon": 3027
+  },
+  "Thrusting Arrows": {
+    "cooldown": "1.00s",
+    "icon": 7461
+  },
+  "Thunder Bellow": {
+    "cooldown": "20s",
+    "icon": 3525
+  },
+  "Thunder Howl": {
+    "cooldown": "20s",
+    "icon": 3523
+  },
+  "Thunder Roar": {
+    "cooldown": "20s",
+    "icon": 3527
+  },
+  "Thunder Shout": {
+    "cooldown": "20s",
+    "icon": 3521
+  },
+  "Thunderous Burst": {
+    "cooldown": "20s",
+    "icon": 13581
+  },
+  "Thunderous Burst (Major)": {
+    "cooldown": "20s",
+    "icon": 13582
+  },
+  "Thunderous Burst (Minor)": {
+    "cooldown": "20s",
+    "icon": 13580
+  },
+  "Tightening Armor": {
+    "cooldown": "10:00 min",
+    "icon": 10611
+  },
+  "Tiring Embrace": {
+    "cooldown": "15s",
+    "icon": 13003
+  },
+  "Tiring Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10562
+  },
+  "Toiling Embrace": {
+    "cooldown": "15s",
+    "icon": 13002
+  },
+  "Toiling Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10561
+  },
+  "Toothgnasher's Bite": {
+    "cooldown": "20s",
+    "icon": 3545
+  },
+  "Toothgnasher's Hoof": {
+    "cooldown": "20s",
+    "icon": 3543
+  },
+  "Toothgnasher's Horn": {
+    "cooldown": "20s",
+    "icon": 3547
+  },
+  "Toothgnasher's Ram": {
+    "cooldown": "20s",
+    "icon": 3549
+  },
+  "Toothgrinder's Bite": {
+    "cooldown": "20s",
+    "icon": 3544
+  },
+  "Toothgrinder's Hoof": {
+    "cooldown": "20s",
+    "icon": 3542
+  },
+  "Toothgrinder's Horn": {
+    "cooldown": "20s",
+    "icon": 3546
+  },
+  "Toothgrinder's Ram": {
+    "cooldown": "20s",
+    "icon": 3548
+  },
+  "Torment Spores": {
+    "cooldown": "1.00s",
+    "icon": 4020
+  },
+  "Tribute from Eir": {
+    "cooldown": "5:00 min",
+    "icon": 3084
+  },
+  "Tumultuous Barrier": {
+    "cooldown": "8s",
+    "icon": 13552
+  },
+  "Typhoon's Dance": {
+    "cooldown": "5s",
+    "icon": 1525
+  },
+  "Ultimate Dazing": {
+    "cooldown": "20s",
+    "icon": 14964
+  },
+  "Ultimate Demoralization": {
+    "cooldown": "20s",
+    "icon": 5427
+  },
+  "Umbral Hulk Charge": {
+    "cooldown": "1:00 min",
+    "icon": 7035
+  },
+  "Umbral Hulk's Touch": {
+    "cooldown": "1:00 h",
+    "icon": 9004
+  },
+  "Unavoidable Encumberance": {
+    "cooldown": "8s",
+    "icon": 10625
+  },
+  "Unavoidable Hindrance": {
+    "cooldown": "8s",
+    "icon": 10621
+  },
+  "Unbending Armor": {
+    "cooldown": "10:00 min",
+    "icon": 10613
+  },
+  "Unceasing Burden": {
+    "cooldown": "5s",
+    "icon": 10615
+  },
+  "Undermine Strength": {
+    "cooldown": "10s",
+    "icon": 2763
+  },
+  "Undulating Aura ": {
+    "cooldown": "5s",
+    "icon": 13602
+  },
+  "Unholy Ground": {
+    "cooldown": "1:30 min",
+    "icon": 735
+  },
+  "Unmake Strength": {
+    "cooldown": "10s",
+    "icon": 4533
+  },
+  "Unnerving Bellow ": {
+    "cooldown": "3:00 min",
+    "icon": 13643
+  },
+  "Unyielding Armor": {
+    "cooldown": "10:00 min",
+    "icon": 10614
+  },
+  "Vale Defense": {
+    "cooldown": "10:00 min",
+    "icon": 3062
+  },
+  "Valhalla's Blessing": {
+    "cooldown": "10:00 min",
+    "icon": 3086
+  },
+  "Valhalla's Contempt": {
+    "cooldown": "40s",
+    "icon": 12527
+  },
+  "Valhalla's Despite": {
+    "cooldown": "50s",
+    "icon": 12526
+  },
+  "Valhalla's Disdain": {
+    "cooldown": "35s",
+    "icon": 12528
+  },
+  "Valhalla's Rage": {
+    "cooldown": "30s",
+    "icon": 12529
+  },
+  "Valhalla's Scorn": {
+    "cooldown": "1:00 min",
+    "icon": 12525
+  },
+  "Valkryie's Command": {
+    "cooldown": "5:00 min",
+    "icon": 12535
+  },
+  "Valkryie's Dominance": {
+    "cooldown": "1:00 min",
+    "icon": 12536
+  },
+  "Vampiiric Awareness ": {
+    "cooldown": "30s",
+    "icon": 13110
+  },
+  "Vampiiric Senses": {
+    "cooldown": "30s",
+    "icon": 13112
+  },
+  "Vampiiric Sight": {
+    "cooldown": "30s",
+    "icon": 13111
+  },
+  "Vanish": {
+    "cooldown": "15:00 min",
+    "icon": 3019
+  },
+  "Vanquish Sight": {
+    "cooldown": "10s",
+    "icon": 13680
+  },
+  "Vehement Renewal": {
+    "cooldown": "10:00 min",
+    "icon": 3016
+  },
+  "Veil Path": {
+    "cooldown": "20s",
+    "icon": 11206
+  },
+  "Veil of Apprehension": {
+    "cooldown": "20s",
+    "icon": 10583
+  },
+  "Veil of Darkness": {
+    "cooldown": "10s",
+    "icon": 2527
+  },
+  "Veil of Doubt": {
+    "cooldown": "20s",
+    "icon": 10584
+  },
+  "Veil of Hesitation": {
+    "cooldown": "20s",
+    "icon": 10585
+  },
+  "Veil of Indecision": {
+    "cooldown": "20s",
+    "icon": 10586
+  },
+  "Veil of Uncertainty": {
+    "cooldown": "20s",
+    "icon": 10582
+  },
+  "Vengeance of the Raven": {
+    "cooldown": "1:00 min",
+    "icon": 13081
+  },
+  "Vent of Elemental Guarding": {
+    "cooldown": "14s",
+    "icon": 11547
+  },
+  "Vent of Elemental Protection": {
+    "cooldown": "14s",
+    "icon": 11546
+  },
+  "Vent of Elemental Resistance": {
+    "cooldown": "14s",
+    "icon": 11545
+  },
+  "Vent of Elemental Shielding": {
+    "cooldown": "14s",
+    "icon": 11548
+  },
+  "Vent of Physical Guarding": {
+    "cooldown": "14s",
+    "icon": 11551
+  },
+  "Vent of Physical Protection": {
+    "cooldown": "14s",
+    "icon": 11550
+  },
+  "Vent of Physical Resistance": {
+    "cooldown": "14s",
+    "icon": 11549
+  },
+  "Vent of Physical Shielding": {
+    "cooldown": "14s",
+    "icon": 11552
+  },
+  "Vigor Siphon": {
+    "cooldown": "20s",
+    "icon": 9611
+  },
+  "Vindictive Bite": {
+    "cooldown": "1:00 min",
+    "icon": 12531
+  },
+  "Vindictive Nip": {
+    "cooldown": "5:00 min",
+    "icon": 12530
+  },
+  "Vitality Siphon": {
+    "cooldown": "20s",
+    "icon": 9615
+  },
+  "Vitiate Strength": {
+    "cooldown": "10s",
+    "icon": 4536
+  },
+  "Voice of Horror": {
+    "cooldown": "5s",
+    "icon": 13056
+  },
+  "Voice of Shock": {
+    "cooldown": "5s",
+    "icon": 13055
+  },
+  "Voice of Skadi": {
+    "cooldown": "5:00 min",
+    "icon": 1844
+  },
+  "Void Abyss": {
+    "cooldown": "20s",
+    "icon": 4520
+  },
+  "Void Bolt": {
+    "cooldown": "20s",
+    "icon": 4552
+  },
+  "Void Break": {
+    "cooldown": "20s",
+    "icon": 4513
+  },
+  "Void Chasm": {
+    "cooldown": "20s",
+    "icon": 4519
+  },
+  "Void Cleave": {
+    "cooldown": "20s",
+    "icon": 4514
+  },
+  "Void Fissure": {
+    "cooldown": "20s",
+    "icon": 4517
+  },
+  "Void Gap": {
+    "cooldown": "20s",
+    "icon": 4512
+  },
+  "Void Gulf": {
+    "cooldown": "20s",
+    "icon": 4518
+  },
+  "Void Rent": {
+    "cooldown": "20s",
+    "icon": 4515
+  },
+  "Void Rift": {
+    "cooldown": "20s",
+    "icon": 4516
+  },
+  "Void Slit": {
+    "cooldown": "20s",
+    "icon": 4511
+  },
+  "Void Strength": {
+    "cooldown": "10s",
+    "icon": 4535
+  },
+  "Volcanic Pillar": {
+    "cooldown": "15:00 min",
+    "icon": 3024
+  },
+  "Volley 1": {
+    "cooldown": "30s",
+    "icon": 7450
+  },
+  "Volley 2": {
+    "cooldown": "30s",
+    "icon": 7451
+  },
+  "Volley 3": {
+    "cooldown": "30s",
+    "icon": 7451
+  },
+  "Volley 4": {
+    "cooldown": "30s",
+    "icon": 7452
+  },
+  "Volley 5": {
+    "cooldown": "30s",
+    "icon": 7452
+  },
+  "Volley 6": {
+    "cooldown": "30s",
+    "icon": 7453
+  },
+  "Volley 7": {
+    "cooldown": "30s",
+    "icon": 7453
+  },
+  "Volley 8": {
+    "cooldown": "30s",
+    "icon": 7454
+  },
+  "Wailing Cascade": {
+    "cooldown": "20s",
+    "icon": 13671
+  },
+  "Wall of Song": {
+    "cooldown": "8s",
+    "icon": 1200
+  },
+  "War Howl": {
+    "cooldown": "15s",
+    "icon": 3624
+  },
+  "Warbellow": {
+    "cooldown": "15s",
+    "icon": 3623
+  },
+  "Warcry": {
+    "cooldown": "15s",
+    "icon": 3620
+  },
+  "Warden's Encouragement": {
+    "cooldown": "8s",
+    "icon": 5134
+  },
+  "Warholler": {
+    "cooldown": "15s",
+    "icon": 3621
+  },
+  "Warshriek": {
+    "cooldown": "15s",
+    "icon": 3622
+  },
+  "Way of Magic": {
+    "cooldown": "1:00 min",
+    "icon": 15242
+  },
+  "Way of Perfection": {
+    "cooldown": "15s",
+    "icon": 10593
+  },
+  "Weaken Body": {
+    "cooldown": "10s",
+    "icon": 673
+  },
+  "Weaken Senses": {
+    "cooldown": "10s",
+    "icon": 13156
+  },
+  "Weaken Strength": {
+    "cooldown": "10s",
+    "icon": 2761
+  },
+  "Weakening Embrace": {
+    "cooldown": "15s",
+    "icon": 13005
+  },
+  "Weakening Grasp of Februstos": {
+    "cooldown": "15s",
+    "icon": 10564
+  },
+  "Weather Blows": {
+    "cooldown": "5s",
+    "icon": 10517
+  },
+  "Weather Lacerations": {
+    "cooldown": "5s",
+    "icon": 10523
+  },
+  "Weather Punctures": {
+    "cooldown": "5s",
+    "icon": 10528
+  },
+  "Whirling Staff": {
+    "cooldown": "10:00 min",
+    "icon": 3042
+  },
+  "Whirring Spike": {
+    "cooldown": "20s",
+    "icon": 13575
+  },
+  "Wither Defenses": {
+    "cooldown": "15s",
+    "icon": 13135
+  },
+  "Withstand Blows": {
+    "cooldown": "5s",
+    "icon": 10515
+  },
+  "Withstand Lacerations": {
+    "cooldown": "5s",
+    "icon": 10521
+  },
+  "Withstand Punctures": {
+    "cooldown": "5s",
+    "icon": 10527
+  },
+  "Wizard's Storm": {
+    "cooldown": "10:00 min",
+    "icon": 3049
+  },
+  "Wracking Aura": {
+    "cooldown": "8s",
+    "icon": 9642
+  },
+  "Wraith's Barricade": {
+    "cooldown": "8s",
+    "icon": 13687
+  },
+  "Wraith's Barrier": {
+    "cooldown": "8s",
+    "icon": 13686
+  },
+  "Wraith's Shield": {
+    "cooldown": "8s",
+    "icon": 13685
+  },
+  "Wrap of Darkness": {
+    "cooldown": "10s",
+    "icon": 2526
+  },
+  "Wrath of Champions": {
+    "cooldown": "10:00 min",
+    "icon": 3023
+  },
+  "Wrath of the Raven": {
+    "cooldown": "1:00 min",
+    "icon": 13082
+  },
+  "Wretched Ground": {
+    "cooldown": "1:30 min",
+    "icon": 732
+  },
+  "Zeal of Kelgor": {
+    "cooldown": "5s",
+    "icon": 10535
+  },
+  "Zealot's Redemption": {
+    "cooldown": "30s",
+    "icon": 14405
+  },
+  "Zombie Servant's Touch": {
+    "cooldown": "1:00 h",
+    "icon": 9004
+  }
+}

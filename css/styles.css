@@ -134,6 +134,45 @@ a { color: var(--series-1); }
 }
 .bg-ticker-list li:first-child { color: var(--text-primary); font-weight: 600; }
 .bg-ticker-list .bg-ticker-time { flex: none; font-size: 11px; color: var(--text-muted); font-weight: 400; font-variant-numeric: tabular-nums; }
+
+/* ---------- cooldown tracker (persistent across all tabs, under the bg ticker) ---------- */
+.cooldown-tracker {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 8px 12px; margin-bottom: 16px; font-size: 13px;
+}
+.cooldown-tracker-icon { line-height: 1.8; flex: none; }
+.cooldown-tracker-list {
+  list-style: none; margin: 0; padding: 0; flex: 1; min-width: 0;
+  display: flex; flex-wrap: wrap; gap: 6px 10px;
+}
+.cooldown-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 3px 8px; position: relative; overflow: hidden;
+}
+.cooldown-pill-icon {
+  flex: none; font-size: 10.5px; font-weight: 600; color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.cooldown-pill-name {
+  flex: none; font-size: 12.5px; color: var(--text-primary); white-space: nowrap;
+  max-width: 180px; overflow: hidden; text-overflow: ellipsis;
+}
+.cooldown-pill-time {
+  flex: none; font-size: 12px; font-weight: 600; color: var(--text-secondary);
+  font-variant-numeric: tabular-nums; min-width: 2.6em; text-align: right;
+}
+.cooldown-pill-bar {
+  flex: none; width: 44px; height: 5px; border-radius: 3px; overflow: hidden;
+  background: var(--grid);
+}
+.cooldown-pill-bar-fill {
+  display: block; height: 100%; background: var(--series-1);
+  transition: width 0.3s linear;
+}
+.cooldown-pill.ready-soon .cooldown-pill-bar-fill { background: var(--status-good); }
+.cooldown-pill.ready-soon .cooldown-pill-time { color: var(--status-good); }
 .bg-ticker-list .bg-ticker-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ---------- cards / grid ---------- */

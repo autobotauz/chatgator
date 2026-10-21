@@ -1,0 +1,36 @@
+{
+  "Adrenaline Rush": [
+    "10:00 min",
+    "15:00 min",
+    "20:00 min",
+    "5:00 min",
+    "7:30 min"
+  ],
+  "Charge": [
+    "10:00 min",
+    "15:00 min",
+    "1:30 min",
+    "3:00 min",
+    "5:00 min"
+  ],
+  "Concentration": [
+    "15:00 min",
+    "1:30 min",
+    "30s",
+    "3:00 min",
+    "9:00 min"
+  ],
+  "Purge": [
+    "10:00 min",
+    "15:00 min",
+    "5:00 min",
+    "7:30 min"
+  ],
+  "Second Wind": [
+    "10:00 min",
+    "15:00 min",
+    "2:00 min",
+    "3:30 min",
+    "5:00 min"
+  ]
+}

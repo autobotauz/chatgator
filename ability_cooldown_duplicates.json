@@ -1,0 +1,53 @@
+{
+  "Disperse Strength": [
+    {
+      "cooldown": "10s",
+      "icon": 2653,
+      "source": "spellGroup:Bonedancer/Suppression/Strength Debuff (Inst)"
+    },
+    {
+      "cooldown": "10s",
+      "icon": 4382,
+      "source": "spellGroup:Eldritch/Mana Magic/Strength Constitution Debuff (AoE, Inst)"
+    },
+    {
+      "cooldown": "10s",
+      "icon": 2653,
+      "source": "spellGroup:Runemaster/Suppression/Strength Debuff (Inst)"
+    },
+    {
+      "cooldown": "10s",
+      "icon": 2653,
+      "source": "spellGroup:Spiritmaster/Suppression/Strength Debuff (Inst)"
+    }
+  ],
+  "Major Deliverance": [
+    {
+      "cooldown": "5:00 min",
+      "icon": 14868,
+      "source": "spellGroup:Cleric/Smite/Snare (PBAoE, Inst)"
+    },
+    {
+      "cooldown": "5:00 min",
+      "icon": 14870,
+      "source": "spellGroup:Cleric/Smite/Snare (PBAoE, Inst)"
+    },
+    {
+      "cooldown": "5:00 min",
+      "icon": 14871,
+      "source": "spellGroup:Cleric/Smite/Snare (PBAoE, Inst)"
+    }
+  ],
+  "Stunning Shout": [
+    {
+      "cooldown": "10s",
+      "icon": 1162,
+      "source": "spellGroup:Minstrel/Instruments/Stun (Inst)"
+    },
+    {
+      "cooldown": "30s",
+      "icon": 3629,
+      "source": "spellGroup:Skald/Battlesongs/Mesmerize (Inst)"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import { loadSkillIndex } from './skills.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { SAMPLE_LOGS } from './sample-data.js';
 import { fmtClock } from './charts.js';
+import { ABILITY_COOLDOWNS } from './ability-cooldowns.js';
 
 const el = (id) => document.getElementById(id);
 
@@ -16,6 +17,15 @@ const state = {
   activeTab: 'overview',
   skillMap: {},
   watcher: null,
+  // Live-clock sync point for the cooldown tracker: the log's own `clock`
+  // is a synthetic elapsed-ms value anchored to the first timestamp in the
+  // file (see parser.js), never a real calendar date — so to turn "time
+  // since last cast" into a *ticking* countdown while watching a live log,
+  // we remember the newest clock value we've seen and the real Date.now()
+  // we saw it at, then extrapolate forward with the wall clock between
+  // polls. Reset to null on a static (non-watched) load, where the tracker
+  // just shows a frozen snapshot as of the end of that file instead.
+  liveSync: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -71,7 +81,9 @@ function startNewSession() {
   el('btnDownloadSnapshot').hidden = true;
   el('snapshotPill').hidden = true;
   el('bgTicker').hidden = true;
+  el('cooldownTracker').hidden = true;
   state.rawEvents = []; state.unmatched = []; state.encounters = []; state.scope = 'all'; state.isSnapshot = false;
+  state.liveSync = null;
 }
 
 if (isWatchSupported()) {
@@ -178,6 +190,15 @@ function ingestTexts(fileTexts) {
   state.scope = 'all';
   state.isSnapshot = false;
 
+  // If we're actively watching a live log file, anchor the cooldown
+  // tracker's live-clock sync point to the newest line we just read, paired
+  // with the real time we read it — see the `liveSync` comment above. A
+  // plain static load (state.watcher is null here) leaves it unset, so the
+  // tracker renders a frozen end-of-file snapshot instead of ticking.
+  state.liveSync = state.watcher
+    ? { clock: lastKnownClock(allEvents), wallTime: Date.now() }
+    : null;
+
   el('dropzoneSection').hidden = true;
   el('appMain').hidden = false;
   el('btnLoadAnother').hidden = false;
@@ -266,6 +287,7 @@ function renderActiveTab() {
   if (!state.rawEvents.length) return;
   const stats = currentStats();
   renderBgTicker();
+  renderCooldownTracker();
 
   el('characterName').textContent = stats.meta.playerName ? `👤 ${stats.meta.playerName}` : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
   const encLabel = state.scope === 'all'
@@ -319,6 +341,117 @@ function renderBgTicker() {
 }
 
 // ---------------------------------------------------------------------------
+// Ability cooldown tracker — persistent across every tab, same as the bg
+// ticker above. Looks at every spell cast (`cast` events) and every weapon
+// swing that landed a named style (`melee_weapon` events carrying a
+// `styleName`), and for any name we recognize in ABILITY_COOLDOWNS, shows a
+// countdown from the most recent use. Ticks every second via the
+// setInterval below; see the `liveSync` comment on `state` for how "now" is
+// estimated while watching a live log vs. a plain static file load.
+// ---------------------------------------------------------------------------
+const COOLDOWN_READY_SOON_SEC = 3; // highlight a pill green once it's about to come off cooldown
+
+function lastKnownClock(events) {
+  for (let i = events.length - 1; i >= 0; i--) {
+    if (events[i].clock != null) return events[i].clock;
+  }
+  return null;
+}
+
+// Most recent cast time per recognized ability name. Events are already
+// chronological (ingestTexts sorts by clock), so a later match simply
+// overwrites an earlier one — we only ever care about the latest use.
+function computeAbilityUsage(events) {
+  const usage = new Map(); // name -> clock
+  for (const e of events) {
+    if (e.clock == null) continue;
+    if (e.type === 'cast' && e.name && ABILITY_COOLDOWNS[e.name]) {
+      usage.set(e.name, e.clock);
+    } else if (e.type === 'melee_weapon' && e.styleName && ABILITY_COOLDOWNS[e.styleName]) {
+      usage.set(e.styleName, e.clock);
+    }
+  }
+  return usage;
+}
+
+function cooldownNowClock() {
+  if (state.watcher && state.liveSync && state.liveSync.clock != null) {
+    return state.liveSync.clock + (Date.now() - state.liveSync.wallTime);
+  }
+  return lastKnownClock(state.rawEvents);
+}
+
+function fmtCooldownRemaining(sec) {
+  const whole = Math.max(0, Math.ceil(sec));
+  if (whole < 60) return `${whole}s`;
+  const m = Math.floor(whole / 60), s = whole % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function renderCooldownTracker() {
+  const tracker = el('cooldownTracker');
+  const list = el('cooldownTrackerList');
+  const usage = computeAbilityUsage(state.rawEvents);
+  const nowClock = cooldownNowClock();
+
+  const active = [];
+  if (nowClock != null) {
+    for (const [name, usedAtClock] of usage) {
+      const info = ABILITY_COOLDOWNS[name];
+      const remainingSec = info.cooldownSeconds - (nowClock - usedAtClock) / 1000;
+      if (remainingSec > 0.25) {
+        active.push({ name, icon: info.icon, remainingSec, cooldownSeconds: info.cooldownSeconds });
+      }
+    }
+  }
+  active.sort((a, b) => a.remainingSec - b.remainingSec);
+
+  list.innerHTML = '';
+  if (!active.length) { tracker.hidden = true; return; }
+  tracker.hidden = false;
+  for (const a of active) {
+    const li = document.createElement('li');
+    li.className = 'cooldown-pill' + (a.remainingSec <= COOLDOWN_READY_SOON_SEC ? ' ready-soon' : '');
+
+    const icon = document.createElement('span');
+    icon.className = 'cooldown-pill-icon';
+    icon.textContent = `#${a.icon}`;
+    icon.title = `icon id ${a.icon} — no id → image mapping yet`;
+
+    const name = document.createElement('span');
+    name.className = 'cooldown-pill-name';
+    name.textContent = a.name;
+    name.title = a.name;
+
+    const barWrap = document.createElement('span');
+    barWrap.className = 'cooldown-pill-bar';
+    const barFill = document.createElement('span');
+    barFill.className = 'cooldown-pill-bar-fill';
+    const pct = Math.max(0, Math.min(100, (a.remainingSec / a.cooldownSeconds) * 100));
+    barFill.style.width = `${pct}%`;
+    barWrap.appendChild(barFill);
+
+    const time = document.createElement('span');
+    time.className = 'cooldown-pill-time';
+    time.textContent = fmtCooldownRemaining(a.remainingSec);
+
+    li.appendChild(icon);
+    li.appendChild(name);
+    li.appendChild(barWrap);
+    li.appendChild(time);
+    list.appendChild(li);
+  }
+}
+
+// Re-render every second so active cooldowns visibly count down while
+// watching a live log. Against a static (non-watched) file this just
+// redraws the same frozen end-of-file snapshot each tick — harmless, and
+// keeps this one code path correct for both cases rather than branching.
+setInterval(() => {
+  if (state.rawEvents.length) renderCooldownTracker();
+}, 1000);
+
+// ---------------------------------------------------------------------------
 // Watch mode (File System Access API — Chrome/Edge)
 // ---------------------------------------------------------------------------
 async function startWatch() {
@@ -344,6 +477,7 @@ async function startWatch() {
 }
 function stopWatching() {
   if (state.watcher) { state.watcher.stop(); state.watcher = null; }
+  state.liveSync = null; // back to a frozen end-of-file snapshot for the cooldown tracker
   el('watchStatus').hidden = true;
   el('watchDot').classList.remove('live');
   if (isWatchSupported()) el('btnWatchHeader').textContent = 'Watch a live log file…';
