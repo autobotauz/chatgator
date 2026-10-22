@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+<canvas id="liveBgCanvas" aria-hidden="true"></canvas>
 <div class="app-shell">
 
   <header class="app-header">
@@ -51,6 +52,21 @@
       <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt,.json">
       <p class="privacy">Everything happens on your machine — your log is parsed in this browser tab and is never uploaded to any server. Pick (or drop) a <code>chat.log</code> and, in Chrome/Edge, Chat Gator keeps watching it live as you play — stats update in near real time, with a "⏹ Stop watching" control up top once it's running. Other browsers get a one-time read of the file; just re-drop it to refresh. A <code>.json</code> file (saved with "⬇ Download snapshot") is always a one-time import, for viewing a session someone shared with you.</p>
     </div>
+
+    <div class="features-card">
+      <h3>What Chat Gator does</h3>
+      <ul>
+        <li><strong>Damage, healing &amp; realm point meters</strong> — broken down by spell, style, weapon, attacker, healer, or pet.</li>
+        <li><strong>Fight-by-fight splitting</strong> — your log is automatically broken into individual engagements, or view your whole session's totals at once.</li>
+        <li><strong>Live ability cooldown tracker</strong> — countdown timers for the spells, styles, and realm abilities you've actually used.</li>
+        <li><strong>/bg center callouts</strong> stay on screen on every tab, so you don't miss one that already scrolled past.</li>
+        <li><strong>Watch your chat.log live while you play</strong> (Chrome/Edge) — stats update in near real time, nothing to re-upload or re-drop.</li>
+        <li><strong>Clear your log file from the browser</strong> when it's gotten big, with an optional timestamped backup first.</li>
+        <li><strong>Share a session</strong> as a file — a groupmate or BG leader can drop it in and see the same breakdown.</li>
+        <li><strong>Your own in-game <code>/stats</code> totals</strong> (RP, deathblows, deaths, kills/death) shown alongside the computed numbers, when available.</li>
+        <li><strong>100% local</strong> — your log is parsed in this browser tab and never leaves your machine.</li>
+      </ul>
+    </div>
   </section>
 
   <main id="appMain" hidden>
@@ -73,6 +89,7 @@
       <ul class="cooldown-tracker-list" id="cooldownTrackerList"></ul>
     </div>
     <div class="last-updated" id="lastUpdated" hidden title="When this view last picked up new lines from the log. While watching a live file, this should keep moving — if it stalls well past your refresh interval, the watched file isn't changing (or the tab lost its handle to it)."></div>
+    <div class="stale-watch-banner" id="staleWatchBanner" hidden>⚠️ No new lines picked up from the log in over 2 minutes. Still watching — but is in-game chat logging turned on?</div>
 
     <nav class="tabbar">
       <button class="tab active" data-tab="overview">Overview</button>

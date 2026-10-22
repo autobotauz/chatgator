@@ -6,6 +6,7 @@ import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { SAMPLE_LOGS } from './sample-data.js';
 import { fmtClock } from './charts.js';
 import { ABILITY_COOLDOWNS } from './ability-cooldowns.js';
+import { startLiveBackground, stopLiveBackground } from './live-bg.js';
 
 const el = (id) => document.getElementById(id);
 
@@ -627,6 +628,16 @@ function renderCooldownTracker() {
 // to re-grant permission after the tab's been backgrounded a long while).
 const STALE_UPDATE_MULTIPLE = 3;
 
+// A second, much coarser threshold: this one isn't about the poll interval
+// at all (a few missed polls in a row is normal and not alarming), it's
+// about real-world time with genuinely nothing new in the log. 2 minutes
+// of total silence while actively watching almost always means the game
+// client has stopped writing to this file — most commonly because in-game
+// chat logging got turned off (or never got turned on) — rather than a
+// normal lull, so this gets a much louder, actionable banner instead of
+// just the quiet orange text above.
+const STALE_WATCH_BANNER_MS = 2 * 60 * 1000;
+
 function fmtAgo(ms) {
   const sec = Math.max(0, Math.round(ms / 1000));
   if (sec < 1) return 'just now';
@@ -637,12 +648,14 @@ function fmtAgo(ms) {
 
 function renderLastUpdated() {
   const el_ = el('lastUpdated');
-  if (!state.lastUpdatedAt) { el_.hidden = true; return; }
+  const banner = el('staleWatchBanner');
+  if (!state.lastUpdatedAt) { el_.hidden = true; banner.hidden = true; return; }
   el_.hidden = false;
   const ageMs = Date.now() - state.lastUpdatedAt;
   el_.textContent = `🕓 Last updated: ${fmtAgo(ageMs)}`;
   const stale = state.watcher && ageMs > state.watchIntervalMs * STALE_UPDATE_MULTIPLE;
   el_.classList.toggle('stale', !!stale);
+  banner.hidden = !(state.watcher && ageMs > STALE_WATCH_BANNER_MS);
 }
 
 // Re-render every second so active cooldowns visibly count down, and the
@@ -688,6 +701,7 @@ async function beginWatch(handle) {
     el('btnStopWatch').hidden = false;
     el('clearLogOptWrap').hidden = false;
     el('btnClearLog').hidden = false;
+    startLiveBackground();
   } catch (err) {
     if (err && err.name !== 'AbortError') console.warn('[chatgator] could not start watch mode', err);
   }
@@ -695,11 +709,13 @@ async function beginWatch(handle) {
 function stopWatching() {
   if (state.watcher) { state.watcher.stop(); state.watcher = null; }
   state.liveSync = null; // back to a frozen end-of-file snapshot for the cooldown tracker
+  stopLiveBackground();
   el('watchStatus').hidden = true;
   el('watchDot').classList.remove('live');
   el('watchIntervalWrap').hidden = true;
   el('btnStopWatch').hidden = true;
   el('clearLogOptWrap').hidden = true;
+  el('staleWatchBanner').hidden = true;
   el('btnClearLog').hidden = true;
 }
 
