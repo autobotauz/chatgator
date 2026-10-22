@@ -36,9 +36,21 @@ export function isWatchSupported() {
 }
 
 export class LogWatcher {
-  constructor({ onChange, onError, pollMs = 2000 }) {
+  constructor({ onChange, onError, onPoll, pollMs = 2000 }) {
     this.onChange = onChange;
     this.onError = onError;
+    // Fired on every successful poll tick -- whether or not the file had
+    // actually grown -- so a caller can show "we checked the file N
+    // seconds ago" separately from "the file had new content N seconds
+    // ago". That split is the whole point: if "checked" keeps ticking on
+    // schedule while "updated" lags well behind, the poll loop itself is
+    // healthy and the delay is upstream of us entirely (most likely the
+    // game client still buffering before it flushes to disk). If
+    // "checked" ALSO lags, the poll loop itself has stalled -- e.g. a
+    // backgrounded tab getting throttled by the browser, or a lost/
+    // revoked file handle -- which is a fundamentally different problem
+    // to go chase.
+    this.onPoll = onPoll;
     this.pollMs = pollMs;
     this.handle = null;
     this.lastSize = 0;
@@ -115,6 +127,7 @@ export class LogWatcher {
     this.timer = setTimeout(async () => {
       try {
         const file = await this.handle.getFile();
+        if (this.onPoll) this.onPoll({ size: file.size });
         if (file.size < this.lastSize) {
           // Shrank — the client rotated or restarted logging to a fresh
           // file. There's no "new tail" relative to our old position, so

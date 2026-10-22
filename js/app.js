@@ -44,6 +44,13 @@ const state = {
   // load, or a live poll that found the file had grown) — drives the
   // "Last updated" line under the cooldown tracker.
   lastUpdatedAt: null,
+  // Date.now() of the last time we successfully asked the OS for the
+  // watched file's current state, regardless of whether it had grown —
+  // drives the separate "File checked" line, which exists specifically to
+  // tell "our poll loop is stalled" apart from "the file just isn't
+  // growing yet" (see LogWatcher's onPoll). Only meaningful while
+  // watching; null for a static/one-time load, which never re-checks.
+  lastPolledAt: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -674,13 +681,31 @@ function fmtAgo(ms) {
 
 function renderLastUpdated() {
   const el_ = el('lastUpdated');
+  const textEl = el('lastUpdatedText');
+  const checkedEl = el('lastCheckedText');
   const banner = el('staleWatchBanner');
   if (!state.lastUpdatedAt) { el_.hidden = true; banner.hidden = true; return; }
   el_.hidden = false;
+
   const ageMs = Date.now() - state.lastUpdatedAt;
-  el_.textContent = `🕓 Last updated: ${fmtAgo(ageMs)}`;
-  const stale = state.watcher && ageMs > state.watchIntervalMs * STALE_UPDATE_MULTIPLE;
-  el_.classList.toggle('stale', !!stale);
+  textEl.textContent = `🕓 Last updated: ${fmtAgo(ageMs)}`;
+  const updateStale = state.watcher && ageMs > state.watchIntervalMs * STALE_UPDATE_MULTIPLE;
+  textEl.classList.toggle('stale', !!updateStale);
+
+  // Only meaningful while actively watching a live handle — a static load
+  // never polls again after its initial read, so there's nothing to show.
+  if (state.watcher && state.lastPolledAt != null) {
+    const checkedAgeMs = Date.now() - state.lastPolledAt;
+    checkedEl.hidden = false;
+    checkedEl.textContent = `File checked: ${fmtAgo(checkedAgeMs)}`;
+    // This one lagging (not just "updated") means the poll loop itself
+    // has stalled — a backgrounded tab throttled by the browser, or a
+    // lost file handle — rather than the file simply not growing yet.
+    checkedEl.classList.toggle('stale', checkedAgeMs > state.watchIntervalMs * STALE_UPDATE_MULTIPLE);
+  } else {
+    checkedEl.hidden = true;
+  }
+
   banner.hidden = !(state.watcher && ageMs > STALE_WATCH_BANNER_MS);
 }
 
@@ -714,11 +739,13 @@ async function beginWatch(handle) {
         else ingestAppend(text);
       },
       onError: (err) => console.warn('[chatgator] watch error', err),
+      onPoll: () => { state.lastPolledAt = Date.now(); },
       pollMs: state.watchIntervalMs,
     });
     await watcher.startWithHandle(handle);
     const initialText = await watcher.readAll();
     state.watcher = watcher;
+    state.lastPolledAt = Date.now(); // the readAll() above was itself a check
     ingestTexts([{ name: 'live', text: initialText }]);
     el('watchStatus').hidden = false;
     el('watchDot').classList.add('live');
@@ -735,6 +762,7 @@ async function beginWatch(handle) {
 function stopWatching() {
   if (state.watcher) { state.watcher.stop(); state.watcher = null; }
   state.liveSync = null; // back to a frozen end-of-file snapshot for the cooldown tracker
+  state.lastPolledAt = null;
   stopLiveBackground();
   el('watchStatus').hidden = true;
   el('watchDot').classList.remove('live');

@@ -87,7 +87,10 @@
       <span class="cooldown-tracker-icon">⏱</span>
       <ul class="cooldown-tracker-list" id="cooldownTrackerList"></ul>
     </div>
-    <div class="last-updated" id="lastUpdated" hidden title="When this view last picked up new lines from the log. While watching a live file, this should keep moving — if it stalls well past your refresh interval, the watched file isn't changing (or the tab lost its handle to it)."></div>
+    <div class="last-updated" id="lastUpdated" hidden>
+      <span id="lastUpdatedText" title="When this view last picked up NEW lines from the log. If this lags while 'File checked' stays fresh, the file on disk genuinely hasn't grown yet — most likely the game client is still buffering those lines and hasn't flushed them to disk, not a problem with Chat Gator's polling."></span>
+      <span id="lastCheckedText" hidden title="When we last successfully asked the OS for the watched file's current state, whether or not it had grown. This should track your refresh interval closely — if THIS lags too, the poll loop itself has stalled (e.g. this tab got backgrounded and the browser throttled its timers, or the file handle needs permission re-granted)."></span>
+    </div>
     <div class="stale-watch-banner" id="staleWatchBanner" hidden>⚠️ No new lines picked up from the log in over 2 minutes. Still watching — but is in-game chat logging turned on?</div>
 
     <nav class="tabbar">
