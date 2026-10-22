@@ -163,6 +163,16 @@ export function buildStats(events, playerNameHint) {
   let lastMeleeLabel = 'Melee'; // bucket key the most recent swing landed in — crit/extra follow-ups reuse it,
                                  // so a style's crit or a spell's "extra damage" line lands on the same row
   let lastMeleeWeapon = null;   // weapon behind that same swing, for crit/extra follow-up lines
+  // Whether `lastMeleeLabel` is actually a spell's bucket rather than a
+  // real melee one — a melee_plain line with e.spellName set (parser.js
+  // attributed it to a recent cast/AE tick/DoT, not a weapon swing) is
+  // spell damage wearing a melee-shaped log line, not melee. It's already
+  // correctly bucketed by spell name in dmgOutBySource above/below; what
+  // this flag guards is totalMelee{Hits,Crits,Dmg} just below, which feed
+  // the "Melee crit rate" stat tile and must only ever count genuine
+  // swings — a crit/extra follow-up line inherits whichever of the two
+  // its preceding hit was, same as it inherits lastMeleeLabel itself.
+  let lastMeleeIsSpell = false;
   // A style name (e.g. "Glowing Blade") replaces the weapon in the bucket
   // label, so without this the weapon a melee player actually swung with —
   // which can change fight to fight with a dual-wield/weapon-swap macro —
@@ -192,6 +202,7 @@ export function buildStats(events, playerNameHint) {
         const key = e.styleName ? `${e.styleName} (${e.weapon})` : `Melee: ${e.weapon}`;
         if (e.styleName) dmgOutBaseName[key] = e.styleName;
         lastMeleeLabel = key;
+        lastMeleeIsSpell = false; // always a real weapon swing
         bump(dmgOutBySource, key, e.dmg, false);
         trackWeapon(key, e.weapon);
         totalMeleeHits++; totalMeleeDmg += e.dmg;
@@ -201,20 +212,32 @@ export function buildStats(events, playerNameHint) {
       case 'melee_plain': {
         // No weapon name on this line — it's either a basic swing (no style
         // triggered this tick) or, if a "You cast a <Spell> spell!" happened
-        // moments ago, that spell's direct-damage result.
+        // moments ago (or this is another tick/target of that same cast —
+        // see parser.js), that spell's direct-damage result wearing the
+        // exact same "You hit <target> for N damage!" shape as a swing.
         const key = e.spellName || (pendingWeapon ? `Melee: ${pendingWeapon}` : 'Melee');
         lastMeleeLabel = key;
+        lastMeleeIsSpell = !!e.spellName;
         if (!e.spellName) { lastMeleeWeapon = pendingWeapon; trackWeapon(key, pendingWeapon); }
         else lastMeleeWeapon = null;
         bump(dmgOutBySource, key, e.dmg, false);
-        totalMeleeHits++; totalMeleeDmg += e.dmg;
+        // Only count toward the melee-specific totals (crit rate tile) when
+        // this genuinely was a swing — a spell's damage is already counted
+        // under its own name in dmgOutBySource just above, via `key`; double
+        // counting it here as melee too was the bug a user reported after
+        // seeing a "Melee: 15k" bucket in a log with no weapon swing in it
+        // at all (totalMeleeDmg was silently summing in 100% of this
+        // character's spell damage on top of its own correct spell-bucket
+        // total, since this line ran unconditionally for every melee_plain
+        // event regardless of e.spellName).
+        if (!e.spellName) { totalMeleeHits++; totalMeleeDmg += e.dmg; }
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
       case 'melee_extra': {
         bump(dmgOutBySource, lastMeleeLabel, e.dmg, false);
         trackWeapon(lastMeleeLabel, lastMeleeWeapon);
-        totalMeleeDmg += e.dmg;
+        if (!lastMeleeIsSpell) totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
@@ -222,7 +245,7 @@ export function buildStats(events, playerNameHint) {
       case 'melee_crit_generic': {
         bump(dmgOutBySource, lastMeleeLabel, e.dmg, true);
         trackWeapon(lastMeleeLabel, lastMeleeWeapon);
-        totalMeleeCrits++; totalMeleeDmg += e.dmg;
+        if (!lastMeleeIsSpell) { totalMeleeCrits++; totalMeleeDmg += e.dmg; }
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }

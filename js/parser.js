@@ -739,6 +739,11 @@ export function parseLogText(rawText, resume) {
   // the window (refreshed each tick so a long DoT keeps attributing
   // correctly), is almost certainly another tick of the same thing, while
   // one on any other target is almost certainly an unrelated plain swing.
+  // The one exception (handled in the main loop below, not here): several
+  // of these lines landing in the exact same logged SECOND — an AE spell
+  // splashing onto multiple targets in one tick — all get attributed
+  // regardless of target, since there's no way for an unrelated swing to
+  // coincide with that same single instant.
   const DOT_TICK_WINDOW_MS = 5000;
   let activeDotName = resume?.activeDotName ?? null, activeDotTarget = resume?.activeDotTarget ?? null, activeDotAt = resume?.activeDotAt ?? -Infinity;
   // A group/AOE heal (e.g. "Group Apotheosis", "Tones of Health") also only
@@ -853,6 +858,21 @@ export function parseLogText(rawText, resume) {
           activeDotTarget = payload.target;
           activeDotAt = clockMs;
           pendingCastName = null;
+        } else if (activeDotName && clockMs === activeDotAt) {
+          // Another bare "You hit <target> for N damage!" in the EXACT same
+          // logged second as the hit just attributed above (or as a
+          // previous tick) — an AE spell landing on more than one target
+          // at once, each producing its own identical-shaped line with
+          // nothing tying them together but that shared timestamp (seen
+          // directly in a reported log: a "Deafening Cascade"/"Deafening
+          // Explosion" AE nuke hitting 2-3 targets in the same tick, where
+          // only the first one was getting attributed and the rest were
+          // falling through and getting counted as plain melee — there was
+          // no actual melee swing anywhere in that entire log). Not
+          // target-restricted, unlike the DoT-tick branch below, but safe
+          // from bleeding into a later unrelated swing precisely because
+          // it only ever matches the SAME instant, never a later one.
+          payload.spellName = activeDotName;
         } else if (activeDotName && payload.target === activeDotTarget && clockMs - activeDotAt <= DOT_TICK_WINDOW_MS) {
           payload.spellName = activeDotName;
           activeDotAt = clockMs; // still ticking — extend the window
