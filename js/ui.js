@@ -383,7 +383,7 @@ export function renderRealm(container, stats, ctx) {
   const g = grid(section(container), 4);
   statTile(g, { label: 'Realm points (this view)', value: fmtExact(rp.total) });
   statTile(g, { label: 'RP / hour', value: fmtNum(rp.perHour) });
-  statTile(g, { label: 'Bonus RP (realm rank)', value: fmtExact(rp.bonusTotal) });
+  statTile(g, { label: 'Bonus RP (guild buff)', value: fmtExact(rp.bonusTotal) });
   statTile(g, { label: 'Deathblows', value: fmtExact(stats.kills.deathblows) });
 
   const tlSec = section(container);
