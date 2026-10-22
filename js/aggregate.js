@@ -383,6 +383,17 @@ export function buildStats(events, playerNameHint) {
   const totalIncomingAttackAttempts = blocks + youParries + youEvades + incomingHitsLanded;
 
   // ---- realm points --------------------------------------------------------------
+  // The game logs a realm-rank bonus as its OWN line ("You get an additional N
+  // realm points due to your realm rank!"), immediately followed by a bare total
+  // line ("You get N realm points!") whose amount already includes that bonus
+  // (base + bonus) -- it is NOT a third, separate award on top of it. Summing
+  // rp_bonus in addition to rp_plain/rp_reason therefore double-counts the bonus
+  // portion of every bonus-eligible award. Verified against a real log's own
+  // in-game /stats "Total RP" snapshots: summing all three event types overshot
+  // the true RP gained by exactly the sum of the rp_bonus amounts; leaving
+  // rp_bonus out of the total lines up with the snapshot delta exactly.
+  // rpBonusTotal is still tracked (for the "Bonus RP" stat tile) but must stay
+  // out of both the grand total and the by-reason breakdown.
   let rpTotal = 0, rpBonusTotal = 0;
   const rpByReason = {};
   const rpPoints = [];
@@ -393,9 +404,7 @@ export function buildStats(events, playerNameHint) {
       rpByReason[key] = (rpByReason[key] || 0) + e.amount;
       rpPoints.push({ clock: e.clock, amount: e.amount });
     } else if (e.type === 'rp_bonus') {
-      rpTotal += e.amount; rpBonusTotal += e.amount;
-      rpByReason["Guild buff"] = (rpByReason["Guild buff"] || 0) + e.amount;
-      rpPoints.push({ clock: e.clock, amount: e.amount });
+      rpBonusTotal += e.amount;
     }
   }
 
@@ -430,9 +439,15 @@ export function buildStats(events, playerNameHint) {
         const e2 = events[j];
         if (e2.clock == null || e.clock == null || e2.clock - e.clock > DEATHBLOW_RP_WINDOW_MS) break;
         if (e2.type === 'kill_feed') break; // the next kill's own reward starts here
-        if ((e2.type === 'rp_plain' || e2.type === 'rp_reason' || e2.type === 'rp_bonus') && !claimedRp.has(j)) {
+        // Only rp_plain/rp_reason, not rp_bonus -- see the realm-points total
+        // above for why: rp_bonus's amount is already folded into its paired
+        // rp_plain total, so adding it again here would double-count it in
+        // each deathblow's listed RP too.
+        if ((e2.type === 'rp_plain' || e2.type === 'rp_reason') && !claimedRp.has(j)) {
           rp += e2.amount;
           rpKnown = true;
+          claimedRp.add(j);
+        } else if (e2.type === 'rp_bonus') {
           claimedRp.add(j);
         }
       }

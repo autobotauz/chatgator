@@ -392,19 +392,49 @@ function durationLabel(ms) {
   return m ? `${m}m ${s}s` : `${s}s`;
 }
 
+// Any single gap between consecutive log lines longer than this is treated as
+// a disconnect, a log-off, or a break between separate real-world play
+// sessions -- not played time -- when working out realm points per hour.
+// Chosen generously above normal lulls (running between objectives, a BG
+// queue, a minute AFK) so it only trims genuine multi-day-file idle gaps,
+// not ordinary play.
+const RP_IDLE_GAP_MS = 15 * 60 * 1000;
+
+// Realm points, unlike DPS/HPS, are routinely earned with no damage event
+// anywhere nearby at all (keep captures, Assault Orders, missions, War
+// Supplies runs, group assists) -- so "time spent dealing/taking damage"
+// badly undercounts how long the player was actually out there earning
+// them (reported bug: a log with lots of RP from BG objectives and very
+// little personal damage showed 42K/hr because the "/hr" denominator was
+// only ~35 minutes of combat out of a 2h8m, gap-free session). Sum the real
+// elapsed time between consecutive log lines instead, skipping any one gap
+// over RP_IDLE_GAP_MS so a multi-day-old file doesn't get treated as one
+// continuous session.
+function playedDurationMs(events) {
+  const clocks = events.map(e => e.clock).filter(x => x != null).sort((a, b) => a - b);
+  if (clocks.length < 2) return 1000;
+  let ms = 0;
+  for (let i = 1; i < clocks.length; i++) {
+    const gap = clocks[i] - clocks[i - 1];
+    if (gap > 0 && gap <= RP_IDLE_GAP_MS) ms += gap;
+  }
+  return Math.max(1000, ms);
+}
+
 function currentStats() {
   if (state.scope === 'all') {
     const stats = buildStats(state.rawEvents, null);
-    // DPS/HPS/RP-per-hour over the *full* file span (which can include
-    // multi-day idle gaps between sessions) is meaningless, so recompute
-    // those rates against the sum of actual encounter time instead.
+    // DPS/HPS over the *full* file span (which can include multi-day idle
+    // gaps between sessions) is meaningless, so recompute those rates
+    // against the sum of actual encounter time instead.
     const activeMs = state.encounters.reduce((a, e) => a + e.durationMs, 0) || stats.meta.durationMs;
     const activeSec = Math.max(1, activeMs / 1000);
     stats.damageOut.dps = +(stats.damageOut.total / activeSec).toFixed(1);
     stats.damageIn.dtps = +(stats.damageIn.total / activeSec).toFixed(1);
     stats.healOut.hps = +(stats.healOut.total / activeSec).toFixed(1);
-    stats.realmPoints.perHour = +(stats.realmPoints.total / (activeSec / 3600)).toFixed(0);
     stats.meta.activeDurationMs = activeMs;
+    const playedSec = playedDurationMs(state.rawEvents) / 1000;
+    stats.realmPoints.perHour = +(stats.realmPoints.total / (playedSec / 3600)).toFixed(0);
     return stats;
   }
   const enc = state.encounters.find(e => String(e.id) === String(state.scope));
