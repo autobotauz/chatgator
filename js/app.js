@@ -6,7 +6,6 @@ import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { SAMPLE_LOGS } from './sample-data.js';
 import { fmtClock } from './charts.js';
 import { ABILITY_COOLDOWNS } from './ability-cooldowns.js';
-import { startLiveBackground, stopLiveBackground } from './live-bg.js';
 
 const el = (id) => document.getElementById(id);
 
@@ -22,16 +21,10 @@ const state = {
   // is a synthetic elapsed-ms value anchored to the first timestamp in the
   // file (see parser.js), never a real calendar date — so to turn "time
   // since last cast" into a *ticking* countdown while watching a live log,
-  // we remember a (clock, real Date.now()) pair and extrapolate forward
-  // from it with the wall clock between polls, rather than re-deriving
-  // "now" from whatever we most recently read — see advanceLiveSync() for
-  // why re-deriving it every poll is wrong whenever a poll runs late (and
-  // on a backgrounded tab, Chrome throttles timers hard, so it often does).
-  // Reset to null on a static (non-watched) load, where the tracker just
-  // shows a frozen snapshot as of the end of that file instead; and
-  // unconditionally re-seeded fresh on any full reload (new file, or the
-  // watched file being rotated/restarted) — only the pure-append path
-  // (ingestAppend) advances it forward-only instead of re-seeding.
+  // we remember the newest clock value we've seen and the real Date.now()
+  // we saw it at, then extrapolate forward with the wall clock between
+  // polls. Reset to null on a static (non-watched) load, where the tracker
+  // just shows a frozen snapshot as of the end of that file instead.
   liveSync: null,
   // Carried parser state (day-rollover clock, pending style/cast/heal
   // attribution — see parseLogText's `resume` param) from the most recent
@@ -44,13 +37,6 @@ const state = {
   // load, or a live poll that found the file had grown) — drives the
   // "Last updated" line under the cooldown tracker.
   lastUpdatedAt: null,
-  // Date.now() of the last time we successfully asked the OS for the
-  // watched file's current state, regardless of whether it had grown —
-  // drives the separate "File checked" line, which exists specifically to
-  // tell "our poll loop is stalled" apart from "the file just isn't
-  // growing yet" (see LogWatcher's onPoll). Only meaningful while
-  // watching; null for a static/one-time load, which never re-checks.
-  lastPolledAt: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -115,59 +101,15 @@ const dropzone = el('dropzone');
 ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
   e.preventDefault(); dropzone.classList.remove('dragover');
 }));
-dropzone.addEventListener('drop', async (e) => {
-  // Prefer a live-watchable handle when the browser supports it, so a
-  // dropped .log file is on equal footing with one picked through the
-  // button below — both end up watched live, not just read once. Only
-  // Chromium implements getAsFileSystemHandle(); everywhere else (and for
-  // a multi-file drop, which we don't try to merge anymore) this falls
-  // through to a plain one-time read of the first file.
-  const items = Array.from(e.dataTransfer.items || []);
-  if (isWatchSupported() && items.length === 1 && items[0].kind === 'file' &&
-      typeof items[0].getAsFileSystemHandle === 'function') {
-    try {
-      const handle = await items[0].getAsFileSystemHandle();
-      if (handle && handle.kind === 'file') {
-        await loadHandle(handle);
-        return;
-      }
-    } catch { /* fall through to the plain read below */ }
-  }
-  const files = Array.from(e.dataTransfer.files || []).slice(0, 1);
+dropzone.addEventListener('drop', (e) => {
+  const files = Array.from(e.dataTransfer.files || []);
   if (files.length) loadFiles(files);
 });
 
-el('btnPickFile').addEventListener('click', pickFileOrSession);
-
-// The single entry point for "give me a log or session file": in a browser
-// with the File System Access API (Chrome/Edge), this opens a picker that
-// hands back a reusable handle, so we can keep polling it for new lines —
-// a .log file picked this way is automatically watched live, no separate
-// "watch" step needed. Elsewhere, it falls back to a plain <input
-// type=file> (one-time read; re-drop/re-pick to refresh).
-async function pickFileOrSession() {
-  if (isWatchSupported()) {
-    try {
-      const [handle] = await window.showOpenFilePicker({
-        types: [{
-          description: 'DAoC chat log or session snapshot',
-          accept: { 'text/plain': ['.log', '.txt'], 'application/json': ['.json'] },
-        }],
-        excludeAcceptAllOption: false,
-      });
-      await loadHandle(handle);
-    } catch (err) {
-      if (err && err.name !== 'AbortError') console.warn('[chatgator] file picker failed', err);
-    }
-    return;
-  }
-  el('fileInput').click();
-}
-
+el('btnPickFile').addEventListener('click', () => el('fileInput').click());
 el('fileInput').addEventListener('change', (e) => {
   const files = Array.from(e.target.files || []);
   if (files.length) loadFiles(files);
-  e.target.value = ''; // so picking the same file again still fires 'change'
 });
 
 el('btnSample').addEventListener('click', () => {
@@ -195,27 +137,24 @@ function startNewSession() {
   state.lastUpdatedAt = null;
 }
 
-el('btnStopWatch').addEventListener('click', stopWatching);
-el('btnClearLog').addEventListener('click', clearWatchedLogFile);
+if (isWatchSupported()) {
+  el('btnWatch').hidden = false;
+  el('btnWatch').addEventListener('click', startWatch);
+  el('btnWatchHeader').hidden = false;
+  el('watchIntervalWrap').hidden = false;
+  el('btnWatchHeader').addEventListener('click', () => {
+    if (state.watcher) stopWatching(); else startWatch();
+  });
+}
 
 el('btnDownloadSnapshot').addEventListener('click', downloadSnapshot);
-
-// Resolves a FileSystemFileHandle (from the picker above, or from a drop
-// resolved to a handle) to either a one-time snapshot import (.json) or a
-// live-watched log (anything else) — the one place that decision is made,
-// since the picker and the drop path both funnel through it.
-async function loadHandle(handle) {
-  const file = await handle.getFile();
-  if (/\.json$/i.test(file.name)) {
-    await loadSnapshotFile(file);
-    return;
-  }
-  await beginWatch(handle);
-}
 
 async function loadFiles(files) {
   // A shared snapshot (exported via "Download snapshot") is a .json file —
   // route it to its own importer instead of trying to parse it as a chat.log.
+  // Mixing a snapshot with raw logs in one drop isn't a meaningful merge
+  // (its event clocks belong to a different parse session), so a snapshot
+  // present in the drop wins and anything else in that drop is ignored.
   const jsonFile = files.find(f => /\.json$/i.test(f.name));
   if (jsonFile) {
     await loadSnapshotFile(jsonFile);
@@ -265,6 +204,7 @@ function ingestSnapshotEvents(data) {
   el('appMain').hidden = false;
   el('btnLoadAnother').hidden = false;
   el('btnDownloadSnapshot').hidden = false;
+  el('btnWatchHeader').hidden = true; // no live file handle behind an imported snapshot
   el('snapshotPill').hidden = false;
   el('snapshotPill').title = data.exportedAt
     ? `Imported snapshot · exported ${new Date(data.exportedAt).toLocaleString()}${data.player ? ` · ${data.player}` : ''}`
@@ -323,6 +263,7 @@ function ingestTexts(fileTexts) {
   el('btnLoadAnother').hidden = false;
   el('btnDownloadSnapshot').hidden = false;
   el('snapshotPill').hidden = true;
+  if (isWatchSupported()) el('btnWatchHeader').hidden = false;
 
   buildEncounterSelect();
   renderActiveTab();
@@ -355,7 +296,7 @@ function ingestAppend(chunkText) {
   }
   state.encounters = segmentEncounters(state.rawEvents);
   state.lastUpdatedAt = Date.now();
-  advanceLiveSync(lastKnownClock(state.rawEvents));
+  state.liveSync = { clock: lastKnownClock(state.rawEvents), wallTime: Date.now() };
 
   buildEncounterSelect();
   renderActiveTab();
@@ -494,13 +435,10 @@ function renderBgTicker() {
 // Ability cooldown tracker — persistent across every tab, same as the bg
 // ticker above. Looks at every spell cast (`cast` events) and every weapon
 // swing that landed a named style (`melee_weapon` events carrying a
-// `styleName`), and the first time we see a name we recognize in
-// ABILITY_COOLDOWNS, it gets a permanent slot here for the rest of the
-// session (see the big comment on renderCooldownTracker below for why it's
-// built as a static roster rather than a dynamic "what's on cooldown right
-// now" list). Ticks every second via the setInterval below; see the
-// `liveSync` comment on `state` for how "now" is estimated while watching a
-// live log vs. a plain static file load.
+// `styleName`), and for any name we recognize in ABILITY_COOLDOWNS, shows a
+// countdown from the most recent use. Ticks every second via the
+// setInterval below; see the `liveSync` comment on `state` for how "now" is
+// estimated while watching a live log vs. a plain static file load.
 // ---------------------------------------------------------------------------
 const COOLDOWN_READY_SOON_SEC = 3; // highlight a pill green once it's about to come off cooldown
 
@@ -509,38 +447,6 @@ function lastKnownClock(events) {
     if (events[i].clock != null) return events[i].clock;
   }
   return null;
-}
-
-// Advances the live-clock sync point forward only — never rewinds it.
-//
-// The bug this fixes: a poll can arrive late for all sorts of reasons
-// (chrome throttles timers hard in a backgrounded tab — easily to a
-// once-a-minute cadence after a few minutes unfocused, which is the normal
-// case while you're actually alt-tabbed into the game). When a late poll
-// finally delivers a backlog of lines, the *newest* clock value in that
-// backlog is already seconds (or tens of seconds) old by the time we see
-// it — it reflects whenever the game printed that line, not "right now".
-// Re-anchoring liveSync to {that backlog clock, Date.now()} on every poll
-// (what this used to do) tells the countdown "that old moment IS right
-// now", which quietly rewinds its sense of time backward by exactly the
-// poll's lateness — the countdown then shows MORE time remaining than is
-// real, by that same amount, every single time a poll lags. That's
-// consistent with seeing ~45s left here against ~7s left in-game: the
-// in-game clock had moved on for ~38s while our estimate of "now" didn't.
-//
-// The fix: only resync if the new data proves our running estimate is
-// actually BEHIND the log's own clock (the normal, on-time case, and a
-// tiny periodic correction for JS timer drift over a long session) —
-// never because a late poll's data happens to be older than our estimate,
-// which is exactly backlog, not a correction.
-function advanceLiveSync(newestClock) {
-  if (newestClock == null) return;
-  const now = Date.now();
-  if (!state.liveSync) { state.liveSync = { clock: newestClock, wallTime: now }; return; }
-  const estimatedNow = state.liveSync.clock + (now - state.liveSync.wallTime);
-  if (newestClock > estimatedNow) {
-    state.liveSync = { clock: newestClock, wallTime: now };
-  }
 }
 
 // Most recent cast time per recognized ability name. Events are already
@@ -559,29 +465,11 @@ function computeAbilityUsage(events) {
   return usage;
 }
 
-// Converts a logged event's synthetic `clock` value into a real wall-clock
-// moment (epoch ms), using the current liveSync anchor -- the one (clock,
-// wallTime) pair we trust to mean "the log was at this clock value at this
-// real moment" (see advanceLiveSync above). Only meaningful while actively
-// watching with a resolved anchor; returns null otherwise (static load, or
-// no anchor yet).
-//
-// This is the literal "take the ability's logged start time and compare it
-// against system time" the cooldown countdown is built on, confirmed
-// against a real session's chat.log: the game's printed [HH:MM:SS] tracks
-// real wall-clock time, so once an event's real-world moment is known via
-// this conversion, its remaining cooldown is simply
-// `cooldownSeconds - (Date.now() - thatMoment) / 1000` -- read straight off
-// the browser's own clock for every ability, every render, rather than
-// through one shared extrapolated "now" value computed once per tick.
-// (The two are mathematically identical -- liveSync.clock + (Date.now() -
-// liveSync.wallTime) - usedAtClock reduces to Date.now() - eventWallClockMs
-// -- but comparing each ability's cast moment straight against Date.now()
-// makes that relationship explicit instead of implicit, and is easier to
-// sanity-check against your actual system clock.)
-function eventWallClockMs(eventClock) {
-  if (!state.liveSync || state.liveSync.clock == null || eventClock == null) return null;
-  return state.liveSync.wallTime + (eventClock - state.liveSync.clock);
+function cooldownNowClock() {
+  if (state.watcher && state.liveSync && state.liveSync.clock != null) {
+    return state.liveSync.clock + (Date.now() - state.liveSync.wallTime);
+  }
+  return lastKnownClock(state.rawEvents);
 }
 
 function fmtCooldownRemaining(sec) {
@@ -591,55 +479,30 @@ function fmtCooldownRemaining(sec) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-// A roster, not a dynamic "what's active right now" list: every ability
-// with a known cooldown that's been cast at least once gets a permanent
-// slot here for the rest of the session, in the order it was first seen
-// (computeAbilityUsage's `usage` Map already preserves that -- a later use
-// overwrites an existing key's clock value without moving it, since Map
-// iteration order follows first insertion, not last update). Each slot
-// just flips between two states as its own cooldown ticks:
-//   ready       — normal opacity, no bar, "Ready" in the time slot.
-//   on-cooldown — name/icon dimmed, bar + countdown ticking down to 0.
-// Nothing is ever added mid-list or removed once it's shown up, and
-// nothing gets re-sorted by remaining time anymore -- that's what makes
-// this "static": once you've used an ability, it keeps the exact same
-// spot on the page whether it's ready or cooling down, so you build a
-// stable muscle-memory read of the row instead of hunting for it as pills
-// used to jump around/appear/disappear every render.
 function renderCooldownTracker() {
   const tracker = el('cooldownTracker');
   const list = el('cooldownTrackerList');
   const usage = computeAbilityUsage(state.rawEvents);
+  const nowClock = cooldownNowClock();
 
-  if (!usage.size) { list.innerHTML = ''; tracker.hidden = true; return; }
-
-  // Live: compare each ability's cast moment directly against the
-  // browser's own Date.now() (see eventWallClockMs above). Static load (no
-  // watcher, or no anchor resolved yet): fall back to the frozen
-  // end-of-file clock, same as before -- there's no "real now" to compare
-  // against for a file that isn't actually being watched.
-  const isLive = !!(state.watcher && state.liveSync && state.liveSync.clock != null);
-  const frozenNowClock = isLive ? null : lastKnownClock(state.rawEvents);
-
-  const rows = [];
-  for (const [name, usedAtClock] of usage) {
-    const info = ABILITY_COOLDOWNS[name];
-    let remainingSec = 0; // can't compute "now" yet (no events at all) -> show ready
-    if (isLive) {
-      remainingSec = info.cooldownSeconds - (Date.now() - eventWallClockMs(usedAtClock)) / 1000;
-    } else if (frozenNowClock != null) {
-      remainingSec = info.cooldownSeconds - (frozenNowClock - usedAtClock) / 1000;
+  const active = [];
+  if (nowClock != null) {
+    for (const [name, usedAtClock] of usage) {
+      const info = ABILITY_COOLDOWNS[name];
+      const remainingSec = info.cooldownSeconds - (nowClock - usedAtClock) / 1000;
+      if (remainingSec > 0.25) {
+        active.push({ name, icon: info.icon, remainingSec, cooldownSeconds: info.cooldownSeconds });
+      }
     }
-    rows.push({ name, icon: info.icon, cooldownSeconds: info.cooldownSeconds, remainingSec });
   }
+  active.sort((a, b) => a.remainingSec - b.remainingSec);
 
-  tracker.hidden = false;
   list.innerHTML = '';
-  for (const a of rows) {
-    const onCooldown = a.remainingSec > 0.25;
+  if (!active.length) { tracker.hidden = true; return; }
+  tracker.hidden = false;
+  for (const a of active) {
     const li = document.createElement('li');
-    li.className = 'cooldown-pill ' + (onCooldown ? 'on-cooldown' : 'ready') +
-      (onCooldown && a.remainingSec <= COOLDOWN_READY_SOON_SEC ? ' ready-soon' : '');
+    li.className = 'cooldown-pill' + (a.remainingSec <= COOLDOWN_READY_SOON_SEC ? ' ready-soon' : '');
 
     const icon = document.createElement('span');
     icon.className = 'cooldown-pill-icon';
@@ -649,21 +512,19 @@ function renderCooldownTracker() {
     const name = document.createElement('span');
     name.className = 'cooldown-pill-name';
     name.textContent = a.name;
-    name.title = onCooldown
-      ? `${a.name} — on cooldown`
-      : `${a.name} — ready`;
+    name.title = a.name;
 
     const barWrap = document.createElement('span');
     barWrap.className = 'cooldown-pill-bar';
     const barFill = document.createElement('span');
     barFill.className = 'cooldown-pill-bar-fill';
-    const pct = onCooldown ? Math.max(0, Math.min(100, (a.remainingSec / a.cooldownSeconds) * 100)) : 0;
+    const pct = Math.max(0, Math.min(100, (a.remainingSec / a.cooldownSeconds) * 100));
     barFill.style.width = `${pct}%`;
     barWrap.appendChild(barFill);
 
     const time = document.createElement('span');
     time.className = 'cooldown-pill-time';
-    time.textContent = onCooldown ? fmtCooldownRemaining(a.remainingSec) : 'Ready';
+    time.textContent = fmtCooldownRemaining(a.remainingSec);
 
     li.appendChild(icon);
     li.appendChild(name);
@@ -683,16 +544,6 @@ function renderCooldownTracker() {
 // to re-grant permission after the tab's been backgrounded a long while).
 const STALE_UPDATE_MULTIPLE = 3;
 
-// A second, much coarser threshold: this one isn't about the poll interval
-// at all (a few missed polls in a row is normal and not alarming), it's
-// about real-world time with genuinely nothing new in the log. 2 minutes
-// of total silence while actively watching almost always means the game
-// client has stopped writing to this file — most commonly because in-game
-// chat logging got turned off (or never got turned on) — rather than a
-// normal lull, so this gets a much louder, actionable banner instead of
-// just the quiet orange text above.
-const STALE_WATCH_BANNER_MS = 2 * 60 * 1000;
-
 function fmtAgo(ms) {
   const sec = Math.max(0, Math.round(ms / 1000));
   if (sec < 1) return 'just now';
@@ -703,32 +554,12 @@ function fmtAgo(ms) {
 
 function renderLastUpdated() {
   const el_ = el('lastUpdated');
-  const textEl = el('lastUpdatedText');
-  const checkedEl = el('lastCheckedText');
-  const banner = el('staleWatchBanner');
-  if (!state.lastUpdatedAt) { el_.hidden = true; banner.hidden = true; return; }
+  if (!state.lastUpdatedAt) { el_.hidden = true; return; }
   el_.hidden = false;
-
   const ageMs = Date.now() - state.lastUpdatedAt;
-  textEl.textContent = `🕓 Last updated: ${fmtAgo(ageMs)}`;
-  const updateStale = state.watcher && ageMs > state.watchIntervalMs * STALE_UPDATE_MULTIPLE;
-  textEl.classList.toggle('stale', !!updateStale);
-
-  // Only meaningful while actively watching a live handle — a static load
-  // never polls again after its initial read, so there's nothing to show.
-  if (state.watcher && state.lastPolledAt != null) {
-    const checkedAgeMs = Date.now() - state.lastPolledAt;
-    checkedEl.hidden = false;
-    checkedEl.textContent = `File checked: ${fmtAgo(checkedAgeMs)}`;
-    // This one lagging (not just "updated") means the poll loop itself
-    // has stalled — a backgrounded tab throttled by the browser, or a
-    // lost file handle — rather than the file simply not growing yet.
-    checkedEl.classList.toggle('stale', checkedAgeMs > state.watchIntervalMs * STALE_UPDATE_MULTIPLE);
-  } else {
-    checkedEl.hidden = true;
-  }
-
-  banner.hidden = !(state.watcher && ageMs > STALE_WATCH_BANNER_MS);
+  el_.textContent = `🕓 Last updated: ${fmtAgo(ageMs)}`;
+  const stale = state.watcher && ageMs > state.watchIntervalMs * STALE_UPDATE_MULTIPLE;
+  el_.classList.toggle('stale', !!stale);
 }
 
 // Re-render every second so active cooldowns visibly count down, and the
@@ -741,14 +572,9 @@ setInterval(() => {
 }, 1000);
 
 // ---------------------------------------------------------------------------
-// Watch mode (File System Access API — Chrome/Edge). There's no separate
-// "start watching" action anymore: picking or dropping a .log file IS
-// watching it, whenever the browser can give us a reusable handle — see
-// pickFileOrSession()/loadHandle() above, which call this once they've
-// already decided (by extension) that the chosen file isn't a snapshot.
+// Watch mode (File System Access API — Chrome/Edge)
 // ---------------------------------------------------------------------------
-async function beginWatch(handle) {
-  stopWatching(); // in case a previous session's watcher is still running
+async function startWatch() {
   try {
     const watcher = new LogWatcher({
       // The common case (file grew) hands us just the new complete lines —
@@ -761,22 +587,16 @@ async function beginWatch(handle) {
         else ingestAppend(text);
       },
       onError: (err) => console.warn('[chatgator] watch error', err),
-      onPoll: () => { state.lastPolledAt = Date.now(); },
       pollMs: state.watchIntervalMs,
     });
-    await watcher.startWithHandle(handle);
+    await watcher.pickAndStart();
     const initialText = await watcher.readAll();
     state.watcher = watcher;
-    state.lastPolledAt = Date.now(); // the readAll() above was itself a check
     ingestTexts([{ name: 'live', text: initialText }]);
     el('watchStatus').hidden = false;
     el('watchDot').classList.add('live');
     el('watchLabel').textContent = 'Watching live — keep this tab open';
-    el('watchIntervalWrap').hidden = false;
-    el('btnStopWatch').hidden = false;
-    el('clearLogOptWrap').hidden = false;
-    el('btnClearLog').hidden = false;
-    startLiveBackground();
+    if (isWatchSupported()) el('btnWatchHeader').textContent = '⏹ Stop watching';
   } catch (err) {
     if (err && err.name !== 'AbortError') console.warn('[chatgator] could not start watch mode', err);
   }
@@ -784,62 +604,9 @@ async function beginWatch(handle) {
 function stopWatching() {
   if (state.watcher) { state.watcher.stop(); state.watcher = null; }
   state.liveSync = null; // back to a frozen end-of-file snapshot for the cooldown tracker
-  state.lastPolledAt = null;
-  stopLiveBackground();
   el('watchStatus').hidden = true;
   el('watchDot').classList.remove('live');
-  el('watchIntervalWrap').hidden = true;
-  el('btnStopWatch').hidden = true;
-  el('clearLogOptWrap').hidden = true;
-  el('staleWatchBanner').hidden = true;
-  el('btnClearLog').hidden = true;
-}
-
-// ---------------------------------------------------------------------------
-// Clear the watched log file itself (not just this view) — truncates the
-// real file on disk via the File System Access API, optionally saving a
-// byte-for-byte timestamped copy first. Only reachable while actively
-// watching via a handle (see beginWatch/stopWatching above), since that's
-// the only time we hold a reference capable of writing back to disk at
-// all — there's no such handle for a plain <input type=file> load.
-// ---------------------------------------------------------------------------
-async function clearWatchedLogFile() {
-  if (!state.watcher) return;
-  const confirmed = confirm(
-    "This clears the actual chat.log file Chat Gator is watching — not just this view.\n\n" +
-    "If DAoC still has chat logging on, pause it in-game first so the client isn't writing " +
-    "to the file at the same moment it's cleared.\n\nContinue?"
-  );
-  if (!confirmed) return;
-
-  try {
-    if (el('chkBackupBeforeClear').checked) {
-      const snapshot = await state.watcher.snapshotFile();
-      const saveHandle = await window.showSaveFilePicker({
-        suggestedName: `chat_${backupTimestamp()}.log`,
-        types: [{ description: 'DAoC chat log backup', accept: { 'text/plain': ['.log'] } }],
-      });
-      const writable = await saveHandle.createWritable();
-      await writable.write(snapshot); // the raw File/Blob — exact bytes, no text round-trip
-      await writable.close();
-    }
-    await state.watcher.clear();
-    // LogWatcher's next poll sees the file shrink to 0 and reports it as a
-    // reset on its own (same path as an external truncation/rotation) —
-    // nothing else to do here; ingestTexts() picks it up from there.
-  } catch (err) {
-    if (err && err.name === 'AbortError') return; // backup "Save As" dialog was cancelled
-    console.warn('[chatgator] could not clear the watched log file', err);
-    alert(err && err.name === 'NotAllowedError'
-      ? "Couldn't clear the log — write permission for the file was declined."
-      : "Couldn't clear the log file. If DAoC is still actively writing to it, try pausing in-game chat logging first, then clear again.");
-  }
-}
-
-function backupTimestamp() {
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+  if (isWatchSupported()) el('btnWatchHeader').textContent = 'Watch a live log file…';
 }
 
 // ---------------------------------------------------------------------------
