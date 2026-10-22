@@ -397,12 +397,14 @@ export function buildStats(events, playerNameHint) {
   let rpTotal = 0, rpBonusTotal = 0;
   const rpByReason = {};
   const rpPoints = [];
+  const rpPointsByReason = {}; // same breakdown as rpByReason, but as a per-source timeline instead of a single total
   for (const e of events) {
     if (e.type === 'rp_plain' || e.type === 'rp_reason') {
       rpTotal += e.amount;
       const key = e.reason || 'Kill / assist';
       rpByReason[key] = (rpByReason[key] || 0) + e.amount;
       rpPoints.push({ clock: e.clock, amount: e.amount });
+      (rpPointsByReason[key] ||= []).push({ clock: e.clock, amount: e.amount });
     } else if (e.type === 'rp_bonus') {
       rpBonusTotal += e.amount;
     }
@@ -565,6 +567,13 @@ export function buildStats(events, playerNameHint) {
       total: rpTotal, bonusTotal: rpBonusTotal, byReason: rpByReason,
       perHour: durationSec ? +(rpTotal / (durationSec / 3600)).toFixed(0) : 0,
       timeline: bucketTimeline(rpPoints, startClock, endClock),
+      // Same bucketing (same startClock/endClock/bucket count) as `timeline`
+      // above, just split out per reason -- so each reason's series lines up
+      // on the same x-axis buckets as every other, which a stacked chart
+      // depends on to add up to the right total at every point in time.
+      timelineByReason: Object.fromEntries(
+        Object.entries(rpPointsByReason).map(([reason, pts]) => [reason, bucketTimeline(pts, startClock, endClock)])
+      ),
     },
     kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal },
     spellsCast: Array.from(castNames),

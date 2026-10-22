@@ -386,16 +386,30 @@ export function renderRealm(container, stats, ctx) {
   statTile(g, { label: 'Bonus RP (realm rank)', value: fmtExact(rp.bonusTotal) });
   statTile(g, { label: 'Deathblows', value: fmtExact(stats.kills.deathblows) });
 
+  // Same descending-by-total order drives both charts below, and the color
+  // for a given reason is looked up by name (not by position) so the two
+  // stay in sync even if one chart's own internal sort ties differently.
+  const reasonEntries = Object.entries(rp.byReason).sort((a, b) => b[1] - a[1]);
+  const colorForReason = new Map(reasonEntries.map(([label], i) => [label, seriesColor(i)]));
+
   const tlSec = section(container);
-  h3(tlSec, 'Realm points over time');
+  h3(tlSec, 'Realm points by source over time');
   const tlCard = card(tlSec);
-  timelineChart(tlCard, { series: [{ name: 'RP', color: 'var(--series-4)', points: rp.timeline.map(p => ({ t: p.t, v: p.v })) }] });
+  legend(tlCard, reasonEntries.map(([label]) => ({ color: colorForReason.get(label), label })));
+  timelineChart(tlCard, {
+    stacked: true,
+    series: reasonEntries.map(([label]) => ({
+      name: label,
+      color: colorForReason.get(label),
+      points: (rp.timelineByReason[label] || []).map(p => ({ t: p.t, v: p.v })),
+    })),
+  });
 
   const bySec = section(container);
   h3(bySec, 'Realm points by source');
   const byCard = card(bySec);
-  const items = Object.entries(rp.byReason).map(([label, value]) => ({ label, value }));
-  barChart(byCard, { items, colorFn: (_, i) => seriesColor(i) });
+  const items = reasonEntries.map(([label, value]) => ({ label, value }));
+  barChart(byCard, { items, colorFn: (item) => colorForReason.get(item.label) });
 
   const dbSec = section(container);
   h3(dbSec, 'Deathblows');
