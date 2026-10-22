@@ -1,0 +1,778 @@
+{
+  "Acid Shot 1": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Acid Shot 2": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Acid Shot 3": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Acid Shot 4": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Acid Shot 5": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Acid Shot 6": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Acid Shot 7": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Acid Shot 8": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Aged Sporespawn": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Aged Tangler": [
+    "Root",
+    "Summon Animist Fn F"
+  ],
+  "Anger of the Underhill": [
+    "Cast Speed Buff",
+    "Combat Speed Buff"
+  ],
+  "Banishing Blows": [
+    "Direct Damage With Debuff",
+    "Offensive Proc"
+  ],
+  "Battle Crier": [
+    "Summon Animist Pet",
+    "Taunt"
+  ],
+  "Battle Fury": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Battle Harbinger": [
+    "Summon Animist Pet",
+    "Taunt"
+  ],
+  "Battle Herald": [
+    "Summon Animist Pet",
+    "Taunt"
+  ],
+  "Battle Messenger": [
+    "Summon Animist Pet",
+    "Taunt"
+  ],
+  "Battle Zeal": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Billowing Death": [
+    "Damage Over Time",
+    "Pet Spell"
+  ],
+  "Bolster Bones": [
+    "Armor Absorption Buff",
+    "Heal"
+  ],
+  "Bone Carapace": [
+    "Ablative Armor",
+    "Defensive Proc"
+  ],
+  "Bringer of Death": [
+    "Illusion",
+    "Pet Spell"
+  ],
+  "Channeled Anger": [
+    "Direct Damage",
+    "Pet Spell"
+  ],
+  "Channeled Frenzy": [
+    "Direct Damage",
+    "Pet Spell"
+  ],
+  "Channeled Fury": [
+    "Direct Damage",
+    "Pet Spell"
+  ],
+  "Channeled Hatred": [
+    "Direct Damage",
+    "Pet Spell"
+  ],
+  "Channeled Wrath": [
+    "Direct Damage",
+    "Pet Spell"
+  ],
+  "Chant of Blood": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Chant of Persistence": [
+    "Endurance Regen Buff",
+    "Fatigue Consumption Buff"
+  ],
+  "Chant of Stamina": [
+    "Endurance Regen Buff",
+    "Fatigue Consumption Buff"
+  ],
+  "Chant of the Battle": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Chant of the Siege": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Chant of the War": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Chilling Ground": [
+    "Direct Damage",
+    "Storm"
+  ],
+  "Circle of Anger": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Circle of Enmity": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Circle of Fury": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Circle of Rage": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Circle of Vengeance": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Circle of Wrath": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Conflagration": [
+    "Direct Damage",
+    "Direct Damage With Debuff"
+  ],
+  "Dead Flesh Living": [
+    "Heal Over Time",
+    "Pet Spell"
+  ],
+  "Decrepit Ground": [
+    "Disease",
+    "Storm"
+  ],
+  "Desecrated Ground": [
+    "Disease",
+    "Storm"
+  ],
+  "Disperse Strength": [
+    "Strength Constitution Debuff",
+    "Strength Debuff"
+  ],
+  "Dissipating Blows": [
+    "Direct Damage With Debuff",
+    "Offensive Proc"
+  ],
+  "Dread Commander Bladeturn": [
+    "Bladeturn",
+    "Defensive Proc"
+  ],
+  "Edge of Hatred": [
+    "Damage Shield",
+    "Pet Spell"
+  ],
+  "Elder Sporespawn": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Elder Tangler": [
+    "Root",
+    "Summon Animist Fn F"
+  ],
+  "Eviscerating Protector": [
+    "Damage Shield",
+    "Pet Spell"
+  ],
+  "Facilitate Painworking": [
+    "Facilitate Painworking",
+    "Pet Spell"
+  ],
+  "Flaying Shield": [
+    "Damage Shield",
+    "Pet Spell"
+  ],
+  "Flowing Death": [
+    "Damage Over Time",
+    "Pet Spell"
+  ],
+  "Forest's Advocate": [
+    "Direct Damage",
+    "Summon Animist Fn F"
+  ],
+  "Forest's Aid": [
+    "Direct Damage",
+    "Summon Animist Pet"
+  ],
+  "Forest's Bulwark": [
+    "Direct Damage",
+    "Summon Animist Pet"
+  ],
+  "Forest's Companion": [
+    "Direct Damage",
+    "Summon Animist Pet"
+  ],
+  "Forest's Compatriot": [
+    "Direct Damage",
+    "Summon Animist Pet"
+  ],
+  "Forest's Core": [
+    "Direct Damage",
+    "Summon Animist Fn F"
+  ],
+  "Forest's Emissary": [
+    "Direct Damage",
+    "Summon Animist Fn F"
+  ],
+  "Forest's Essence": [
+    "Direct Damage",
+    "Summon Animist Fn F"
+  ],
+  "Forest's Heart": [
+    "Direct Damage",
+    "Summon Animist Fn F"
+  ],
+  "Forest's Incarnation": [
+    "Direct Damage",
+    "Summon Animist Fn F"
+  ],
+  "Forest's Protector": [
+    "Direct Damage",
+    "Summon Animist Pet"
+  ],
+  "Forest's Sentry": [
+    "Direct Damage",
+    "Summon Animist Pet"
+  ],
+  "Forest's Servant": [
+    "Direct Damage",
+    "Summon Animist Pet"
+  ],
+  "Forest's Soul": [
+    "Direct Damage",
+    "Summon Animist Fn F"
+  ],
+  "Forest's Spirit": [
+    "Direct Damage",
+    "Summon Animist Fn F"
+  ],
+  "Freezing Ground": [
+    "Direct Damage",
+    "Storm"
+  ],
+  "Frigid Ground": [
+    "Direct Damage",
+    "Storm"
+  ],
+  "Fury of Nature": [
+    "Combat Speed Buff",
+    "Spread Heal",
+    "Style Heal"
+  ],
+  "Gift of Essence": [
+    "Pet Spell",
+    "Power Transfer"
+  ],
+  "Gift of Force": [
+    "Pet Spell",
+    "Power Transfer"
+  ],
+  "Gift of Power": [
+    "Pet Spell",
+    "Power Transfer"
+  ],
+  "Gift of Vim": [
+    "Pet Spell",
+    "Power Transfer"
+  ],
+  "Glimpse of Death": [
+    "Base Af Debuff",
+    "Pet Spell"
+  ],
+  "Glimpse of the Grave": [
+    "Base Af Debuff",
+    "Pet Spell"
+  ],
+  "Glimpse of the Inevitable": [
+    "Base Af Debuff",
+    "Pet Spell"
+  ],
+  "Grasping Creepers": [
+    "Root",
+    "Snare"
+  ],
+  "Greater Battle Fury": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Greater Battle Zeal": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Greater Regeneration": [
+    "Heal",
+    "Heal Over Time"
+  ],
+  "Greater Renewal": [
+    "Heal",
+    "Heal Over Time"
+  ],
+  "Grove's Agent": [
+    "Damage Speed Decrease",
+    "Summon Animist Pet"
+  ],
+  "Grove's Assailant": [
+    "Damage Speed Decrease",
+    "Summon Animist Pet"
+  ],
+  "Grove's Assassin": [
+    "Damage Speed Decrease",
+    "Summon Animist Pet"
+  ],
+  "Grove's Eliminator": [
+    "Damage Speed Decrease",
+    "Summon Animist Pet"
+  ],
+  "Grove's Enforcer": [
+    "Damage Speed Decrease",
+    "Summon Animist Pet"
+  ],
+  "Grove's Executioner": [
+    "Damage Speed Decrease",
+    "Summon Animist Pet"
+  ],
+  "Grove's Hunter": [
+    "Damage Speed Decrease",
+    "Summon Animist Pet"
+  ],
+  "Grove's Inquisitor": [
+    "Damage Speed Decrease",
+    "Summon Animist Pet"
+  ],
+  "Heightening Death": [
+    "Damage Over Time",
+    "Pet Spell"
+  ],
+  "Hinder Prey": [
+    "Offensive Proc",
+    "Snare"
+  ],
+  "Hunter's Trap": [
+    "Offensive Proc",
+    "Snare"
+  ],
+  "Ice Blast": [
+    "Damage Speed Decrease",
+    "Direct Damage"
+  ],
+  "Icy Ground": [
+    "Direct Damage",
+    "Storm"
+  ],
+  "Imbue the Abyss": [
+    "Heal Over Time",
+    "Pet Spell"
+  ],
+  "Infinite Death": [
+    "Damage Over Time",
+    "Pet Spell"
+  ],
+  "Jade Ablative": [
+    "Both Ablative Armor",
+    "Defensive Proc"
+  ],
+  "Knives of Death": [
+    "Damage Shield",
+    "Pet Spell"
+  ],
+  "Ligneous Barrier": [
+    "Ablative Armor",
+    "Summon Animist Fn F"
+  ],
+  "Ligneous Guard": [
+    "Ablative Armor",
+    "Summon Animist Fn F"
+  ],
+  "Ligneous Seal": [
+    "Ablative Armor",
+    "Summon Animist Fn F"
+  ],
+  "Ligneous Sheath": [
+    "Ablative Armor",
+    "Summon Animist Fn F"
+  ],
+  "Ligneous Shield": [
+    "Ablative Armor",
+    "Summon Animist Fn F"
+  ],
+  "Ligneous Wall": [
+    "Ablative Armor",
+    "Summon Animist Fn F"
+  ],
+  "Longing for Death": [
+    "Armor Absorption Buff",
+    "Pet Spell"
+  ],
+  "Magic Shield": [
+    "AF Buff",
+    "Magic Resist Secondary Buff"
+  ],
+  "Minor Reconstitution": [
+    "Heal",
+    "Resurrect"
+  ],
+  "Molten Earth": [
+    "Damage Speed Decrease",
+    "Direct Damage"
+  ],
+  "Nature's Feud": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Nature's Reckoning": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Nature's Retaliation": [
+    "Celerity Buff",
+    "Damage Add",
+    "Damage Shield"
+  ],
+  "Nature's Retribution": [
+    "Celerity Buff",
+    "Damage Add"
+  ],
+  "Numbing Ground": [
+    "Direct Damage",
+    "Storm"
+  ],
+  "Poison Shot 1": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Poison Shot 2": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Poison Shot 3": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Poison Shot 4": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Poison Shot 5": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Poison Shot 6": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Poison Shot 7": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Poison Shot 8": [
+    "Archery",
+    "Damage Over Time"
+  ],
+  "Power Vacuum": [
+    "Pet Spell",
+    "Power Drain"
+  ],
+  "Protecting Spirit": [
+    "Armor Absorption Buff",
+    "Bladeturn"
+  ],
+  "Reconstitution": [
+    "Heal",
+    "Resurrect"
+  ],
+  "Recuperation": [
+    "Heal",
+    "Heal Over Time"
+  ],
+  "Regenerate Blood": [
+    "Heal Over Time",
+    "Pet Spell"
+  ],
+  "Regenerate Body": [
+    "Heal Over Time",
+    "Pet Spell"
+  ],
+  "Regenerate Flesh": [
+    "Heal Over Time",
+    "Pet Spell"
+  ],
+  "Regenerate Muscle": [
+    "Heal Over Time",
+    "Pet Spell"
+  ],
+  "Regeneration": [
+    "Heal",
+    "Heal Over Time",
+    "Health Regen Buff"
+  ],
+  "Renewal": [
+    "Heal",
+    "Heal Over Time",
+    "Health Regen Buff"
+  ],
+  "Restoration": [
+    "Heal",
+    "Heal Over Time"
+  ],
+  "Restore Spirit": [
+    "Heal",
+    "Resurrect"
+  ],
+  "Rotting Ground": [
+    "Disease",
+    "Storm"
+  ],
+  "Routing Blows": [
+    "Direct Damage With Debuff",
+    "Offensive Proc"
+  ],
+  "Snaring Blow": [
+    "Offensive Proc",
+    "Snare"
+  ],
+  "Spirit Evacuation": [
+    "Lifedrain",
+    "Pet Spell"
+  ],
+  "Spirit of Aggravation": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Anger": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Cunning": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Deceit": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Deception": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Enmity": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Fury": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Guile": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Hatred": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Ire": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Outrage": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Rage": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Trickery": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Vengeance": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spirit of Wrath": [
+    "Bomber",
+    "Direct Damage"
+  ],
+  "Spore Cannon": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Spore Ejector": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Spore Emitter": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Spore Erupter": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Spore Jet": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Spore Secreter": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Spore Spewer": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Spore Vent": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Sporespawn": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Sporespawn Youth": [
+    "Melee Damage Debuff",
+    "Summon Animist Fn F"
+  ],
+  "Steel Mind": [
+    "Mesmerize Duration Buff",
+    "Spec AF Buff"
+  ],
+  "Stunning Shout": [
+    "Mesmerize",
+    "Stun"
+  ],
+  "Sundering Blows": [
+    "Direct Damage With Debuff",
+    "Offensive Proc"
+  ],
+  "Swelling Death": [
+    "Damage Over Time",
+    "Pet Spell"
+  ],
+  "Tangler": [
+    "Root",
+    "Summon Animist Fn F"
+  ],
+  "Tangler Sapling": [
+    "Root",
+    "Summon Animist Fn F"
+  ],
+  "Tangler Youngling": [
+    "Root",
+    "Summon Animist Fn F"
+  ],
+  "Theft of Energy": [
+    "Lifedrain",
+    "Pet Spell"
+  ],
+  "Theft of Liveliness": [
+    "Lifedrain",
+    "Pet Spell"
+  ],
+  "Theft of Vigor": [
+    "Lifedrain",
+    "Pet Spell"
+  ],
+  "Unending Death": [
+    "Damage Over Time",
+    "Pet Spell"
+  ],
+  "Unholy Ground": [
+    "Disease",
+    "Storm"
+  ],
+  "Vent of Elemental Guarding": [
+    "Elemental Resists Primary Buff",
+    "Summon Animist Fn F"
+  ],
+  "Vent of Elemental Protection": [
+    "Elemental Resists Primary Buff",
+    "Summon Animist Fn F"
+  ],
+  "Vent of Elemental Resistance": [
+    "Elemental Resists Primary Buff",
+    "Summon Animist Fn F"
+  ],
+  "Vent of Elemental Shielding": [
+    "Elemental Resists Primary Buff",
+    "Summon Animist Fn F"
+  ],
+  "Vent of Physical Guarding": [
+    "Soul Resist Primary Buff",
+    "Summon Animist Fn F"
+  ],
+  "Vent of Physical Protection": [
+    "Soul Resist Primary Buff",
+    "Summon Animist Fn F"
+  ],
+  "Vent of Physical Resistance": [
+    "Soul Resist Primary Buff",
+    "Summon Animist Fn F"
+  ],
+  "Vent of Physical Shielding": [
+    "Soul Resist Primary Buff",
+    "Summon Animist Fn F"
+  ],
+  "Vitality Theft": [
+    "Lifedrain",
+    "Pet Spell"
+  ],
+  "War Crier": [
+    "Summon Animist Pet",
+    "Taunt"
+  ],
+  "War Herald": [
+    "Summon Animist Pet",
+    "Taunt"
+  ],
+  "War Messenger": [
+    "Summon Animist Pet",
+    "Taunt"
+  ],
+  "Weakened Armor": [
+    "Base Af Debuff",
+    "Offensive Proc"
+  ],
+  "Wrath of the Underhill": [
+    "Cast Speed Buff",
+    "Combat Speed Buff"
+  ],
+  "Wretched Ground": [
+    "Disease",
+    "Storm"
+  ],
+  "Zombie Servant's Touch": [
+    "Armor Absorption Debuff",
+    "Offensive Proc"
+  ]
+}

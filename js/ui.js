@@ -5,6 +5,7 @@
 
 import { statTile, barChart, legend, timelineChart, fmtNum, fmtExact, fmtClock, seriesColor } from './charts.js';
 import { describeSkill } from './skills.js';
+import { ABILITY_DATABASE } from './ability-database.js';
 
 function clear(el) { el.innerHTML = ''; }
 function h3(el, text) { const h = document.createElement('h3'); h.textContent = text; el.appendChild(h); }
@@ -118,6 +119,23 @@ function sourceMapToRows(bySource) {
     .sort((a, b) => b.dmg - a.dmg);
 }
 
+// Drops pet-summon-spell "ghost" entries (e.g. "underhill ally", keyed by the
+// pet's own in-log name, which parser.js/aggregate.js can momentarily credit
+// with a stray CC/resist — see isSelfTargetingPetCast in parser.js) from a
+// bySource/bySpell map BEFORE it's turned into chart items or table rows.
+// Only safe to use on maps keyed by ability/spell name (damageOut.bySource,
+// healOut.bySpell) — never on maps keyed by player/attacker/target name
+// (damageIn.bySource, healIn.bySource, healOut.byTarget), where a name
+// happening to match a pet-summon spell would be a real person, not a ghost.
+function filterGhostSource(bySource) {
+  const out = {};
+  for (const [key, s] of Object.entries(bySource)) {
+    if (isPetSummonGhost(key)) continue;
+    out[key] = s;
+  }
+  return out;
+}
+
 // ===========================================================================
 export function renderOverview(container, stats, ctx) {
   clear(container);
@@ -195,9 +213,10 @@ export function renderDamage(container, stats, ctx) {
   const outSec = section(container);
   h3(outSec, 'Damage done by spell / style / weapon');
   const outCard = card(outSec);
-  const items = sourceMapToItems(stats.damageOut.bySource);
+  const damageOutBySource = filterGhostSource(stats.damageOut.bySource);
+  const items = sourceMapToItems(damageOutBySource);
   barChart(outCard, { items, colorFn: (_, i) => seriesColor(i) });
-  const rows = sourceMapToRows(stats.damageOut.bySource);
+  const rows = sourceMapToRows(damageOutBySource);
   dataTable(outCard, {
     columns: [
       { key: 'name', label: 'Source' },
@@ -246,7 +265,8 @@ export function renderHealing(container, stats, ctx) {
   const spellSec = section(container);
   h3(spellSec, 'Healing done by spell');
   const spellCard = card(spellSec);
-  const spellItems = sourceMapToItems(stats.healOut.bySpell);
+  const healOutBySpell = filterGhostSource(stats.healOut.bySpell);
+  const spellItems = sourceMapToItems(healOutBySpell);
   barChart(spellCard, { items: spellItems, colorFn: (_, i) => seriesColor(i + 2) });
   dataTable(spellCard, {
     columns: [
@@ -258,7 +278,7 @@ export function renderHealing(container, stats, ctx) {
       { key: 'avg', label: 'Avg', num: true },
       { key: 'max', label: 'Max', num: true },
     ],
-    rows: sourceMapToRows(stats.healOut.bySpell),
+    rows: sourceMapToRows(healOutBySpell),
   });
 
   const outSec = section(container);
@@ -437,12 +457,75 @@ export function renderRealm(container, stats, ctx) {
 }
 
 // ===========================================================================
+// Same name, lowercased, since the game refers to a pet in third person in
+// lowercase ("the underhill ally casts a spell!") while charplan's own
+// entry for the summon that creates it is properly-cased ("Underhill
+// Ally") — built once per module load, not per lookup.
+const ABILITY_DATABASE_BY_LOWER = (() => {
+  const m = new Map();
+  for (const name of Object.keys(ABILITY_DATABASE)) {
+    const lower = name.toLowerCase();
+    if (!m.has(lower)) m.set(lower, ABILITY_DATABASE[name]);
+  }
+  return m;
+})();
+
+// A pet-summon name (e.g. "Underhill Ally", the pet itself showing up as
+// "underhill ally" in third person in the log) is not a player-cast spell
+// or style outcome at all — it's the summon landing in this table only
+// because some stray cc-landed/resist count got attached to its name (see
+// parser.js's isSelfTargetingPetCast and aggregate.js's ccLandedBySource).
+// Reported directly: a Bainshee's "Spells, styles & abilities used" table
+// showed "underhill ally"/"underhill companion" rows with a "Damage" role
+// despite zero damage ever being possible for them. Checked against
+// ABILITY_DATABASE's `type` (never against dmg/hits being zero, which a
+// perfectly legitimate ability can also have) so this only hides genuine
+// pet-summon noise, not a real ability that just didn't land anything in
+// this particular view. Matched case-insensitively — see
+// ABILITY_DATABASE_BY_LOWER above for why.
+function isPetSummonGhost(name) {
+  const info = ABILITY_DATABASE[name] || ABILITY_DATABASE_BY_LOWER.get(String(name).toLowerCase());
+  return !!(info && info.type && info.type.startsWith('Summon'));
+}
+
+// The naive 'Damage'/'Heal' role above only reflects *which table* a name
+// happened to end up in (damageOut.bySource vs healOut.bySpell) — which, for
+// an ability ABILITY_DATABASE confirms can't actually do that thing, is
+// itself informative of a bug, not a label to repeat at face value. Prefer
+// the ability's real charplan Type when we have one (e.g. "Nearsight",
+// "Stun", "Mesmerize") over a flatly wrong "Damage"/"Heal". A name
+// ABILITY_DATABASE doesn't recognize at all keeps its naive role unchanged
+// — same permissive-by-default rule as the parser-level fix.
+function trueRole(name, naiveRole) {
+  const info = ABILITY_DATABASE[name];
+  if (!info) return naiveRole;
+  const wantsDamage = naiveRole === 'Damage' || naiveRole === 'Damage + Heal';
+  const wantsHeal = naiveRole === 'Heal' || naiveRole === 'Damage + Heal';
+  if (wantsDamage && info.isDamage === false) return info.type || 'Other';
+  if (wantsHeal && info.isHeal === false) return info.type || 'Other';
+  return naiveRole;
+}
+
+// describeSkill() needs skills.js's live fetch of Eden's public spell
+// database to have succeeded (see that file's header: it's best-effort,
+// and must still work with nothing at all when it hasn't). ABILITY_DATABASE
+// is bundled, so it's always there as a fallback, just with less detail (no
+// damage-type/line, and only the full class list rather than one chosen
+// one) — still far better than the bare "—" this used to fall back to.
+function staticSkillInfo(name) {
+  const info = ABILITY_DATABASE[name];
+  if (!info) return null;
+  const bits = [info.type, info.classes && info.classes.length ? info.classes.join('/') : null].filter(Boolean);
+  return bits.join(' · ') || null;
+}
+
 export function renderSpells(container, stats, ctx) {
   clear(container);
   const skillMap = ctx && ctx.skillMap || {};
   const byName = {};
   for (const [key, s] of Object.entries(stats.damageOut.bySource)) {
     if (key.startsWith('Melee')) continue;
+    if (isPetSummonGhost(key)) continue;
     // Keep per-weapon rows distinct (same composite key as the Damage tab —
     // see aggregate.js) but show the bare style/spell name here, same idea
     // as sourceMapToRows.
@@ -454,11 +537,15 @@ export function renderSpells(container, stats, ctx) {
   // a character cast, whichever role it played.
   for (const [name, s] of Object.entries(stats.healOut.bySpell || {})) {
     if (name === 'Heal (spell not identified)') continue;
+    if (isPetSummonGhost(name)) continue;
     if (byName[name]) {
       byName[name] = { ...byName[name], role: 'Damage + Heal' };
     } else {
       byName[name] = { name, role: 'Heal', ...s };
     }
+  }
+  for (const row of Object.values(byName)) {
+    row.role = trueRole(row.name, row.role);
   }
   const rows = Object.values(byName).sort((a, b) => b.dmg - a.dmg);
 
@@ -487,7 +574,7 @@ export function renderSpells(container, stats, ctx) {
       { key: 'dmg', label: 'Total dmg/heal', num: true, fmt: fmtExact },
       { key: 'avg', label: 'Avg', num: true },
     ],
-    rows: rows.map(r => ({ ...r, info: describeSkill(skillMap, r.name) || '—' })),
+    rows: rows.map(r => ({ ...r, info: describeSkill(skillMap, r.name) || staticSkillInfo(r.name) || '—' })),
   });
 
   if (castOnly.length) {

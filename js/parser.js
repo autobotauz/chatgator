@@ -2,6 +2,13 @@
 // Pure, dependency-free, runs entirely client-side. Nothing in this file
 // ever sends data anywhere — it only reads the string it's given.
 //
+// The one exception to "pure, no dependencies" is ABILITY_DATABASE below, a
+// bundled, static, synchronous data file (same build pipeline as, and
+// always available alongside, ability-cooldowns.js's cooldown lookup) —
+// never a network fetch. Parsing must stay fully deterministic regardless
+// of network conditions, so this can only ever come from data baked in at
+// build time, same as the cooldown map.
+//
 // Every event has: { t: <elapsed ms since the first line we saw>, clock: same
 // value, type, ...fields }. The game only ever prints a bare [HH:MM:SS] on
 // each line — no date, and the header's "*** Chat Log Opened: <date>" text
@@ -16,6 +23,8 @@
 // spans many real days. Display code must only ever render the time-of-day
 // portion of `clock`, never a calendar date, since we don't actually know
 // what the date was.
+
+import { ABILITY_DATABASE } from './ability-database.js';
 
 const LINE_RE = /^\[(\d{2}):(\d{2}):(\d{2})\]\s?(.*)$/;
 const OPEN_RE = /^\*\*\*\s*Chat Log Opened:\s*(.+)$/;
@@ -679,6 +688,41 @@ const RULES = [
 
 function toNum(s) { return parseInt(String(s).replace(/,/g, ''), 10); }
 
+// True when a cc_landed/resist_generic's own target is the exact same
+// creature as the pending pet-cast that would otherwise get credited as its
+// source — see the cc_landed/resist_generic branches below for why that
+// collision means "something landed on our pet", not "our pet's cast
+// landed on something". cc_landed/resist_generic's target capture keeps a
+// leading "The "/"A "/"An " article (it's just "(.+?) is entranced!" etc.),
+// while pet_cast's capture doesn't ("The (.+?) casts a spell!"), so the
+// article has to be stripped before comparing.
+function isSelfTargetingPetCast(target, pendingEffectIsPet, pendingEffectName) {
+  if (!pendingEffectIsPet || !pendingEffectName || !target) return false;
+  const bare = String(target).replace(/^(the|a|an)\s+/i, '').toLowerCase();
+  return bare === String(pendingEffectName).toLowerCase();
+}
+
+// Is `name` positively confirmed, by ABILITY_DATABASE, to be INCAPABLE of
+// the thing being attributed to it? Used right before crediting a pending
+// cast with a nearby unnamed damage/heal result line (see the melee_plain/
+// heal_out branches below) — the one case this exists to catch is a CC/
+// debuff/buff spell (no damage or heal component at all) sitting
+// immediately before a damage/heal line from something else entirely.
+// Deliberately permissive by construction: a name ABILITY_DATABASE doesn't
+// recognize at all returns false from *both* calls below (never blocks),
+// same as a name whose damage/heal capability wasn't confidently resolved
+// at build time — see that file's header for exactly when isDamage/isHeal
+// are set. A gap in the data can only ever fail to catch a bug this way,
+// never block a real attribution.
+function confirmedCannotDamage(name) {
+  const info = ABILITY_DATABASE[name];
+  return !!info && info.isDamage === false;
+}
+function confirmedCannotHeal(name) {
+  const info = ABILITY_DATABASE[name];
+  return !!info && info.isHeal === false;
+}
+
 // `resume`, when given, is the `state` object returned by an earlier call —
 // see the return value below. Passing it in lets the live-watch path feed
 // just the *new* lines appended to a growing chat.log (instead of
@@ -852,7 +896,17 @@ export function parseLogText(rawText, resume) {
         pendingStyleName = null;
         pendingCastName = null; // a weapon swing means we're past any pending spell result
       } else if (type === 'melee_plain') {
-        if (pendingCastName && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
+        // The `&& !confirmedCannotDamage(...)` guard is what stops a CC/
+        // debuff/buff cast with zero damage component (no Direct Damage,
+        // Bolt, DoT, etc.) from absorbing an unrelated damage line that
+        // merely happens to land within the window — reported directly: a
+        // log showed "Expel Sight" (a pure Nearsight debuff) credited with
+        // 504 damage and 3 hits it never actually dealt, just because it
+        // was the most recently cast spell when an unrelated hit landed.
+        // Falling through here (rather than attributing wrongly) still
+        // lets the activeDotName branches below correctly pick up a REAL
+        // damage DoT/AE already in progress instead — see ABILITY_DATABASE.
+        if (pendingCastName && !confirmedCannotDamage(pendingCastName) && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
           payload.spellName = pendingCastName;
           activeDotName = pendingCastName;
           activeDotTarget = payload.target;
@@ -878,7 +932,12 @@ export function parseLogText(rawText, resume) {
           activeDotAt = clockMs; // still ticking — extend the window
         }
       } else if (type === 'heal_out' || type === 'heal_out_crit') {
-        if (pendingCastName && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
+        // Same guard as melee_plain above, mirrored for heals: a cast
+        // ABILITY_DATABASE positively confirms can't heal (e.g. a damage
+        // spell, a buff, a debuff) shouldn't absorb a heal result line that
+        // happens to land in its window — falls through to activeHealName
+        // (a real heal already resolving) instead of attributing wrongly.
+        if (pendingCastName && !confirmedCannotHeal(pendingCastName) && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
           payload.spellName = pendingCastName;
           activeHealName = pendingCastName;
           activeHealAt = clockMs;
@@ -888,12 +947,26 @@ export function parseLogText(rawText, resume) {
           activeHealAt = clockMs; // still resolving — extend the window
         }
       } else if (type === 'cc_landed') {
-        if (pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS) {
+        // A pending pet-cast ("The X casts a spell!") only tells us *that*
+        // X cast something, not what it does or who it hit — so when the
+        // very next cc_landed's target is that SAME creature (e.g. "The
+        // underhill ally is entranced." right after "The underhill ally
+        // casts a spell!"), this is an enemy's CC landing ON our pet, not
+        // our pet's own cast landing on an enemy, and attributing it to
+        // pendingEffectName would have it backwards — seen directly in a
+        // reported log, where a pure-caster pet that never melees or
+        // self-heals (so never otherwise confirmed as "ours") ended up with
+        // a phantom "Landed (CC): 2" row in the Spells table, as if its own
+        // generic cast-flavor line were a named ability. ("The " is part of
+        // cc_landed's target capture but not pet_cast's, hence the strip.)
+        if (!isSelfTargetingPetCast(payload.target, pendingEffectIsPet, pendingEffectName) &&
+            pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS) {
           payload.sourceName = pendingEffectName;
           payload.isPet = pendingEffectIsPet;
         }
       } else if (type === 'resist_generic') {
-        if (!payload.source && pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS) {
+        if (!payload.source && !isSelfTargetingPetCast(payload.target, pendingEffectIsPet, pendingEffectName) &&
+            pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS) {
           payload.source = pendingEffectName;
           payload.isPet = pendingEffectIsPet;
         }
