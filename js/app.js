@@ -188,6 +188,7 @@ function startNewSession() {
 }
 
 el('btnStopWatch').addEventListener('click', stopWatching);
+el('btnClearLog').addEventListener('click', clearWatchedLogFile);
 
 el('btnDownloadSnapshot').addEventListener('click', downloadSnapshot);
 
@@ -685,6 +686,8 @@ async function beginWatch(handle) {
     el('watchLabel').textContent = 'Watching live — keep this tab open';
     el('watchIntervalWrap').hidden = false;
     el('btnStopWatch').hidden = false;
+    el('clearLogOptWrap').hidden = false;
+    el('btnClearLog').hidden = false;
   } catch (err) {
     if (err && err.name !== 'AbortError') console.warn('[chatgator] could not start watch mode', err);
   }
@@ -696,6 +699,55 @@ function stopWatching() {
   el('watchDot').classList.remove('live');
   el('watchIntervalWrap').hidden = true;
   el('btnStopWatch').hidden = true;
+  el('clearLogOptWrap').hidden = true;
+  el('btnClearLog').hidden = true;
+}
+
+// ---------------------------------------------------------------------------
+// Clear the watched log file itself (not just this view) — truncates the
+// real file on disk via the File System Access API, optionally saving a
+// byte-for-byte timestamped copy first. Only reachable while actively
+// watching via a handle (see beginWatch/stopWatching above), since that's
+// the only time we hold a reference capable of writing back to disk at
+// all — there's no such handle for a plain <input type=file> load.
+// ---------------------------------------------------------------------------
+async function clearWatchedLogFile() {
+  if (!state.watcher) return;
+  const confirmed = confirm(
+    "This clears the actual chat.log file Chat Gator is watching — not just this view.\n\n" +
+    "If DAoC still has chat logging on, pause it in-game first so the client isn't writing " +
+    "to the file at the same moment it's cleared.\n\nContinue?"
+  );
+  if (!confirmed) return;
+
+  try {
+    if (el('chkBackupBeforeClear').checked) {
+      const snapshot = await state.watcher.snapshotFile();
+      const saveHandle = await window.showSaveFilePicker({
+        suggestedName: `chat_${backupTimestamp()}.log`,
+        types: [{ description: 'DAoC chat log backup', accept: { 'text/plain': ['.log'] } }],
+      });
+      const writable = await saveHandle.createWritable();
+      await writable.write(snapshot); // the raw File/Blob — exact bytes, no text round-trip
+      await writable.close();
+    }
+    await state.watcher.clear();
+    // LogWatcher's next poll sees the file shrink to 0 and reports it as a
+    // reset on its own (same path as an external truncation/rotation) —
+    // nothing else to do here; ingestTexts() picks it up from there.
+  } catch (err) {
+    if (err && err.name === 'AbortError') return; // backup "Save As" dialog was cancelled
+    console.warn('[chatgator] could not clear the watched log file', err);
+    alert(err && err.name === 'NotAllowedError'
+      ? "Couldn't clear the log — write permission for the file was declined."
+      : "Couldn't clear the log file. If DAoC is still actively writing to it, try pausing in-game chat logging first, then clear again.");
+  }
+}
+
+function backupTimestamp() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
 // ---------------------------------------------------------------------------

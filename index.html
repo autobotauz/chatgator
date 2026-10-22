@@ -23,6 +23,11 @@
         <select class="btn" id="watchIntervalSelect"></select>
       </label>
       <button class="btn" id="btnStopWatch" hidden>⏹ Stop watching</button>
+      <label class="clear-log-opt" id="clearLogOptWrap" hidden title="When checked, saves a byte-for-byte copy of the log's current contents to a file you name (suggested: chat_YYYYMMDDHHMMSS.log) before clearing it.">
+        <input type="checkbox" id="chkBackupBeforeClear" checked>
+        <span>Save a copy first</span>
+      </label>
+      <button class="btn danger" id="btnClearLog" hidden title="Truncates the actual chat.log file on disk that's being watched — not just this view. If DAoC still has logging on, pause it in-game first so the client isn't fighting the clear.">🗑 Clear log…</button>
       <button class="btn" id="btnDownloadSnapshot" hidden>⬇ Download snapshot</button>
       <button class="icon-btn" id="btnTheme" title="Toggle light/dark">🌓</button>
       <button class="btn" id="btnLoadAnother" hidden>New session</button>

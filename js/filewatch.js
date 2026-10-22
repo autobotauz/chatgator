@@ -76,6 +76,40 @@ export class LogWatcher {
     return await file.text();
   }
 
+  // A File (which is also a Blob) snapshot of the watched file's CURRENT
+  // on-disk contents — for the "save a copy before clearing" feature in
+  // app.js. Deliberately returns the raw File rather than decoded text: a
+  // chat.log is windows-1252, not UTF-8, and handing the Blob straight to
+  // a writable stream's write() copies every byte exactly as-is, with no
+  // decode/re-encode round-trip that could mangle anything above 0x7F.
+  async snapshotFile() {
+    return this.handle.getFile();
+  }
+
+  // Truncates the actual watched file on disk to zero bytes. Requests
+  // readwrite permission on our handle first if the browser hasn't
+  // already granted it (requestPermission is undefined on handles from
+  // older Chromium that predates it — treated as already-granted there,
+  // same as createWritable() always was before the permission model
+  // existed). Deliberately does NOT touch our own polling state: the next
+  // scheduled poll sees file.size < this.lastSize exactly like an
+  // external truncation or log rotation, and reports it the normal way
+  // via onChange(text, { reset: true }) — see _poll() above — so the
+  // caller doesn't need to special-case "I just cleared it myself".
+  async clear() {
+    if (typeof this.handle.requestPermission === 'function') {
+      const perm = await this.handle.requestPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const err = new Error('Write permission was not granted for this file.');
+        err.name = 'NotAllowedError';
+        throw err;
+      }
+    }
+    const writable = await this.handle.createWritable();
+    await writable.write('');
+    await writable.close();
+  }
+
   _poll() {
     if (this.stopped) return;
     this.timer = setTimeout(async () => {
