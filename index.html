@@ -57,7 +57,7 @@
       <ul>
         <li><strong>Damage, healing &amp; realm point meters</strong> — broken down by spell, style, weapon, attacker, healer, or pet.</li>
         <li><strong>Fight-by-fight splitting</strong> — your log is automatically broken into individual engagements, or view your whole session's totals at once.</li>
-        <li><strong>Live ability cooldown tracker</strong> — countdown timers for the spells, styles, and realm abilities you've actually used (live, but not quite real-time — the game client buffers before it writes to the log file).</li>
+        <li><strong>Ability cooldown tracker</strong> — the first time you cast a spell, style, or realm ability with a known cooldown, it gets a permanent spot in a tracker shown on every tab: full brightness and "Ready" when it's up, dimmed with a shrinking bar and countdown the moment you use it. Live, but not quite real-time — the game client buffers lines before writing them to the log file, so there can be a delay (shown separately as "File checked" vs. "Last updated" while watching) before a cast actually shows up here.</li>
         <li><strong>/bg center callouts</strong> stay on screen on every tab, so you don't miss one that already scrolled past.</li>
         <li><strong>Watch your chat.log live while you play</strong> (Chrome/Edge) — stats update in near real time, nothing to re-upload or re-drop.</li>
         <li><strong>Clear your log file from the browser</strong> when it's gotten big, with an optional timestamped backup first.</li>
@@ -83,7 +83,7 @@
       <ul class="bg-ticker-list" id="bgTickerList"></ul>
     </div>
 
-    <div class="cooldown-tracker" id="cooldownTracker" hidden title="Abilities with a known cooldown you've cast, counting down from when you last used them — shown on every tab. Icons show their numeric id for now; image mapping is future work.">
+    <div class="cooldown-tracker" id="cooldownTracker" hidden title="Every ability with a known cooldown gets a permanent slot here the first time you cast it, and keeps that same spot for the rest of the session — shown on every tab. Full brightness + 'Ready' = available now. Dimmed + a shrinking bar/countdown = on cooldown, ticking down from your last cast. Icons show their numeric id for now; image mapping is future work.">
       <span class="cooldown-tracker-icon">⏱</span>
       <ul class="cooldown-tracker-list" id="cooldownTrackerList"></ul>
     </div>

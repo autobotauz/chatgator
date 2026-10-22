@@ -494,10 +494,13 @@ function renderBgTicker() {
 // Ability cooldown tracker — persistent across every tab, same as the bg
 // ticker above. Looks at every spell cast (`cast` events) and every weapon
 // swing that landed a named style (`melee_weapon` events carrying a
-// `styleName`), and for any name we recognize in ABILITY_COOLDOWNS, shows a
-// countdown from the most recent use. Ticks every second via the
-// setInterval below; see the `liveSync` comment on `state` for how "now" is
-// estimated while watching a live log vs. a plain static file load.
+// `styleName`), and the first time we see a name we recognize in
+// ABILITY_COOLDOWNS, it gets a permanent slot here for the rest of the
+// session (see the big comment on renderCooldownTracker below for why it's
+// built as a static roster rather than a dynamic "what's on cooldown right
+// now" list). Ticks every second via the setInterval below; see the
+// `liveSync` comment on `state` for how "now" is estimated while watching a
+// live log vs. a plain static file load.
 // ---------------------------------------------------------------------------
 const COOLDOWN_READY_SOON_SEC = 3; // highlight a pill green once it's about to come off cooldown
 
@@ -588,10 +591,28 @@ function fmtCooldownRemaining(sec) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
+// A roster, not a dynamic "what's active right now" list: every ability
+// with a known cooldown that's been cast at least once gets a permanent
+// slot here for the rest of the session, in the order it was first seen
+// (computeAbilityUsage's `usage` Map already preserves that -- a later use
+// overwrites an existing key's clock value without moving it, since Map
+// iteration order follows first insertion, not last update). Each slot
+// just flips between two states as its own cooldown ticks:
+//   ready       — normal opacity, no bar, "Ready" in the time slot.
+//   on-cooldown — name/icon dimmed, bar + countdown ticking down to 0.
+// Nothing is ever added mid-list or removed once it's shown up, and
+// nothing gets re-sorted by remaining time anymore -- that's what makes
+// this "static": once you've used an ability, it keeps the exact same
+// spot on the page whether it's ready or cooling down, so you build a
+// stable muscle-memory read of the row instead of hunting for it as pills
+// used to jump around/appear/disappear every render.
 function renderCooldownTracker() {
   const tracker = el('cooldownTracker');
   const list = el('cooldownTrackerList');
   const usage = computeAbilityUsage(state.rawEvents);
+
+  if (!usage.size) { list.innerHTML = ''; tracker.hidden = true; return; }
+
   // Live: compare each ability's cast moment directly against the
   // browser's own Date.now() (see eventWallClockMs above). Static load (no
   // watcher, or no anchor resolved yet): fall back to the frozen
@@ -600,26 +621,25 @@ function renderCooldownTracker() {
   const isLive = !!(state.watcher && state.liveSync && state.liveSync.clock != null);
   const frozenNowClock = isLive ? null : lastKnownClock(state.rawEvents);
 
-  const active = [];
-  if (isLive || frozenNowClock != null) {
-    for (const [name, usedAtClock] of usage) {
-      const info = ABILITY_COOLDOWNS[name];
-      const remainingSec = isLive
-        ? info.cooldownSeconds - (Date.now() - eventWallClockMs(usedAtClock)) / 1000
-        : info.cooldownSeconds - (frozenNowClock - usedAtClock) / 1000;
-      if (remainingSec > 0.25) {
-        active.push({ name, icon: info.icon, remainingSec, cooldownSeconds: info.cooldownSeconds });
-      }
+  const rows = [];
+  for (const [name, usedAtClock] of usage) {
+    const info = ABILITY_COOLDOWNS[name];
+    let remainingSec = 0; // can't compute "now" yet (no events at all) -> show ready
+    if (isLive) {
+      remainingSec = info.cooldownSeconds - (Date.now() - eventWallClockMs(usedAtClock)) / 1000;
+    } else if (frozenNowClock != null) {
+      remainingSec = info.cooldownSeconds - (frozenNowClock - usedAtClock) / 1000;
     }
+    rows.push({ name, icon: info.icon, cooldownSeconds: info.cooldownSeconds, remainingSec });
   }
-  active.sort((a, b) => a.remainingSec - b.remainingSec);
 
-  list.innerHTML = '';
-  if (!active.length) { tracker.hidden = true; return; }
   tracker.hidden = false;
-  for (const a of active) {
+  list.innerHTML = '';
+  for (const a of rows) {
+    const onCooldown = a.remainingSec > 0.25;
     const li = document.createElement('li');
-    li.className = 'cooldown-pill' + (a.remainingSec <= COOLDOWN_READY_SOON_SEC ? ' ready-soon' : '');
+    li.className = 'cooldown-pill ' + (onCooldown ? 'on-cooldown' : 'ready') +
+      (onCooldown && a.remainingSec <= COOLDOWN_READY_SOON_SEC ? ' ready-soon' : '');
 
     const icon = document.createElement('span');
     icon.className = 'cooldown-pill-icon';
@@ -629,19 +649,21 @@ function renderCooldownTracker() {
     const name = document.createElement('span');
     name.className = 'cooldown-pill-name';
     name.textContent = a.name;
-    name.title = a.name;
+    name.title = onCooldown
+      ? `${a.name} — on cooldown`
+      : `${a.name} — ready`;
 
     const barWrap = document.createElement('span');
     barWrap.className = 'cooldown-pill-bar';
     const barFill = document.createElement('span');
     barFill.className = 'cooldown-pill-bar-fill';
-    const pct = Math.max(0, Math.min(100, (a.remainingSec / a.cooldownSeconds) * 100));
+    const pct = onCooldown ? Math.max(0, Math.min(100, (a.remainingSec / a.cooldownSeconds) * 100)) : 0;
     barFill.style.width = `${pct}%`;
     barWrap.appendChild(barFill);
 
     const time = document.createElement('span');
     time.className = 'cooldown-pill-time';
-    time.textContent = fmtCooldownRemaining(a.remainingSec);
+    time.textContent = onCooldown ? fmtCooldownRemaining(a.remainingSec) : 'Ready';
 
     li.appendChild(icon);
     li.appendChild(name);

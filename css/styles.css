@@ -215,6 +215,19 @@ a { color: var(--series-1); }
 .cooldown-pill.ready-soon .cooldown-pill-bar-fill { background: var(--status-good); }
 .cooldown-pill.ready-soon .cooldown-pill-time { color: var(--status-good); }
 
+/* Static roster states — see renderCooldownTracker() in app.js. An
+   ability keeps the same pill for the rest of the session once it's been
+   cast; only these two states ever change, never its position. */
+.cooldown-pill.on-cooldown .cooldown-pill-icon,
+.cooldown-pill.on-cooldown .cooldown-pill-name {
+  opacity: 0.45; /* "greyed out" while unavailable — the countdown/bar stay full-strength so the running timer is what draws the eye */
+}
+.cooldown-pill.ready {
+  border-color: color-mix(in srgb, var(--status-good) 30%, var(--border));
+}
+.cooldown-pill.ready .cooldown-pill-bar { display: none; }
+.cooldown-pill.ready .cooldown-pill-time { color: var(--status-good); font-weight: 600; }
+
 .last-updated { font-size: 11.5px; color: var(--text-muted); margin: -8px 0 16px 2px; }
 .last-updated #lastUpdatedText.stale, .last-updated #lastCheckedText.stale { color: var(--status-warning); }
 .last-updated #lastCheckedText { margin-left: 10px; }
