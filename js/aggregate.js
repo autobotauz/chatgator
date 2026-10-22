@@ -14,8 +14,18 @@ const COMBAT_TYPES = new Set([
   'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in',
   'resist_named', 'resist_generic',
   'rp_bonus', 'rp_reason', 'rp_plain',
-  'kill_feed', 'resurrected_by', 'you_died',
+  'resurrected_by', 'you_died',
   'cc_landed',
+  // Deliberately NOT 'kill_feed': "<victim> was just killed by <killer> in
+  // <zone>" is a zone/battlegroup-wide broadcast of *anyone's* nearby kill,
+  // not something that implies this player was personally still fighting.
+  // On a busy populated BG log it fires every 10-30s basically nonstop
+  // (observed ~47% of ALL events in one real session), which bridged every
+  // gap and merged what should have been dozens of separate fights spread
+  // across 2h43m into a single unbroken "encounter". The player's own kills
+  // are still correctly pulled out of these same kill_feed events elsewhere
+  // (see the kill-reward logic below, which filters by killer name) --
+  // this only removes kill_feed as a signal for "is MY fight still going".
 ]);
 
 export function segmentEncounters(events) {
