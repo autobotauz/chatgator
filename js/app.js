@@ -549,11 +549,29 @@ function computeAbilityUsage(events) {
   return usage;
 }
 
-function cooldownNowClock() {
-  if (state.watcher && state.liveSync && state.liveSync.clock != null) {
-    return state.liveSync.clock + (Date.now() - state.liveSync.wallTime);
-  }
-  return lastKnownClock(state.rawEvents);
+// Converts a logged event's synthetic `clock` value into a real wall-clock
+// moment (epoch ms), using the current liveSync anchor -- the one (clock,
+// wallTime) pair we trust to mean "the log was at this clock value at this
+// real moment" (see advanceLiveSync above). Only meaningful while actively
+// watching with a resolved anchor; returns null otherwise (static load, or
+// no anchor yet).
+//
+// This is the literal "take the ability's logged start time and compare it
+// against system time" the cooldown countdown is built on, confirmed
+// against a real session's chat.log: the game's printed [HH:MM:SS] tracks
+// real wall-clock time, so once an event's real-world moment is known via
+// this conversion, its remaining cooldown is simply
+// `cooldownSeconds - (Date.now() - thatMoment) / 1000` -- read straight off
+// the browser's own clock for every ability, every render, rather than
+// through one shared extrapolated "now" value computed once per tick.
+// (The two are mathematically identical -- liveSync.clock + (Date.now() -
+// liveSync.wallTime) - usedAtClock reduces to Date.now() - eventWallClockMs
+// -- but comparing each ability's cast moment straight against Date.now()
+// makes that relationship explicit instead of implicit, and is easier to
+// sanity-check against your actual system clock.)
+function eventWallClockMs(eventClock) {
+  if (!state.liveSync || state.liveSync.clock == null || eventClock == null) return null;
+  return state.liveSync.wallTime + (eventClock - state.liveSync.clock);
 }
 
 function fmtCooldownRemaining(sec) {
@@ -567,13 +585,21 @@ function renderCooldownTracker() {
   const tracker = el('cooldownTracker');
   const list = el('cooldownTrackerList');
   const usage = computeAbilityUsage(state.rawEvents);
-  const nowClock = cooldownNowClock();
+  // Live: compare each ability's cast moment directly against the
+  // browser's own Date.now() (see eventWallClockMs above). Static load (no
+  // watcher, or no anchor resolved yet): fall back to the frozen
+  // end-of-file clock, same as before -- there's no "real now" to compare
+  // against for a file that isn't actually being watched.
+  const isLive = !!(state.watcher && state.liveSync && state.liveSync.clock != null);
+  const frozenNowClock = isLive ? null : lastKnownClock(state.rawEvents);
 
   const active = [];
-  if (nowClock != null) {
+  if (isLive || frozenNowClock != null) {
     for (const [name, usedAtClock] of usage) {
       const info = ABILITY_COOLDOWNS[name];
-      const remainingSec = info.cooldownSeconds - (nowClock - usedAtClock) / 1000;
+      const remainingSec = isLive
+        ? info.cooldownSeconds - (Date.now() - eventWallClockMs(usedAtClock)) / 1000
+        : info.cooldownSeconds - (frozenNowClock - usedAtClock) / 1000;
       if (remainingSec > 0.25) {
         active.push({ name, icon: info.icon, remainingSec, cooldownSeconds: info.cooldownSeconds });
       }
