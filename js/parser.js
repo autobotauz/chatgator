@@ -640,6 +640,28 @@ const RULES = [
   ['flavor', /^You move normally again\.$/, () => ({})],
   ['flavor', /^You feel invigorated!$/, () => ({})],
 
+  // ---- /record macro system — these are bare, untagged client messages
+  // (no "@@" channel prefix) just like a real /bg center broadcast, so
+  // without a rule here they'd fall all the way through to the
+  // bg_broadcast catch-all below and show up in the bg ticker as if
+  // someone had typed them. Reported by a user seeing exactly this in
+  // their log:
+  //   Recording is stopped.
+  //   Record with name <nsDemez> saved.
+  //   Record [nsDemez] contains 2 actions.
+  //   (1) Spell: Expel Sight
+  //   (2) Spell: Awaking Scream
+  // "Recording is started." is the documented counterpart to "...is
+  // stopped." for the same /record toggle, included on the same basis
+  // even though it wasn't in the reported example. The numbered-action
+  // line is kept general (any action-type word, not just "Spell") since
+  // /record can presumably also list Style/Ability/etc. entries the same
+  // way. -----------------------------------------------------------------
+  ['flavor', /^Recording is (started|stopped)\.$/, () => ({})],
+  ['flavor', /^Record with name <.+?> saved\.$/, () => ({})],
+  ['flavor', /^Record \[.+?\] contains \d+ actions?\.$/, () => ({})],
+  ['flavor', /^\(\d+\) \w+: .+$/, () => ({})],
+
   // ---- /bg center screen-broadcast (catch-all — MUST stay last) -----------
   // /bg center puts arbitrary free-typed text in the middle of everyone's
   // screen for a few seconds; the log records it as a completely bare line
