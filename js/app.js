@@ -107,15 +107,59 @@ const dropzone = el('dropzone');
 ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
   e.preventDefault(); dropzone.classList.remove('dragover');
 }));
-dropzone.addEventListener('drop', (e) => {
-  const files = Array.from(e.dataTransfer.files || []);
+dropzone.addEventListener('drop', async (e) => {
+  // Prefer a live-watchable handle when the browser supports it, so a
+  // dropped .log file is on equal footing with one picked through the
+  // button below — both end up watched live, not just read once. Only
+  // Chromium implements getAsFileSystemHandle(); everywhere else (and for
+  // a multi-file drop, which we don't try to merge anymore) this falls
+  // through to a plain one-time read of the first file.
+  const items = Array.from(e.dataTransfer.items || []);
+  if (isWatchSupported() && items.length === 1 && items[0].kind === 'file' &&
+      typeof items[0].getAsFileSystemHandle === 'function') {
+    try {
+      const handle = await items[0].getAsFileSystemHandle();
+      if (handle && handle.kind === 'file') {
+        await loadHandle(handle);
+        return;
+      }
+    } catch { /* fall through to the plain read below */ }
+  }
+  const files = Array.from(e.dataTransfer.files || []).slice(0, 1);
   if (files.length) loadFiles(files);
 });
 
-el('btnPickFile').addEventListener('click', () => el('fileInput').click());
+el('btnPickFile').addEventListener('click', pickFileOrSession);
+
+// The single entry point for "give me a log or session file": in a browser
+// with the File System Access API (Chrome/Edge), this opens a picker that
+// hands back a reusable handle, so we can keep polling it for new lines —
+// a .log file picked this way is automatically watched live, no separate
+// "watch" step needed. Elsewhere, it falls back to a plain <input
+// type=file> (one-time read; re-drop/re-pick to refresh).
+async function pickFileOrSession() {
+  if (isWatchSupported()) {
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{
+          description: 'DAoC chat log or session snapshot',
+          accept: { 'text/plain': ['.log', '.txt'], 'application/json': ['.json'] },
+        }],
+        excludeAcceptAllOption: false,
+      });
+      await loadHandle(handle);
+    } catch (err) {
+      if (err && err.name !== 'AbortError') console.warn('[chatgator] file picker failed', err);
+    }
+    return;
+  }
+  el('fileInput').click();
+}
+
 el('fileInput').addEventListener('change', (e) => {
   const files = Array.from(e.target.files || []);
   if (files.length) loadFiles(files);
+  e.target.value = ''; // so picking the same file again still fires 'change'
 });
 
 el('btnSample').addEventListener('click', () => {
@@ -143,24 +187,26 @@ function startNewSession() {
   state.lastUpdatedAt = null;
 }
 
-if (isWatchSupported()) {
-  el('btnWatch').hidden = false;
-  el('btnWatch').addEventListener('click', startWatch);
-  el('btnWatchHeader').hidden = false;
-  el('watchIntervalWrap').hidden = false;
-  el('btnWatchHeader').addEventListener('click', () => {
-    if (state.watcher) stopWatching(); else startWatch();
-  });
-}
+el('btnStopWatch').addEventListener('click', stopWatching);
 
 el('btnDownloadSnapshot').addEventListener('click', downloadSnapshot);
+
+// Resolves a FileSystemFileHandle (from the picker above, or from a drop
+// resolved to a handle) to either a one-time snapshot import (.json) or a
+// live-watched log (anything else) — the one place that decision is made,
+// since the picker and the drop path both funnel through it.
+async function loadHandle(handle) {
+  const file = await handle.getFile();
+  if (/\.json$/i.test(file.name)) {
+    await loadSnapshotFile(file);
+    return;
+  }
+  await beginWatch(handle);
+}
 
 async function loadFiles(files) {
   // A shared snapshot (exported via "Download snapshot") is a .json file —
   // route it to its own importer instead of trying to parse it as a chat.log.
-  // Mixing a snapshot with raw logs in one drop isn't a meaningful merge
-  // (its event clocks belong to a different parse session), so a snapshot
-  // present in the drop wins and anything else in that drop is ignored.
   const jsonFile = files.find(f => /\.json$/i.test(f.name));
   if (jsonFile) {
     await loadSnapshotFile(jsonFile);
@@ -210,7 +256,6 @@ function ingestSnapshotEvents(data) {
   el('appMain').hidden = false;
   el('btnLoadAnother').hidden = false;
   el('btnDownloadSnapshot').hidden = false;
-  el('btnWatchHeader').hidden = true; // no live file handle behind an imported snapshot
   el('snapshotPill').hidden = false;
   el('snapshotPill').title = data.exportedAt
     ? `Imported snapshot · exported ${new Date(data.exportedAt).toLocaleString()}${data.player ? ` · ${data.player}` : ''}`
@@ -269,7 +314,6 @@ function ingestTexts(fileTexts) {
   el('btnLoadAnother').hidden = false;
   el('btnDownloadSnapshot').hidden = false;
   el('snapshotPill').hidden = true;
-  if (isWatchSupported()) el('btnWatchHeader').hidden = false;
 
   buildEncounterSelect();
   renderActiveTab();
@@ -610,9 +654,14 @@ setInterval(() => {
 }, 1000);
 
 // ---------------------------------------------------------------------------
-// Watch mode (File System Access API — Chrome/Edge)
+// Watch mode (File System Access API — Chrome/Edge). There's no separate
+// "start watching" action anymore: picking or dropping a .log file IS
+// watching it, whenever the browser can give us a reusable handle — see
+// pickFileOrSession()/loadHandle() above, which call this once they've
+// already decided (by extension) that the chosen file isn't a snapshot.
 // ---------------------------------------------------------------------------
-async function startWatch() {
+async function beginWatch(handle) {
+  stopWatching(); // in case a previous session's watcher is still running
   try {
     const watcher = new LogWatcher({
       // The common case (file grew) hands us just the new complete lines —
@@ -627,14 +676,15 @@ async function startWatch() {
       onError: (err) => console.warn('[chatgator] watch error', err),
       pollMs: state.watchIntervalMs,
     });
-    await watcher.pickAndStart();
+    await watcher.startWithHandle(handle);
     const initialText = await watcher.readAll();
     state.watcher = watcher;
     ingestTexts([{ name: 'live', text: initialText }]);
     el('watchStatus').hidden = false;
     el('watchDot').classList.add('live');
     el('watchLabel').textContent = 'Watching live — keep this tab open';
-    if (isWatchSupported()) el('btnWatchHeader').textContent = '⏹ Stop watching';
+    el('watchIntervalWrap').hidden = false;
+    el('btnStopWatch').hidden = false;
   } catch (err) {
     if (err && err.name !== 'AbortError') console.warn('[chatgator] could not start watch mode', err);
   }
@@ -644,7 +694,8 @@ function stopWatching() {
   state.liveSync = null; // back to a frozen end-of-file snapshot for the cooldown tracker
   el('watchStatus').hidden = true;
   el('watchDot').classList.remove('live');
-  if (isWatchSupported()) el('btnWatchHeader').textContent = 'Watch a live log file…';
+  el('watchIntervalWrap').hidden = true;
+  el('btnStopWatch').hidden = true;
 }
 
 // ---------------------------------------------------------------------------

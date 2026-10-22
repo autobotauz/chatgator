@@ -52,6 +52,15 @@ export class LogWatcher {
       types: [{ description: 'DAoC chat log', accept: { 'text/plain': ['.log', '.txt'] } }],
       excludeAcceptAllOption: false,
     });
+    return this.startWithHandle(handle);
+  }
+
+  // Same as pickAndStart(), but for a handle the caller already obtained
+  // some other way — e.g. app.js's unified file picker (which needs the
+  // handle in hand first to decide whether it's a .log to watch or a
+  // .json snapshot to import once), or a drag-and-dropped file resolved
+  // to a handle via DataTransferItem.getAsFileSystemHandle() in Chromium.
+  async startWithHandle(handle) {
     this.handle = handle;
     const file = await handle.getFile();
     this.lastSize = 0; // caller decides whether to parse the existing content first via readAll()

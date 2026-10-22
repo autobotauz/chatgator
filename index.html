@@ -22,7 +22,7 @@
         <span class="watch-interval-text">Refresh:</span>
         <select class="btn" id="watchIntervalSelect"></select>
       </label>
-      <button class="btn" id="btnWatchHeader" hidden>Watch a live log file…</button>
+      <button class="btn" id="btnStopWatch" hidden>⏹ Stop watching</button>
       <button class="btn" id="btnDownloadSnapshot" hidden>⬇ Download snapshot</button>
       <button class="icon-btn" id="btnTheme" title="Toggle light/dark">🌓</button>
       <button class="btn" id="btnLoadAnother" hidden>New session</button>
@@ -32,10 +32,9 @@
   <section id="dropzoneSection">
     <div class="dropzone" id="dropzone">
       <h2>Drop your DAoC chat.log here</h2>
-      <p>Or pick a file, pick several at once, or try a sample log first — pick a class below to see how Chat Gator renders its spells, styles, and pets — or drop a <code>.json</code> snapshot someone shared with you to view their session.</p>
+      <p>Or choose a log or session file below, or try a sample log first — pick a class below to see how Chat Gator renders its spells, styles, and pets.</p>
       <div class="actions">
-        <button class="btn primary" id="btnPickFile">Choose file(s)</button>
-        <button class="btn" id="btnWatch" hidden>Watch a live log file…</button>
+        <button class="btn primary" id="btnPickFile">Choose log or session file…</button>
         <select class="btn" id="sampleClassSelect" title="Choose a class for the sample log">
           <option value="bonedancer">Bonedancer</option>
           <option value="occultist">Occultist</option>
@@ -44,8 +43,8 @@
         </select>
         <button class="btn" id="btnSample">Try a sample log</button>
       </div>
-      <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt,.json" multiple>
-      <p class="privacy">Everything happens on your machine — your log is parsed in this browser tab and is never uploaded to any server. "Watch a live log file" uses your browser's File System Access API so you can point it at your actual <code>chat.log</code> and see stats update as you play (Chrome/Edge only; other browsers can just re-drop the file). Use "⬇ Download snapshot" to save a session as a <code>.json</code> file you can send to someone else — they can drop it right back in here to see it.</p>
+      <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt,.json">
+      <p class="privacy">Everything happens on your machine — your log is parsed in this browser tab and is never uploaded to any server. Pick (or drop) a <code>chat.log</code> and, in Chrome/Edge, Chat Gator keeps watching it live as you play — stats update in near real time, with a "⏹ Stop watching" control up top once it's running. Other browsers get a one-time read of the file; just re-drop it to refresh. A <code>.json</code> file (saved with "⬇ Download snapshot") is always a one-time import, for viewing a session someone shared with you.</p>
     </div>
   </section>
 

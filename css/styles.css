@@ -83,6 +83,19 @@ a { color: var(--series-1); }
 .app-title .tag { font-size: 12px; color: var(--text-muted); background: var(--surface-2); padding: 3px 8px; border-radius: 999px; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
+/* Several controls below are shown/hidden purely via the `hidden` attribute
+   from JS, but also set their own `display` (flex/inline-block) so they lay
+   out correctly once visible. An author-stylesheet `display` declaration
+   always wins over the browser's built-in `[hidden] { display: none }`
+   rule regardless of selector specificity (user-agent styles lose to author
+   styles in the cascade), so without this override each of these would
+   render — empty or not — even while `hidden` is set. Caught via a
+   Playwright check that found "Watching live" and an empty refresh-interval
+   dropdown rendering in the header before any session had even started. */
+.watch-status[hidden], .watch-interval[hidden], .bg-ticker[hidden], .cooldown-tracker[hidden], .pill[hidden] {
+  display: none;
+}
+
 .icon-btn, .btn {
   font: inherit; font-size: 13px; border-radius: var(--radius-sm); border: 1px solid var(--border);
   background: var(--surface-1); color: var(--text-primary); padding: 7px 12px; cursor: pointer;
