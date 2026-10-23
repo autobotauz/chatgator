@@ -275,8 +275,27 @@ export function buildStats(events, playerNameHint) {
 
       case 'ability_hit': {
         if (petNames.has(e.name)) {
+          // "Your <pet> hits <target> for N damage!" — grammatically
+          // identical to a player's own named-ability line (hence matching
+          // the same `ability_hit` rule), but reported directly: for a pet
+          // this phrasing is the pet's own spell/proc damage, distinct from
+          // its melee swing ("Your <pet> attacks <target> and hits for N
+          // damage!", pet_melee below, bucketed as 'Melee'). A concrete
+          // example: "spirit aegis" has an AE proc that fires off its melee
+          // hits and can land on several nearby targets in the same moment,
+          // logged as separate "hits <target> for N" lines per target —
+          // real melee damage, by contrast, never gets this phrasing.
+          // Bucketing these under the pet's own name (the old behavior)
+          // produced a confusing, redundant-looking row ("spirit aegis"
+          // nested inside "spirit aegis"'s own breakdown) that also gave no
+          // hint this was a different kind of damage than the Melee row
+          // right next to it. 'Proc' matches the label pet_hit already uses
+          // for the exact same "hit (singular) ... for N" grammar below —
+          // both describe a pet's own spell-like damage, not its melee
+          // attack, so they share one label rather than inventing a second
+          // name for the identical concept.
           const p = petBucket(e.name); p.dmg += e.dmg; p.hits++;
-          bump(p.bySource, e.name, e.dmg, false);
+          bump(p.bySource, 'Proc', e.dmg, false);
         } else {
           bump(dmgOutBySource, e.name, e.dmg, false);
         }
@@ -285,8 +304,10 @@ export function buildStats(events, playerNameHint) {
       }
       case 'ability_crit': {
         if (petNames.has(e.name)) {
+          // Same reasoning as ability_hit above — this is the pet's own
+          // critical proc/spell hit, not a melee crit.
           const p = petBucket(e.name); p.dmg += e.dmg; p.crits++;
-          bump(p.bySource, e.name, e.dmg, true);
+          bump(p.bySource, 'Proc', e.dmg, true);
         } else {
           bump(dmgOutBySource, e.name, e.dmg, true);
         }
