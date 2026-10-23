@@ -469,7 +469,10 @@ function renderActiveTab() {
   renderCooldownTracker();
   renderLastUpdated();
 
-  el('characterName').textContent = stats.meta.playerName ? `👤 ${stats.meta.playerName}` : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
+  // inferredClass (see aggregate.js's inferClass) is only ever set when
+  // confident, so appending it here is never a guess shown as a fact.
+  const classSuffix = stats.meta.inferredClass ? ` (${stats.meta.inferredClass.name})` : '';
+  el('characterName').textContent = stats.meta.playerName ? `👤 ${stats.meta.playerName}${classSuffix}` : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
   const encLabel = state.scope === 'all'
     ? `Totals across the whole file · DPS/HPS use ${durationLabel(stats.meta.activeDurationMs || stats.meta.durationMs)} of active time`
     : `Single encounter · ${durationLabel(stats.meta.durationMs)}`;

@@ -119,18 +119,24 @@ function sourceMapToRows(bySource) {
     .sort((a, b) => b.dmg - a.dmg);
 }
 
-// Drops pet-summon-spell "ghost" entries (e.g. "underhill ally", keyed by the
-// pet's own in-log name, which parser.js/aggregate.js can momentarily credit
-// with a stray CC/resist — see isSelfTargetingPetCast in parser.js) from a
-// bySource/bySpell map BEFORE it's turned into chart items or table rows.
-// Only safe to use on maps keyed by ability/spell name (damageOut.bySource,
-// healOut.bySpell) — never on maps keyed by player/attacker/target name
-// (damageIn.bySource, healIn.bySource, healOut.byTarget), where a name
-// happening to match a pet-summon spell would be a real person, not a ghost.
-function filterGhostSource(bySource) {
+// Drops "ghost" entries (see isAbilityGhost, defined further down this file
+// — hoisted, so callable from here) from a bySource/bySpell map BEFORE it's
+// turned into chart items or table rows. Only safe to use on maps keyed by
+// ability/spell name (damageOut.bySource, healOut.bySpell) — never on maps
+// keyed by player/attacker/target name (damageIn.bySource, healIn.bySource,
+// healOut.byTarget), where a name happening to match a ghost ability would
+// be a real person, not a ghost. `inferredClass` is stats.meta.inferredClass
+// — pass it through so the class-mismatch half of the ghost check applies
+// here exactly as it does in the Spells & Styles tab. Checked against
+// s.displayName when present rather than the raw map key, since a style
+// thrown with more than one weapon is keyed by a composite "Style (Weapon)"
+// string (see aggregate.js) that would never match ABILITY_DATABASE's own
+// bare-name keys at all — silently skipping the ghost check on every
+// multi-weapon style row, not just correctly leaving non-ghosts alone.
+function filterGhostSource(bySource, inferredClass) {
   const out = {};
   for (const [key, s] of Object.entries(bySource)) {
-    if (isPetSummonGhost(key)) continue;
+    if (isAbilityGhost(s.displayName || key, inferredClass)) continue;
     out[key] = s;
   }
   return out;
@@ -213,7 +219,7 @@ export function renderDamage(container, stats, ctx) {
   const outSec = section(container);
   h3(outSec, 'Damage done by spell / style / weapon');
   const outCard = card(outSec);
-  const damageOutBySource = filterGhostSource(stats.damageOut.bySource);
+  const damageOutBySource = filterGhostSource(stats.damageOut.bySource, stats.meta.inferredClass);
   const items = sourceMapToItems(damageOutBySource);
   barChart(outCard, { items, colorFn: (_, i) => seriesColor(i) });
   const rows = sourceMapToRows(damageOutBySource);
@@ -265,7 +271,7 @@ export function renderHealing(container, stats, ctx) {
   const spellSec = section(container);
   h3(spellSec, 'Healing done by spell');
   const spellCard = card(spellSec);
-  const healOutBySpell = filterGhostSource(stats.healOut.bySpell);
+  const healOutBySpell = filterGhostSource(stats.healOut.bySpell, stats.meta.inferredClass);
   const spellItems = sourceMapToItems(healOutBySpell);
   barChart(spellCard, { items: spellItems, colorFn: (_, i) => seriesColor(i + 2) });
   dataTable(spellCard, {
@@ -470,62 +476,86 @@ const ABILITY_DATABASE_BY_LOWER = (() => {
   return m;
 })();
 
-// A pet-summon name (e.g. "Underhill Ally", the pet itself showing up as
-// "underhill ally" in third person in the log) is not a player-cast spell
-// or style outcome at all — it's the summon landing in this table only
-// because some stray cc-landed/resist count got attached to its name (see
-// parser.js's isSelfTargetingPetCast and aggregate.js's ccLandedBySource).
-// Reported directly: a Bainshee's "Spells, styles & abilities used" table
-// showed "underhill ally"/"underhill companion" rows with a "Damage" role
-// despite zero damage ever being possible for them. Checked against
-// ABILITY_DATABASE's `type` (never against dmg/hits being zero, which a
-// perfectly legitimate ability can also have) so this only hides genuine
-// pet-summon noise, not a real ability that just didn't land anything in
-// this particular view. Matched case-insensitively — see
-// ABILITY_DATABASE_BY_LOWER above for why.
-function isPetSummonGhost(name) {
+// Is `name` a row that has no business being in a by-ability table at all,
+// given what we positively know about it? Two independent reasons, either
+// one sufficient on its own:
+//
+//   1. It's a pet-summon ability (e.g. "Underhill Ally", the pet itself
+//      showing up as "underhill ally" in third person in the log) — not a
+//      player-cast spell/style outcome, just the summon's name picking up
+//      a stray cc-landed/resist count (see parser.js's isSelfTargetingPet-
+//      Cast and aggregate.js's ccLandedBySource). Always filtered, with no
+//      dependency on knowing the log's class — a pet-summon row is never a
+//      legitimate damage/heal source in this table for ANY class. Matched
+//      case-insensitively, see ABILITY_DATABASE_BY_LOWER above.
+//   2. `inferredClass` is set (i.e. aggregate.js's inferClass() was
+//      confident — see that function's own comment for the thresholds) and
+//      ABILITY_DATABASE positively knows which class(es) train this name,
+//      none of which is the inferred one. This is the general form of (1):
+//      an ability we can see for certain belongs to some OTHER class is
+//      exactly the kind of cross-talk (another player's pet, another
+//      player's AE landing on/near this character) that produces a ghost
+//      row, whether or not it happens to be a pet summon specifically. Only
+//      applied when inferredClass is non-null, so an unconfident/unknown
+//      class guess changes nothing — same permissive-by-default rule as
+//      everywhere else this database is consulted.
+function isAbilityGhost(name, inferredClass) {
   const info = ABILITY_DATABASE[name] || ABILITY_DATABASE_BY_LOWER.get(String(name).toLowerCase());
-  return !!(info && info.type && info.type.startsWith('Summon'));
+  if (!info) return false;
+  if (info.type && info.type.startsWith('Summon')) return true;
+  if (inferredClass && info.classes && info.classes.length && !info.classes.includes(inferredClass.name)) return true;
+  return false;
 }
 
-// The naive 'Damage'/'Heal' role above only reflects *which table* a name
-// happened to end up in (damageOut.bySource vs healOut.bySpell) — which, for
-// an ability ABILITY_DATABASE confirms can't actually do that thing, is
-// itself informative of a bug, not a label to repeat at face value. Prefer
-// the ability's real charplan Type when we have one (e.g. "Nearsight",
-// "Stun", "Mesmerize") over a flatly wrong "Damage"/"Heal". A name
-// ABILITY_DATABASE doesn't recognize at all keeps its naive role unchanged
-// — same permissive-by-default rule as the parser-level fix.
-function trueRole(name, naiveRole) {
+// Single merged Role/Type value for one row. These used to be two separate
+// columns (a naive Damage/Heal "Role" derived from which table a name
+// happened to end up in, plus a "Type" column repeating ABILITY_DATABASE's
+// real charplan Type right next to it) which were redundant most of the
+// time (Role: Damage, Type: Direct Damage · Bainshee) and actively
+// confusing the rest of the time (Role already silently became the Type
+// string whenever it was known to be wrong — see the old trueRole — making
+// the dedicated Type column alongside it pure repetition). One column now:
+//   1. ABILITY_DATABASE's Type (+ training classes) when known — the same
+//      authoritative source the damage/heal gating itself uses, so this
+//      label and the gating decision can never disagree with each other.
+//   2. Else the live best-effort skills.js fetch, when it has this name
+//      (covers names not yet in this build's bundled charplan export).
+//   3. Else the naive Damage/Heal/Damage+Heal role, corrected to "Other"
+//      only when ABILITY_DATABASE positively rules it out, same
+//      permissive-by-default rule as the parser-level fix — never
+//      corrected on a name we have no data for at all.
+function roleOrType(name, naiveRole, skillMap) {
   const info = ABILITY_DATABASE[name];
-  if (!info) return naiveRole;
-  const wantsDamage = naiveRole === 'Damage' || naiveRole === 'Damage + Heal';
-  const wantsHeal = naiveRole === 'Heal' || naiveRole === 'Damage + Heal';
-  if (wantsDamage && info.isDamage === false) return info.type || 'Other';
-  if (wantsHeal && info.isHeal === false) return info.type || 'Other';
+  if (info && info.type) {
+    const bits = [info.type, info.classes && info.classes.length ? info.classes.join('/') : null].filter(Boolean);
+    return bits.join(' · ');
+  }
+  const live = describeSkill(skillMap, name);
+  if (live) return live;
+  if (info) {
+    const wantsDamage = naiveRole === 'Damage' || naiveRole === 'Damage + Heal';
+    const wantsHeal = naiveRole === 'Heal' || naiveRole === 'Damage + Heal';
+    if (wantsDamage && info.isDamage === false) return 'Other';
+    if (wantsHeal && info.isHeal === false) return 'Other';
+    // No specific Type (e.g. its Type string genuinely differs between the
+    // classes that train it — see build-ability-database.py's ambiguous-
+    // types handling) but we do know who trains it at all, which is still
+    // worth showing alongside the naive role rather than silently dropping.
+    if (info.classes && info.classes.length) return [naiveRole, info.classes.join('/')].join(' · ');
+  }
   return naiveRole;
-}
-
-// describeSkill() needs skills.js's live fetch of Eden's public spell
-// database to have succeeded (see that file's header: it's best-effort,
-// and must still work with nothing at all when it hasn't). ABILITY_DATABASE
-// is bundled, so it's always there as a fallback, just with less detail (no
-// damage-type/line, and only the full class list rather than one chosen
-// one) — still far better than the bare "—" this used to fall back to.
-function staticSkillInfo(name) {
-  const info = ABILITY_DATABASE[name];
-  if (!info) return null;
-  const bits = [info.type, info.classes && info.classes.length ? info.classes.join('/') : null].filter(Boolean);
-  return bits.join(' · ') || null;
 }
 
 export function renderSpells(container, stats, ctx) {
   clear(container);
   const skillMap = ctx && ctx.skillMap || {};
+  const inferredClass = stats.meta.inferredClass;
   const byName = {};
   for (const [key, s] of Object.entries(stats.damageOut.bySource)) {
     if (key.startsWith('Melee')) continue;
-    if (isPetSummonGhost(key)) continue;
+    // Checked against the bare name (s.displayName), not the raw composite
+    // "Style (Weapon)" key — see filterGhostSource's comment above for why.
+    if (isAbilityGhost(s.displayName || key, inferredClass)) continue;
     // Keep per-weapon rows distinct (same composite key as the Damage tab —
     // see aggregate.js) but show the bare style/spell name here, same idea
     // as sourceMapToRows.
@@ -537,15 +567,12 @@ export function renderSpells(container, stats, ctx) {
   // a character cast, whichever role it played.
   for (const [name, s] of Object.entries(stats.healOut.bySpell || {})) {
     if (name === 'Heal (spell not identified)') continue;
-    if (isPetSummonGhost(name)) continue;
+    if (isAbilityGhost(name, inferredClass)) continue;
     if (byName[name]) {
       byName[name] = { ...byName[name], role: 'Damage + Heal' };
     } else {
       byName[name] = { name, role: 'Heal', ...s };
     }
-  }
-  for (const row of Object.values(byName)) {
-    row.role = trueRole(row.name, row.role);
   }
   const rows = Object.values(byName).sort((a, b) => b.dmg - a.dmg);
 
@@ -554,15 +581,20 @@ export function renderSpells(container, stats, ctx) {
   // covered" has to be checked against the bare names actually shown, not
   // the raw map keys.
   const coveredNames = new Set(rows.map(r => r.name));
-  const castOnly = stats.spellsCast.filter(n => !coveredNames.has(n));
+  const castOnly = stats.spellsCast.filter(n => !coveredNames.has(n) && !isAbilityGhost(n, inferredClass));
 
   const s = section(container);
   h3(s, 'Spells, styles &amp; abilities used');
+  if (inferredClass) {
+    const p = document.createElement('p');
+    p.className = 'sub';
+    p.textContent = `Detected class: ${inferredClass.name} (from the abilities cast in this view) — used above to hide rows that can only belong to some other class.`;
+    s.appendChild(p);
+  }
   const c = card(s);
   dataTable(c, {
     columns: [
       { key: 'name', label: 'Name' },
-      { key: 'role', label: 'Role' },
       { key: 'weapon', label: 'Weapon', fmt: v => v || '—' },
       { key: 'info', label: 'Type' },
       { key: 'totalHits', label: 'Hits', num: true },
@@ -574,7 +606,7 @@ export function renderSpells(container, stats, ctx) {
       { key: 'dmg', label: 'Total dmg/heal', num: true, fmt: fmtExact },
       { key: 'avg', label: 'Avg', num: true },
     ],
-    rows: rows.map(r => ({ ...r, info: describeSkill(skillMap, r.name) || staticSkillInfo(r.name) || '—' })),
+    rows: rows.map(r => ({ ...r, info: roleOrType(r.name, r.role, skillMap) })),
   });
 
   if (castOnly.length) {

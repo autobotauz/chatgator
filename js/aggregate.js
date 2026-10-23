@@ -3,6 +3,16 @@
 // "encounters" (bursts of activity separated by quiet gaps) so a single
 // multi-hour chat.log can be viewed as a set of individual fights, the way
 // a live meter would show one fight at a time.
+//
+// Imports ABILITY_DATABASE (the same bundled, static data file parser.js
+// uses for damage/heal gating — see that file's header) for one purpose:
+// inferClass() below, which guesses the log's own class from the set of
+// abilities it was seen to cast. That guess (stats.meta.inferredClass) is
+// then available to ui.js to decide which rows in a by-ability table are
+// even plausible for this character to have cast for real — see
+// isAbilityGhost in ui.js.
+
+import { ABILITY_DATABASE } from './ability-database.js';
 
 const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts the next
 const COMBAT_TYPES = new Set([
@@ -148,6 +158,18 @@ export function buildStats(events, playerNameHint) {
   // ---- spells cast (for Spell vs Style/Ability tagging) -------------------
   const castNames = new Set();
   for (const e of events) if (e.type === 'cast') castNames.add(e.name);
+
+  // Class-inference signal: spell casts plus melee style names. A style
+  // name only ever reaches an event as e.styleName tacked onto its
+  // melee_weapon hit (see parser.js — "You perform your X!" is itself a
+  // setup-only line, never its own event), so it can't be read off
+  // castNames above; folding both into one combined set here is what lets
+  // a melee class (whose rotation is almost entirely named styles, not
+  // spells) get a confident class guess too, not just casters.
+  const abilityNamesForClassGuess = new Set(castNames);
+  for (const e of events) if (e.styleName) abilityNamesForClassGuess.add(e.styleName);
+
+  const inferredClass = inferClass(abilityNamesForClassGuess);
 
   // ---- damage out -----------------------------------------------------------
   const dmgOutBySource = {};
@@ -521,6 +543,7 @@ export function buildStats(events, playerNameHint) {
       playerName, startClock, endClock, durationMs,
       statsSnapshots, latestSnapshot,
       petNames: Array.from(petNames),
+      inferredClass,
     },
     damageOut: {
       total: totalDmgOut,
@@ -584,4 +607,51 @@ export function buildStats(events, playerNameHint) {
 function sumVals(map) { return Object.values(map).reduce((a, s) => a + s.dmg, 0); }
 function sumPetDmg(petStats) { return Object.values(petStats).reduce((a, p) => a + p.dmg, 0); }
 function pct(n, total) { return total ? +(100 * n / total).toFixed(1) : 0; }
+
+// Guess which single class this log's player plays, from the set of
+// ability names it was observed to cast. Each cast name votes for every
+// class ABILITY_DATABASE says trains it, weighted 1/(number of classes that
+// train it) — a name trained by only one class (the overwhelming majority
+// of a real rotation: nukes, debuffs, pet summons, class-specific buffs)
+// casts a full vote for that class, while a name shared across several
+// classes (baseline/common realm abilities, common group buffs) is diluted
+// across all of them so it can't single-handedly tip the result. A name
+// ABILITY_DATABASE doesn't recognize at all (not yet in this build's
+// charplan export, or a weapon-proc/item spell with no class of its own)
+// contributes no vote either way — same permissive-by-default rule as the
+// damage/heal gating in parser.js: a gap in the data can only ever fail to
+// produce a guess, never produce a wrong one.
+//
+// Returns { name, score, confidence } when the result clears both
+// thresholds below, else null — "we don't confidently know" is the honest
+// and safe answer the rest of the app (ui.js's isAbilityGhost) treats as
+// "don't filter anything on this". The thresholds are deliberately
+// conservative tunables, not a precise statistical claim:
+//   MIN_SCORE   — the winning class needs at least this much weighted
+//                 evidence (~2 fully class-exclusive abilities' worth)
+//                 before a guess is even considered.
+//   MIN_MARGIN  — the winner must lead the runner-up by at least this
+//                 fraction of its own score, so two classes that trained
+//                 similar amounts of what was cast (e.g. a log with mostly
+//                 shared realm abilities and little else) correctly yields
+//                 "unknown" instead of an arbitrary tie-break.
+const MIN_CLASS_SCORE = 2;
+const MIN_CLASS_MARGIN = 0.4;
+
+function inferClass(castNames) {
+  const scores = {};
+  for (const name of castNames) {
+    const info = ABILITY_DATABASE[name];
+    if (!info || !info.classes || !info.classes.length) continue;
+    const weight = 1 / info.classes.length;
+    for (const cls of info.classes) scores[cls] = (scores[cls] || 0) + weight;
+  }
+  const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  if (!ranked.length) return null;
+  const [name, score] = ranked[0];
+  const runnerUp = ranked[1] ? ranked[1][1] : 0;
+  const confidence = +((score - runnerUp) / score).toFixed(3);
+  if (score < MIN_CLASS_SCORE || confidence < MIN_CLASS_MARGIN) return null;
+  return { name, score: +score.toFixed(3), confidence };
+}
 function normalizeName(s) { return (s || '').trim().toLowerCase(); }
