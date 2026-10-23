@@ -85,7 +85,12 @@ const RULES = [
   ['pet_melee', /^Your (.+?) attacks (.+?) and hits for (\d+)(?:\s*\(([+-]\d+)\))? damage!$/,
     m => ({ pet: m[1], target: m[2], dmg: +m[3], mod: m[4] ? +m[4] : null })],
   // "Your <pet> hit <target> for N damage!" (proc-style line, often @@-tagged)
-  ['pet_hit', /^Your (.+?) hit (.+?) for (\d+) damage!$/, m => ({ pet: m[1], target: m[2], dmg: +m[3] })],
+  // Same optional "(±N)" armor/resist modifier as ability_hit below, applied
+  // defensively here too — same pattern shape, same bug class, even though no
+  // instance of this specific singular-"hit" line with a modifier suffix has
+  // been observed in the available logs.
+  ['pet_hit', /^Your (.+?) hit (.+?) for (\d+)(?:\s*\(([+-]\d+)\))? damage!$/,
+    m => ({ pet: m[1], target: m[2], dmg: +m[3], mod: m[4] ? +m[4] : null })],
   // "Your <pet> critical hits <target> for an additional N damage! (Crit Chance: N%)"
   ['pet_melee_crit', /^Your (.+?) critical(?:ly)? hits (.+?) for an additional (\d+) damage!(?:\s*\(Crit Chance:\s*([\d.]+)%\))?$/,
     m => ({ pet: m[1], target: m[2], dmg: +m[3], pct: m[4] ? parseFloat(m[4]) : null })],
@@ -110,7 +115,22 @@ const RULES = [
   // crit MUST be matched before the plain hit rule (both start the same way)
   ['ability_crit', /^Your (.+?) critical(?:ly)? hits (.+?) for an additional (\d+) damage!(?:\s*\(([\d.]+)%\))?$/,
     m => ({ name: m[1], target: m[2], dmg: +m[3], pct: m[4] ? parseFloat(m[4]) : null })],
-  ['ability_hit', /^Your (.+?) hits (.+?) for (\d+) damage!$/, m => ({ name: m[1], target: m[2], dmg: +m[3] })],
+  // Trailing "(±N)" is the target's armor/resist damage-reduction modifier —
+  // every sibling melee rule (melee_plain, melee_weapon, incoming_dmg) already
+  // accepts this optional suffix, but this rule didn't, so any ability/pet
+  // hit against an armored or resistant target ("Your forest heart hits
+  // Level 50 Training Dummy for 63 (-39) damage!") failed to match here and
+  // fell all the way through to the bg_broadcast catch-all instead — reported
+  // directly as these lines wrongly showing up in the BG center ticker. Worse
+  // than a display bug: the damage was silently dropped from totals entirely
+  // rather than just mis-displayed (confirmed across the available logs: 47
+  // real instances, all pet hits — "spirit aegis", "isolationist wizardess",
+  // "underhill companion" — against targets with damage mitigation). Adding
+  // the same optional group used elsewhere fixes both at once: the damage is
+  // now correctly attributed, and the line no longer falls through to
+  // bg_broadcast since it's matched here first.
+  ['ability_hit', /^Your (.+?) hits (.+?) for (\d+)(?:\s*\(([+-]\d+)\))? damage!$/,
+    m => ({ name: m[1], target: m[2], dmg: +m[3], mod: m[4] ? +m[4] : null })],
 
   // ---- styles: "You perform your <Style> perfectly! (+N, Growth Rate: x)"
   // confirms the weapon swing that immediately follows was a style, not a
