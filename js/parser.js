@@ -62,7 +62,18 @@ const RULES = [
   ['cast', /^You cast an?\s+(.+?)\s+spell!$/, m => ({ name: m[1] })],
 
   // ---- pet lifecycle ----------------------------------------------------
-  ['pet_summon', /^The (.+?) is now under your control\.$/, m => ({ pet: m[1] })],
+  // Animist/Spiritmaster turret pets ("Forest's Core", "Ligneous Wall",
+  // "Grove Augur", "Vent of Physical/Elemental Shielding", ...) append a
+  // running turret-count sentence to this same line — "The forest heart is
+  // now under your control. 3 turrets are under your control." — which the
+  // original `$`-anchored version of this regex required NOT to be there,
+  // so it silently never matched any turret at all (while a non-turret pet
+  // like "war crier", whose line has no such suffix, matched fine). The
+  // Pets tab showing only "war crier" and never the turrets it was
+  // summoned alongside was reported directly from a log with exactly this
+  // mix. The optional group below accepts the suffix without requiring it,
+  // so a non-turret pet's plain line still matches exactly as before.
+  ['pet_summon', /^The (.+?) is now under your control\.(?:\s*\d+\s*turrets?\s*are\s*under\s*your\s*control\.)?$/, m => ({ pet: m[1] })],
   ['pet_lost', /^You lose control of the (.+?)\.$/, m => ({ pet: m[1] })],
   ['pet_command', /^You command the (.+?) to (.+?)!$/, m => ({ pet: m[1], command: m[2] })],
 

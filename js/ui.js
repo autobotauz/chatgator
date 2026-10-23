@@ -502,7 +502,13 @@ const ABILITY_DATABASE_BY_LOWER = (() => {
 function isAbilityGhost(name, inferredClass) {
   const info = ABILITY_DATABASE[name] || ABILITY_DATABASE_BY_LOWER.get(String(name).toLowerCase());
   if (!info) return false;
-  if (info.type && info.type.startsWith('Summon')) return true;
+  // isPetSummon (not a plain `info.type.startsWith('Summon')` check) is what
+  // catches a turret like "Forest's Core": it has TWO charplan entries under
+  // that one name (its own Direct Damage effect, and a "Summon ..." Type for
+  // the pet-summon component), which build-ability-database.py's ambiguous-
+  // Type handling leaves `type` null for — isPetSummon carries the signal
+  // through regardless of what else the name is ambiguous with.
+  if (info.isPetSummon) return true;
   if (inferredClass && info.classes && info.classes.length && !info.classes.includes(inferredClass.name)) return true;
   return false;
 }
