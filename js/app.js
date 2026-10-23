@@ -170,10 +170,30 @@ el('fileInput').addEventListener('change', (e) => {
   e.target.value = ''; // so picking the same file again still fires 'change'
 });
 
-el('btnSample').addEventListener('click', () => {
+el('btnSample').addEventListener('click', async () => {
   const key = el('sampleClassSelect').value;
   const sample = SAMPLE_LOGS[key];
   if (!sample) return;
+  // Real exported sessions (see sample-data.js) are pre-parsed JSON
+  // snapshots fetched on demand, not inlined log text — route them through
+  // the same importer as a user-supplied "Download snapshot" file instead
+  // of ingestTexts (which expects raw chat.log text to run through
+  // parseLogText).
+  if (sample.kind === 'snapshot') {
+    try {
+      const res = await fetch(sample.url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data || data.tool !== 'Chat Gator' || !Array.isArray(data.events)) {
+        throw new Error('unexpected snapshot shape');
+      }
+      ingestSnapshotEvents(data);
+    } catch (err) {
+      console.warn('[chatgator] failed to load sample snapshot', err);
+      alert('Could not load the sample session. If you opened this page directly from a file instead of a web server, that\'s why — sample sessions need to be fetched, which browsers block under file://.');
+    }
+    return;
+  }
   ingestTexts([{ name: `${key}.log`, text: sample.text }]);
 });
 

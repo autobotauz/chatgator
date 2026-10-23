@@ -25,10 +25,13 @@ type/class (and even that one fails silently and harmlessly if it's blocked
 
 1. Open the page (once published to GitHub Pages, or just double-click
    `index.html` on your own computer — it works offline too, except for the
-   optional spell-label enrichment above).
+   optional spell-label enrichment above and the sample session below, both
+   of which need a real fetch and so need the page served over http(s)).
 2. Drag your `chat.log` in, or click **Choose file(s)**. You can drop
    several files at once (e.g. a few sessions) and they'll be merged.
-3. No file handy? Click **Try a sample log** to see it working first.
+3. No file handy? Click **Try a sample log** to see it working first with a
+   real exported session (more get added here over time as real log data
+   comes in).
 4. Use the dropdown at the top to look at **one encounter at a time** (the
    parser automatically splits the log into fights separated by ~45s of
    quiet) or **All combined** for session totals.
