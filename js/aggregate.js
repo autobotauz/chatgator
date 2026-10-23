@@ -420,6 +420,21 @@ export function buildStats(events, playerNameHint) {
   const rpByReason = {};
   const rpPoints = [];
   const rpPointsByReason = {}; // same breakdown as rpByReason, but as a per-source timeline instead of a single total
+  // Bonus-only breakdown, by the free-text reason the "additional N realm
+  // points due to X!" line names: "your realm rank", "your guild's buff",
+  // "your buff", and whatever else the game logs this way (never a fixed
+  // list — any new reason text works here automatically, it just needs a
+  // first log that has it to show up). Reported directly: with three
+  // different bonus sources stacking on one kill, the single combined
+  // "Bonus RP (realm rank)" stat tile (named for the only source anyone had
+  // seen before) was blending a guild buff and a personal buff in under a
+  // label that implied it was realm-rank-only, with no way to tell how much
+  // of the total bonus came from which source. Kept strictly separate from
+  // rpByReason/rpTotal above -- these amounts are already folded into their
+  // paired rp_plain/rp_reason total (see the comment above), so adding them
+  // here too is purely an additional view for display, never summed into
+  // the grand total or the main by-reason breakdown.
+  const rpBonusByReason = {};
   for (const e of events) {
     if (e.type === 'rp_plain' || e.type === 'rp_reason') {
       rpTotal += e.amount;
@@ -429,6 +444,8 @@ export function buildStats(events, playerNameHint) {
       (rpPointsByReason[key] ||= []).push({ clock: e.clock, amount: e.amount });
     } else if (e.type === 'rp_bonus') {
       rpBonusTotal += e.amount;
+      const bonusKey = e.reason || 'Unknown bonus';
+      rpBonusByReason[bonusKey] = (rpBonusByReason[bonusKey] || 0) + e.amount;
     }
   }
 
@@ -587,7 +604,7 @@ export function buildStats(events, playerNameHint) {
       evadeRate: pct(youEvades, totalIncomingAttackAttempts),
     },
     realmPoints: {
-      total: rpTotal, bonusTotal: rpBonusTotal, byReason: rpByReason,
+      total: rpTotal, bonusTotal: rpBonusTotal, byReason: rpByReason, bonusByReason: rpBonusByReason,
       perHour: durationSec ? +(rpTotal / (durationSec / 3600)).toFixed(0) : 0,
       timeline: bucketTimeline(rpPoints, startClock, endClock),
       // Same bucketing (same startClock/endClock/bucket count) as `timeline`

@@ -409,7 +409,7 @@ export function renderRealm(container, stats, ctx) {
   const g = grid(section(container), 4);
   statTile(g, { label: 'Realm points (this view)', value: fmtExact(rp.total) });
   statTile(g, { label: 'RP / hour', value: fmtNum(rp.perHour) });
-  statTile(g, { label: 'Bonus RP (realm rank)', value: fmtExact(rp.bonusTotal) });
+  statTile(g, { label: 'Bonus RP', value: fmtExact(rp.bonusTotal) });
   statTile(g, { label: 'Deathblows', value: fmtExact(stats.kills.deathblows) });
 
   // Same descending-by-total order drives both charts below, and the color
@@ -436,6 +436,31 @@ export function renderRealm(container, stats, ctx) {
   const byCard = card(bySec);
   const items = reasonEntries.map(([label, value]) => ({ label, value }));
   barChart(byCard, { items, colorFn: (item) => colorForReason.get(item.label) });
+
+  // Bonus lines ("You get an additional N realm points due to X!") are
+  // already folded into the kill/assist total above (see aggregate.js's
+  // own comment on rpBonusTotal) and deliberately excluded from
+  // reasonEntries so this breakdown and the main one never double-count —
+  // this is purely a separate view onto where the "Bonus RP" tile's total
+  // actually came from. Reported directly: before bonusByReason existed,
+  // every bonus source (realm rank, a guild buff, a personal buff, ...)
+  // was blended into that one tile with no way to tell them apart, under a
+  // label ("Bonus RP (realm rank)") that was already wrong the moment a
+  // second bonus source showed up in the same log. Shown only when there's
+  // at least one bonus line in this view, so a log with none doesn't get an
+  // empty chart.
+  const bonusEntries = Object.entries(rp.bonusByReason || {}).sort((a, b) => b[1] - a[1]);
+  if (bonusEntries.length) {
+    const bonusSec = section(container);
+    h3(bonusSec, 'Realm point bonuses by source');
+    const bonusCard = card(bonusSec);
+    const bonusItems = bonusEntries.map(([label, value], i) => ({
+      label: label.charAt(0).toUpperCase() + label.slice(1),
+      value,
+      color: seriesColor(i),
+    }));
+    barChart(bonusCard, { items: bonusItems, colorFn: (item) => item.color });
+  }
 
   const dbSec = section(container);
   h3(dbSec, 'Deathblows');
