@@ -51,10 +51,24 @@ entries = defaultdict(list)   # name -> [(cooldown_str, icon, source), ...]
 ignored_dynamic = {}          # name -> sorted list of distinct cooldown strings seen
 
 
+def clean_name(name):
+    # A handful of charplan entries (e.g. the whole Bainshee aura line, all
+    # 6 classes' "Mastery of Stealth") carry a trailing space in their own
+    # "name" field. Using that raw string as a dict key means the lookup
+    # silently never matches anything: the log prints the name WITHOUT the
+    # stray space, every other charplan occurrence of the same ability
+    # (almost always) doesn't have it either, and even the icon/cooldown
+    # values on the mismatched entries look completely normal, so nothing
+    # about this is visible without diffing keys byte-for-byte. Stripped
+    # once, right here, so every lookup and every merge-by-name downstream
+    # (duplicate reconciliation included) sees one consistent key.
+    return name.strip() if isinstance(name, str) else name
+
+
 def record(name, cooldown, icon, source):
     if name is None or cooldown is None:
         return
-    entries[name].append((cooldown, icon, source))
+    entries[clean_name(name)].append((cooldown, icon, source))
 
 
 def extract_recast_delay(attributes):
@@ -79,7 +93,7 @@ for c in data:
 
     # ---- realm abilities (class-level) ----
     for ra in (c.get("realmAbilities") or []):
-        name = ra.get("name")
+        name = clean_name(ra.get("name"))
         icon = ra.get("icon")
         levels = ra.get("levels") or []
         cds = {lvl.get("cooldown") for lvl in levels if lvl.get("cooldown") is not None}

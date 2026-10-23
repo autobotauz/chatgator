@@ -1,5 +1,8 @@
 // ability-cooldowns.js — GENERATED FILE, do not hand-edit.
-// Produced by tools/build-ability-cooldowns.py from a charplan export.
+// Produced by tools/build-ability-cooldowns.py from a charplan export, with
+// a one-time whitespace-key fix applied by tools/fix-ability-name-whitespace.py
+// (see that script's header) — the next real regeneration from a fresh
+// charplan export supersedes this patch.
 // Flat map of ability name -> { cooldownSeconds, cooldown (display string), icon }.
 // `icon` is the numeric icon id from the client's spell-icon atlas; there is no
 // id -> image mapping yet (future work), so the UI just shows the bare id for now.
@@ -314,7 +317,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 15.0,
     "icon": 13037
   },
-  "Avert Magic ": {
+  "Avert Magic": {
     "cooldown": "15s",
     "cooldownSeconds": 15.0,
     "icon": 13132
@@ -1474,7 +1477,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 5.0,
     "icon": 10519
   },
-  "Deflect Magic ": {
+  "Deflect Magic": {
     "cooldown": "15s",
     "cooldownSeconds": 15.0,
     "icon": 13131
@@ -1579,7 +1582,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 15.0,
     "icon": 13139
   },
-  "Destroy Magic ": {
+  "Destroy Magic": {
     "cooldown": "15s",
     "cooldownSeconds": 15.0,
     "icon": 13134
@@ -3149,7 +3152,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 30.0,
     "icon": 13152
   },
-  "Impress Dread ": {
+  "Impress Dread": {
     "cooldown": "30s",
     "cooldownSeconds": 30.0,
     "icon": 13150
@@ -3299,7 +3302,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 30.0,
     "icon": 15197
   },
-  "Intoning Aura ": {
+  "Intoning Aura": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 13604
@@ -3719,7 +3722,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 15.0,
     "icon": 13065
   },
-  "Mesmerizing Glare ": {
+  "Mesmerizing Glare": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 13145
@@ -4069,7 +4072,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 15.0,
     "icon": 13137
   },
-  "Negate Magic ": {
+  "Negate Magic": {
     "cooldown": "15s",
     "cooldownSeconds": 15.0,
     "icon": 13133
@@ -4364,7 +4367,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 30.0,
     "icon": 15199
   },
-  "Oscillating Aura ": {
+  "Oscillating Aura": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 13603
@@ -4584,7 +4587,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 3600,
     "icon": 151
   },
-  "Petrifying Cry ": {
+  "Petrifying Cry": {
     "cooldown": "4:00 min",
     "cooldownSeconds": 240,
     "icon": 13642
@@ -4904,7 +4907,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 15.0,
     "icon": 13035
   },
-  "Resist Magic ": {
+  "Resist Magic": {
     "cooldown": "15s",
     "cooldownSeconds": 15.0,
     "icon": 13130
@@ -4914,7 +4917,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 600,
     "icon": 3046
   },
-  "Resonating Aura ": {
+  "Resonating Aura": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 13602
@@ -4954,7 +4957,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 300,
     "icon": 3041
   },
-  "Reverberating Aura ": {
+  "Reverberating Aura": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 13605
@@ -5184,7 +5187,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 20.0,
     "icon": 13670
   },
-  "Shrill Aura ": {
+  "Shrill Aura": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 13601
@@ -5384,7 +5387,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 600,
     "icon": 3088
   },
-  "Sonorous Aura ": {
+  "Sonorous Aura": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 13605
@@ -6029,7 +6032,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 10.0,
     "icon": 2763
   },
-  "Undulating Aura ": {
+  "Undulating Aura": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 13602
@@ -6044,7 +6047,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 10.0,
     "icon": 4533
   },
-  "Unnerving Bellow ": {
+  "Unnerving Bellow": {
     "cooldown": "3:00 min",
     "cooldownSeconds": 180,
     "icon": 13643
@@ -6099,7 +6102,7 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 60,
     "icon": 12536
   },
-  "Vampiiric Awareness ": {
+  "Vampiiric Awareness": {
     "cooldown": "30s",
     "cooldownSeconds": 30.0,
     "icon": 13110

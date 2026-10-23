@@ -2305,7 +2305,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Parry Buff"
   },
-  "Avert Magic ": {
+  "Avert Magic": {
     "classes": [
       "Vampiir"
     ],
@@ -6759,7 +6759,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": null
   },
-  "Chilling Shriek ": {
+  "Chilling Shriek": {
     "classes": [
       "Bainshee"
     ],
@@ -9915,7 +9915,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Savage Slash Resistance Buff"
   },
-  "Deflect Magic ": {
+  "Deflect Magic": {
     "classes": [
       "Vampiir"
     ],
@@ -10308,7 +10308,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Random Armor Debuff"
   },
-  "Destroy Magic ": {
+  "Destroy Magic": {
     "classes": [
       "Vampiir"
     ],
@@ -21341,7 +21341,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Skills Debuff"
   },
-  "Impress Dread ": {
+  "Impress Dread": {
     "classes": [
       "Vampiir"
     ],
@@ -22173,7 +22173,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Fear"
   },
-  "Intoning Aura ": {
+  "Intoning Aura": {
     "classes": [
       "Bainshee"
     ],
@@ -25900,7 +25900,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": null
   },
-  "Mastery of Stealth ": {
+  "Mastery of Stealth": {
     "classes": [
       "Hunter",
       "Infiltrator",
@@ -26063,7 +26063,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Mesmerize"
   },
-  "Mesmerizing Glare ": {
+  "Mesmerizing Glare": {
     "classes": [
       "Vampiir"
     ],
@@ -28064,7 +28064,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Random Armor Debuff"
   },
-  "Negate Magic ": {
+  "Negate Magic": {
     "classes": [
       "Vampiir"
     ],
@@ -29142,7 +29142,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": null
   },
-  "Oscillating Aura ": {
+  "Oscillating Aura": {
     "classes": [
       "Bainshee"
     ],
@@ -31249,7 +31249,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Mesmerize"
   },
-  "Petrifying Cry ": {
+  "Petrifying Cry": {
     "classes": [
       "Bainshee"
     ],
@@ -34420,7 +34420,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Parry Buff"
   },
-  "Resist Magic ": {
+  "Resist Magic": {
     "classes": [
       "Vampiir"
     ],
@@ -34470,7 +34470,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Direct Damage"
   },
-  "Resonating Aura ": {
+  "Resonating Aura": {
     "classes": [
       "Bainshee"
     ],
@@ -34680,7 +34680,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": null
   },
-  "Reverberating Aura ": {
+  "Reverberating Aura": {
     "classes": [
       "Bainshee"
     ],
@@ -36734,7 +36734,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Bolt"
   },
-  "Shrill Aura ": {
+  "Shrill Aura": {
     "classes": [
       "Bainshee"
     ],
@@ -38122,7 +38122,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": null
   },
-  "Sonorous Aura ": {
+  "Sonorous Aura": {
     "classes": [
       "Bainshee"
     ],
@@ -43810,7 +43810,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Strength Constitution Debuff"
   },
-  "Undulating Aura ": {
+  "Undulating Aura": {
     "classes": [
       "Bainshee"
     ],
@@ -43911,7 +43911,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Nearsight"
   },
-  "Unnerving Bellow ": {
+  "Unnerving Bellow": {
     "classes": [
       "Bainshee"
     ],
@@ -44359,7 +44359,7 @@ export const ABILITY_DATABASE =
     "isHeal": false,
     "type": "Speed Enhancement"
   },
-  "Vampiiric Awareness ": {
+  "Vampiiric Awareness": {
     "classes": [
       "Vampiir"
     ],

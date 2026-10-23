@@ -239,7 +239,7 @@
     "cooldown": "15s",
     "icon": 13037
   },
-  "Avert Magic ": {
+  "Avert Magic": {
     "cooldown": "15s",
     "icon": 13132
   },
@@ -1167,7 +1167,7 @@
     "cooldown": "5s",
     "icon": 10519
   },
-  "Deflect Magic ": {
+  "Deflect Magic": {
     "cooldown": "15s",
     "icon": 13131
   },
@@ -1251,7 +1251,7 @@
     "cooldown": "15s",
     "icon": 13139
   },
-  "Destroy Magic ": {
+  "Destroy Magic": {
     "cooldown": "15s",
     "icon": 13134
   },
@@ -2507,7 +2507,7 @@
     "cooldown": "30s",
     "icon": 13152
   },
-  "Impress Dread ": {
+  "Impress Dread": {
     "cooldown": "30s",
     "icon": 13150
   },
@@ -2627,7 +2627,7 @@
     "cooldown": "30s",
     "icon": 15197
   },
-  "Intoning Aura ": {
+  "Intoning Aura": {
     "cooldown": "5s",
     "icon": 13604
   },
@@ -2963,7 +2963,7 @@
     "cooldown": "15s",
     "icon": 13065
   },
-  "Mesmerizing Glare ": {
+  "Mesmerizing Glare": {
     "cooldown": "5s",
     "icon": 13145
   },
@@ -3243,7 +3243,7 @@
     "cooldown": "15s",
     "icon": 13137
   },
-  "Negate Magic ": {
+  "Negate Magic": {
     "cooldown": "15s",
     "icon": 13133
   },
@@ -3479,7 +3479,7 @@
     "cooldown": "30s",
     "icon": 15199
   },
-  "Oscillating Aura ": {
+  "Oscillating Aura": {
     "cooldown": "5s",
     "icon": 13603
   },
@@ -3655,7 +3655,7 @@
     "cooldown": "1:00 h",
     "icon": 151
   },
-  "Petrifying Cry ": {
+  "Petrifying Cry": {
     "cooldown": "4:00 min",
     "icon": 13642
   },
@@ -3911,7 +3911,7 @@
     "cooldown": "15s",
     "icon": 13035
   },
-  "Resist Magic ": {
+  "Resist Magic": {
     "cooldown": "15s",
     "icon": 13130
   },
@@ -3919,7 +3919,7 @@
     "cooldown": "10:00 min",
     "icon": 3046
   },
-  "Resonating Aura ": {
+  "Resonating Aura": {
     "cooldown": "5s",
     "icon": 13602
   },
@@ -3951,7 +3951,7 @@
     "cooldown": "5:00 min",
     "icon": 3041
   },
-  "Reverberating Aura ": {
+  "Reverberating Aura": {
     "cooldown": "5s",
     "icon": 13605
   },
@@ -4135,7 +4135,7 @@
     "cooldown": "20s",
     "icon": 13670
   },
-  "Shrill Aura ": {
+  "Shrill Aura": {
     "cooldown": "5s",
     "icon": 13601
   },
@@ -4295,7 +4295,7 @@
     "cooldown": "10:00 min",
     "icon": 3088
   },
-  "Sonorous Aura ": {
+  "Sonorous Aura": {
     "cooldown": "5s",
     "icon": 13605
   },
@@ -4811,7 +4811,7 @@
     "cooldown": "10s",
     "icon": 2763
   },
-  "Undulating Aura ": {
+  "Undulating Aura": {
     "cooldown": "5s",
     "icon": 13602
   },
@@ -4823,7 +4823,7 @@
     "cooldown": "10s",
     "icon": 4533
   },
-  "Unnerving Bellow ": {
+  "Unnerving Bellow": {
     "cooldown": "3:00 min",
     "icon": 13643
   },
@@ -4867,7 +4867,7 @@
     "cooldown": "1:00 min",
     "icon": 12536
   },
-  "Vampiiric Awareness ": {
+  "Vampiiric Awareness": {
     "cooldown": "30s",
     "icon": 13110
   },

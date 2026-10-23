@@ -101,12 +101,29 @@ def attrs_dict(attributes):
     return d
 
 
+def clean_name(name):
+    # A handful of charplan entries (e.g. the whole Bainshee aura line —
+    # Shrill/Undulating/Resonating/Oscillating/Intoning/Reverberating/
+    # Sonorous Aura — and all 6 classes' "Mastery of Stealth") carry a
+    # trailing space in their own "name" field. Using that raw string as a
+    # dict key means the entry silently never matches anything: the log
+    # prints the name WITHOUT the stray space, so every lookup from
+    # parser.js/ui.js/aggregate.js misses, with nothing about the entry
+    # itself (icon, attributes, Type) looking wrong — reported directly:
+    # "Resonating Aura" (Type: Direct Damage, Damage: 110) was in this exact
+    # export all along, just invisibly keyed as "Resonating Aura ". Stripped
+    # once, right here, so every lookup and every merge-by-name downstream
+    # sees one consistent key — same fix as build-ability-cooldowns.py's
+    # own clean_name, which has the identical problem for the same reason.
+    return name.strip() if isinstance(name, str) else name
+
+
 # name -> accumulated info while walking the export
 by_name = defaultdict(lambda: {"types": set(), "has_damage_attr": False, "classes": set(), "has_spec_data": False})
 
 
 def walk_skill(sk, class_name):
-    name = sk.get("name")
+    name = clean_name(sk.get("name"))
     if name:
         a = attrs_dict(sk.get("attributes"))
         t = a.get("Type")
@@ -125,7 +142,7 @@ for c in data:
     class_name = c.get("name")
 
     for ra in (c.get("realmAbilities") or []):
-        ra_name = ra.get("name")
+        ra_name = clean_name(ra.get("name"))
         if not ra_name:
             continue
         by_name[ra_name]["classes"].add(class_name)
