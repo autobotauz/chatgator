@@ -61,6 +61,74 @@ export function segmentEncounters(events) {
   }));
 }
 
+// ---------------------------------------------------------------------------
+// Checkpoints — reported directly: a /stats block is routinely left over
+// from a PREVIOUS character in the same chat.log (the player forgot to
+// clear it before switching alts, or just never has), and before this, the
+// whole file was blindly treated as one player's session — "Statistics for
+// <name> this Session:" only ever decided a DISPLAY name (see buildStats'
+// own playerName, which keeps the FIRST one seen and ignores every later
+// one), never where one player's data ends and another's begins. A /bg log
+// full of other players' combat text made this worse: there was no signal
+// at all for "this chunk of the file isn't really about the name shown."
+//
+// A checkpoint is the span of events from one "Statistics for X this
+// Session:" header up to (but not including) the next one anywhere in the
+// file, whoever it names — including the common case of just one name
+// repeated (re-running /stats for the same character periodically, which
+// must keep behaving exactly like today: one continuous session, nothing
+// to pick). The FIRST checkpoint also absorbs every event before the
+// file's first header at all, so a log that starts mid-fight and only
+// types /stats later still attributes that leading play to the right name
+// -- matching today's behavior for the common single-header case exactly.
+// A file with no header anywhere returns a single checkpoint with
+// player: null, covering everything -- today's behavior, unchanged.
+//
+// playerIndex numbers each checkpoint among that SAME player's own
+// checkpoints only (not a global count), so "player1, player1, player1,
+// player3, player1" yields player1's checkpoints 1/2/3/4 (4th skips right
+// over player3's single checkpoint 1 in between) and player3's checkpoint
+// 1 -- exactly the "playerName_checkpointN" scheme asked for, including the
+// case where the same name reappears non-contiguously after someone else's
+// checkpoint sits in the middle (switched back to that alt later, or just
+// ran "/stats player <name>" to peek at a groupmate's totals mid-session --
+// the log can't tell those two apart, and doesn't need to: either way, the
+// right fix is splitting there, not guessing why).
+// ---------------------------------------------------------------------------
+export function segmentCheckpoints(events) {
+  const headerIdxs = [];
+  events.forEach((e, i) => { if (e.type === 'stats_header') headerIdxs.push(i); });
+
+  if (!headerIdxs.length) {
+    return [{
+      id: 0, player: null, playerIndex: 1,
+      startClock: events[0]?.clock ?? null,
+      endClock: events[events.length - 1]?.clock ?? null,
+      events,
+    }];
+  }
+
+  const perPlayerCount = new Map();
+  const checkpoints = [];
+  for (let k = 0; k < headerIdxs.length; k++) {
+    const sliceStart = k === 0 ? 0 : headerIdxs[k];
+    const sliceEnd = k + 1 < headerIdxs.length ? headerIdxs[k + 1] : events.length;
+    const slice = events.slice(sliceStart, sliceEnd);
+    const player = events[headerIdxs[k]].player;
+    const playerIndex = (perPlayerCount.get(player) || 0) + 1;
+    perPlayerCount.set(player, playerIndex);
+    checkpoints.push({
+      id: k,
+      player,
+      playerIndex,
+      startClock: slice[0]?.clock ?? null,
+      endClock: slice[slice.length - 1]?.clock ?? null,
+      events: slice,
+    });
+  }
+  return checkpoints;
+}
+
 // "Last N distinct messages" per the user's call: a leader often spams the
 // same /bg center line several times in a row (or across a whole fight), so
 // showing every raw occurrence would just repeat one message instead of

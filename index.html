@@ -69,6 +69,12 @@
 
     <div class="encounter-bar">
       <strong id="characterName">—</strong>
+      <span class="select-wrap" id="playerSelectWrap" hidden title="More than one character name showed up via /stats in this log — pick which one to view.">
+        <select id="playerSelect"></select>
+      </span>
+      <span class="select-wrap" id="checkpointSelectWrap" hidden title="This character ran /stats more than once in this log — each run starts a new checkpoint, in case the log wasn't reset between play sessions.">
+        <select id="checkpointSelect"></select>
+      </span>
       <select id="encounterSelect"></select>
       <span class="meta" id="encounterMeta"></span>
       <span class="meta" id="officialStatsNote"></span>

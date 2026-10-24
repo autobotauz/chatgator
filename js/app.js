@@ -1,5 +1,5 @@
 import { parseLogText } from './parser.js';
-import { buildStats, segmentEncounters, getBgBroadcasts } from './aggregate.js';
+import { buildStats, segmentEncounters, segmentCheckpoints, getBgBroadcasts } from './aggregate.js';
 import { renderers } from './ui.js';
 import { loadSkillIndex } from './skills.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
@@ -13,8 +13,30 @@ const el = (id) => document.getElementById(id);
 const state = {
   rawEvents: [],       // merged events from all loaded files
   unmatched: [],
-  encounters: [],       // from segmentEncounters(rawEvents)
-  scope: 'all',          // 'all' or encounter id
+  // Checkpoints — see aggregate.js's segmentCheckpoints for the full
+  // rationale. Always derived from the FULL rawEvents (every /stats header
+  // in the file, whoever it names), recomputed any time rawEvents changes.
+  checkpoints: [],
+  // Which player's checkpoints are currently being viewed. null is a real,
+  // meaningful value here (the "no /stats header anywhere in this file"
+  // case) — not "not yet chosen". Defaults to the most-recently-active
+  // player (the last checkpoint's own name) every time checkpoints are
+  // rebuilt from a changed player set, which for the overwhelmingly common
+  // single-name-or-no-/stats-at-all file is also the ONLY player, so this
+  // never surfaces as a visible choice in that case (see buildPlayerSelect).
+  playerScope: null,
+  // 'all' (every checkpoint belonging to playerScope, concatenated in file
+  // order — which can be non-contiguous in time when another player's
+  // checkpoint sits in between two of this one's own, see segmentCheckpoints)
+  // or a specific checkpoint id scoped to playerScope.
+  checkpointScope: 'all',
+  // The resolved event list for the current player+checkpoint selection —
+  // what encounters, and ultimately buildStats, actually run against.
+  // Recomputed by refreshScopedEncounters() any time playerScope or
+  // checkpointScope changes (or rawEvents itself changes).
+  scopedEvents: [],
+  encounters: [],       // from segmentEncounters(scopedEvents) — see above
+  scope: 'all',          // 'all' or encounter id, WITHIN the current player+checkpoint scope
   activeTab: 'overview',
   skillMap: {},
   watcher: null,
@@ -209,7 +231,9 @@ function startNewSession() {
   el('bgTicker').hidden = true;
   el('cooldownTracker').hidden = true;
   el('lastUpdated').hidden = true;
-  state.rawEvents = []; state.unmatched = []; state.encounters = []; state.scope = 'all'; state.isSnapshot = false;
+  state.rawEvents = []; state.unmatched = [];
+  state.checkpoints = []; state.playerScope = null; state.checkpointScope = 'all'; state.scopedEvents = [];
+  state.encounters = []; state.scope = 'all'; state.isSnapshot = false;
   state.liveSync = null;
   state.parseResumeState = null;
   state.lastUpdatedAt = null;
@@ -277,9 +301,9 @@ function ingestSnapshotEvents(data) {
   stopWatching();
   state.rawEvents = data.events.slice().sort((a, b) => (a.clock ?? 0) - (b.clock ?? 0));
   state.unmatched = []; // the original log's unmatched lines weren't carried in the export
-  state.encounters = segmentEncounters(state.rawEvents);
   state.scope = 'all';
   state.isSnapshot = true;
+  refreshCheckpointsAndScope();
 
   el('dropzoneSection').hidden = true;
   el('appMain').hidden = false;
@@ -290,6 +314,8 @@ function ingestSnapshotEvents(data) {
     ? `Imported snapshot · exported ${new Date(data.exportedAt).toLocaleString()}${data.player ? ` · ${data.player}` : ''}`
     : 'Imported snapshot';
 
+  buildPlayerSelect();
+  buildCheckpointSelect();
   buildEncounterSelect();
   renderActiveTab();
 
@@ -323,11 +349,11 @@ function ingestTexts(fileTexts) {
   allEvents.sort((a, b) => (a.clock ?? 0) - (b.clock ?? 0));
   state.rawEvents = allEvents;
   state.unmatched = allUnmatched;
-  state.encounters = segmentEncounters(allEvents);
   state.scope = 'all';
   state.isSnapshot = false;
   state.parseResumeState = resumeState;
   state.lastUpdatedAt = Date.now();
+  refreshCheckpointsAndScope();
 
   // If we're actively watching a live log file, anchor the cooldown
   // tracker's live-clock sync point to the newest line we just read, paired
@@ -344,6 +370,8 @@ function ingestTexts(fileTexts) {
   el('btnDownloadSnapshot').hidden = false;
   el('snapshotPill').hidden = true;
 
+  buildPlayerSelect();
+  buildCheckpointSelect();
   buildEncounterSelect();
   renderActiveTab();
 
@@ -373,17 +401,142 @@ function ingestAppend(chunkText) {
     state.unmatched.push(...unmatched);
     if (state.unmatched.length > 500) state.unmatched.length = 500; // same cap parseLogText applies per call
   }
-  state.encounters = segmentEncounters(state.rawEvents);
   state.lastUpdatedAt = Date.now();
   advanceLiveSync(lastKnownClock(state.rawEvents));
+  refreshCheckpointsAndScope();
 
+  buildPlayerSelect();
+  buildCheckpointSelect();
   buildEncounterSelect();
   renderActiveTab();
 }
 
 // ---------------------------------------------------------------------------
-// Encounter picker
+// Player / checkpoint / encounter pickers
+//
+// Three nested levels, outermost first: a PLAYER (a name any "Statistics
+// for X this Session:" block in the file named — see aggregate.js's
+// segmentCheckpoints for exactly how a changed name splits the file), a
+// CHECKPOINT (one specific /stats block belonging to that player, or "all"
+// of that player's checkpoints combined), and an ENCOUNTER (unchanged from
+// before this feature — a single fight within whatever player+checkpoint
+// scope is currently selected, or "all" of them combined). Each level's
+// dropdown is rebuilt top-down whenever the level above it changes, and
+// state.scopedEvents/state.encounters always reflect the fully-resolved
+// player+checkpoint scope — buildStats and playedDurationMs etc. never see
+// the raw whole-file event list directly, only this resolved view of it.
 // ---------------------------------------------------------------------------
+
+// Called any time state.rawEvents changes (new file, snapshot import, or a
+// live-watch append). Rebuilds the checkpoint list and, only when the
+// current playerScope no longer exists in it (a fresh load, or — in
+// principle — a live file somehow losing a name, which never really
+// happens since a watched file only grows), re-defaults to the most
+// recently active player: the last checkpoint's own name. That default
+// rule is deliberately "most recent", not "first" or "most data", since
+// the whole point of this feature is usually "which character am I
+// playing *right now*" — and it's also why a live-watch append, which can
+// only ever add a NEWER checkpoint, never yanks the view away from a
+// player the user deliberately selected earlier (their choice still
+// exists in the rebuilt list, so the "no longer exists" re-default never
+// fires for them).
+function refreshCheckpointsAndScope() {
+  state.checkpoints = segmentCheckpoints(state.rawEvents);
+  const knownPlayers = new Set(state.checkpoints.map(cp => cp.player));
+  if (!knownPlayers.has(state.playerScope)) {
+    state.playerScope = state.checkpoints.length
+      ? state.checkpoints[state.checkpoints.length - 1].player
+      : null;
+    state.checkpointScope = 'all';
+  }
+  const cpsForPlayer = state.checkpoints.filter(cp => cp.player === state.playerScope);
+  if (state.checkpointScope !== 'all' && !cpsForPlayer.some(cp => String(cp.id) === String(state.checkpointScope))) {
+    state.checkpointScope = 'all';
+  }
+  refreshScopedEncounters();
+}
+
+// The events for the current player+checkpoint selection, then re-derives
+// state.encounters from exactly that (never from the raw whole-file list),
+// preserving the current encounter selection if it's still valid and
+// falling back to "all" otherwise — so switching player/checkpoint, or a
+// live-watch append adding more lines to the SAME selection, never yanks
+// the view back to "all" out from under someone looking at one specific
+// fight (the "continue from where you left off" ask).
+function refreshScopedEncounters() {
+  const cpsForPlayer = state.checkpoints.filter(cp => cp.player === state.playerScope);
+  state.scopedEvents = state.checkpointScope === 'all'
+    ? cpsForPlayer.flatMap(cp => cp.events)
+    : (cpsForPlayer.find(cp => String(cp.id) === String(state.checkpointScope))?.events
+       || cpsForPlayer.flatMap(cp => cp.events));
+  state.encounters = segmentEncounters(state.scopedEvents);
+  if (state.scope !== 'all' && !state.encounters.some(e => String(e.id) === String(state.scope))) {
+    state.scope = 'all';
+  }
+}
+
+function buildPlayerSelect() {
+  const wrap = el('playerSelectWrap');
+  const sel = el('playerSelect');
+  // First-appearance order (by each player's first checkpoint), not
+  // alphabetical or most-active — reads naturally as "who showed up when".
+  const seen = new Set();
+  const players = [];
+  for (const cp of state.checkpoints) {
+    if (!seen.has(cp.player)) { seen.add(cp.player); players.push(cp.player); }
+  }
+  sel.innerHTML = '';
+  for (const p of players) {
+    const opt = document.createElement('option');
+    opt.value = p == null ? '__unknown__' : p;
+    opt.textContent = p == null ? '(name not found)' : p;
+    sel.appendChild(opt);
+  }
+  sel.value = state.playerScope == null ? '__unknown__' : state.playerScope;
+  // Only ever shows up once a SECOND player name is actually seen — a
+  // typical single-character log (the vast majority) looks exactly like it
+  // did before this feature existed.
+  wrap.hidden = players.length <= 1;
+  sel.onchange = () => {
+    state.playerScope = sel.value === '__unknown__' ? null : sel.value;
+    state.checkpointScope = 'all';
+    refreshScopedEncounters();
+    buildCheckpointSelect();
+    buildEncounterSelect();
+    renderActiveTab();
+  };
+}
+
+function buildCheckpointSelect() {
+  const wrap = el('checkpointSelectWrap');
+  const sel = el('checkpointSelect');
+  const cps = state.checkpoints.filter(cp => cp.player === state.playerScope);
+  sel.innerHTML = '';
+  const optAll = document.createElement('option');
+  optAll.value = 'all';
+  optAll.textContent = `All checkpoints (${cps.length})`;
+  sel.appendChild(optAll);
+  cps.forEach((cp) => {
+    const opt = document.createElement('option');
+    opt.value = String(cp.id);
+    const time = cp.startClock != null ? fmtClock(cp.startClock, true) : '?';
+    opt.textContent = `Checkpoint ${cp.playerIndex} — ${time}`;
+    sel.appendChild(opt);
+  });
+  sel.value = state.checkpointScope;
+  // Only shows up once the selected player actually has a second
+  // checkpoint — re-running /stats once for the same character (by far the
+  // most common reason a /stats block exists at all) stays exactly as
+  // simple as it always was.
+  wrap.hidden = cps.length <= 1;
+  sel.onchange = () => {
+    state.checkpointScope = sel.value;
+    refreshScopedEncounters();
+    buildEncounterSelect();
+    renderActiveTab();
+  };
+}
+
 function buildEncounterSelect() {
   const sel = el('encounterSelect');
   sel.innerHTML = '';
@@ -402,7 +555,12 @@ function buildEncounterSelect() {
     opt.textContent = `#${i + 1} — ${time} (${durationLabel(enc.durationMs)})`;
     sel.appendChild(opt);
   });
-  sel.value = 'all';
+  // Preserve the current selection across a rebuild (a live-watch append
+  // rebuilds this on every poll) if it's still a valid encounter id in the
+  // new list, instead of always snapping back to "all" — same
+  // continue-where-you-left-off reasoning as refreshScopedEncounters above.
+  sel.value = state.encounters.some(e => String(e.id) === String(state.scope)) ? String(state.scope) : 'all';
+  if (sel.value === 'all') state.scope = 'all';
   sel.onchange = () => { state.scope = sel.value; renderActiveTab(); };
 }
 
@@ -441,10 +599,19 @@ function playedDurationMs(events) {
   return Math.max(1000, ms);
 }
 
+// Everything here runs against state.scopedEvents (the resolved
+// player+checkpoint selection — see refreshScopedEncounters), never the raw
+// whole-file state.rawEvents directly, so a file covering more than one
+// character or more than one /stats-separated play session never blends
+// another player's (or another checkpoint's) numbers into what's shown.
+// state.playerScope is passed explicitly as buildStats' hint instead of
+// buildStats inferring it from whatever /stats header it sees first — see
+// aggregate.js's buildStats for why that first-wins default is wrong once a
+// file can contain more than one name.
 function currentStats() {
   if (state.scope === 'all') {
-    const stats = buildStats(state.rawEvents, null);
-    // DPS/HPS over the *full* file span (which can include multi-day idle
+    const stats = buildStats(state.scopedEvents, state.playerScope);
+    // DPS/HPS over the *full* scoped span (which can include multi-day idle
     // gaps between sessions) is meaningless, so recompute those rates
     // against the sum of actual encounter time instead.
     const activeMs = state.encounters.reduce((a, e) => a + e.durationMs, 0) || stats.meta.durationMs;
@@ -453,19 +620,13 @@ function currentStats() {
     stats.damageIn.dtps = +(stats.damageIn.total / activeSec).toFixed(1);
     stats.healOut.hps = +(stats.healOut.total / activeSec).toFixed(1);
     stats.meta.activeDurationMs = activeMs;
-    const playedSec = playedDurationMs(state.rawEvents) / 1000;
+    const playedSec = playedDurationMs(state.scopedEvents) / 1000;
     stats.realmPoints.perHour = +(stats.realmPoints.total / (playedSec / 3600)).toFixed(0);
     return stats;
   }
   const enc = state.encounters.find(e => String(e.id) === String(state.scope));
-  if (!enc) return buildStats(state.rawEvents, null);
-  return buildStats(enc.events, playerNameGuess());
-}
-
-function playerNameGuess() {
-  // reuse whatever name any /stats block in the whole file reported
-  const full = buildStats(state.rawEvents, null);
-  return full.meta.playerName;
+  if (!enc) return buildStats(state.scopedEvents, state.playerScope);
+  return buildStats(enc.events, state.playerScope);
 }
 
 // ---------------------------------------------------------------------------
@@ -493,8 +654,14 @@ function renderActiveTab() {
   // confident, so appending it here is never a guess shown as a fact.
   const classSuffix = stats.meta.inferredClass ? ` (${stats.meta.inferredClass.name})` : '';
   el('characterName').textContent = stats.meta.playerName ? `👤 ${stats.meta.playerName}${classSuffix}` : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
+  // "the whole file" is only accurate when there's nothing to scope away —
+  // a single player, no /stats-separated checkpoints. Once either kind of
+  // scoping is actually narrowing the view, say so instead of overclaiming.
+  const isFullFile = state.checkpointScope === 'all' &&
+    new Set(state.checkpoints.map(cp => cp.player)).size <= 1;
+  const totalsLabel = isFullFile ? 'Totals across the whole file' : 'Totals for this selection';
   const encLabel = state.scope === 'all'
-    ? `Totals across the whole file · DPS/HPS use ${durationLabel(stats.meta.activeDurationMs || stats.meta.durationMs)} of active time`
+    ? `${totalsLabel} · DPS/HPS use ${durationLabel(stats.meta.activeDurationMs || stats.meta.durationMs)} of active time`
     : `Single encounter · ${durationLabel(stats.meta.durationMs)}`;
   el('encounterMeta').textContent = encLabel;
   el('officialStatsNote').textContent = stats.meta.latestSnapshot ? '· /stats snapshot available on Overview' : '';
@@ -503,7 +670,7 @@ function renderActiveTab() {
   const renderer = renderers[state.activeTab];
   if (renderer) {
     const scopeEventCount = state.scope === 'all'
-      ? state.rawEvents.length
+      ? state.scopedEvents.length
       : (state.encounters.find(e => String(e.id) === String(state.scope)) || { events: [] }).events.length;
     renderer(panel, stats, {
       skillMap: state.skillMap,
@@ -902,18 +1069,35 @@ function backupTimestamp() {
 function downloadSnapshot() {
   if (!state.rawEvents.length) return;
   const stats = currentStats();
-  const scopeLabel = state.scope === 'all'
+  const encounterLabel = state.scope === 'all'
     ? 'all encounters combined'
     : (() => {
         const enc = state.encounters.find(e => String(e.id) === String(state.scope));
         return enc ? `encounter starting ${fmtClock(enc.start, true)}` : String(state.scope);
       })();
+  // Mention the player/checkpoint scope too whenever it's actually narrowing
+  // anything — a file with only one player and no /stats-separated
+  // checkpoints (by far the common case) keeps the exact label this always
+  // had, rather than a name/checkpoint clause nobody asked to see.
+  const cpsForPlayer = state.checkpoints.filter(cp => cp.player === state.playerScope);
+  const multiplePlayers = new Set(state.checkpoints.map(cp => cp.player)).size > 1;
+  const checkpointLabel = state.checkpointScope === 'all'
+    ? null
+    : (() => {
+        const cp = cpsForPlayer.find(c => String(c.id) === String(state.checkpointScope));
+        return cp ? `checkpoint ${cp.playerIndex}` : null;
+      })();
+  const scopeParts = [];
+  if (multiplePlayers) scopeParts.push(state.playerScope == null ? '(name not found)' : state.playerScope);
+  if (checkpointLabel) scopeParts.push(checkpointLabel);
+  scopeParts.push(encounterLabel);
+  const scopeLabel = scopeParts.join(' · ');
   // The events for whatever scope is currently selected — this is what lets
   // someone else's upload of this file reconstruct the full session (encounter
   // switching, sortable tables, everything), not just a flat summary.
   const scopeEvents = state.scope === 'all'
-    ? state.rawEvents
-    : (state.encounters.find(e => String(e.id) === String(state.scope))?.events || state.rawEvents);
+    ? state.scopedEvents
+    : (state.encounters.find(e => String(e.id) === String(state.scope))?.events || state.scopedEvents);
   const snapshot = {
     tool: 'Chat Gator',
     format: 'chatgator-session-v1',
