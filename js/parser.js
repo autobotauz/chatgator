@@ -170,12 +170,30 @@ const RULES = [
   ['incoming_extra', /^(.+?) does (\d+) extra damage to you!$/, m => ({ attacker: m[1], dmg: +m[2] })],
 
   // ---- healing -------------------------------------------------------------
+  // The real crit-bonus line, confirmed directly against a healer's own
+  // chat.log, carries NO target at all and uses completely different
+  // grammar from a melee crit line: "Your heal criticals for an extra N
+  // amount of hit points! (Crit Chance: N%)" — not "You critically heal X
+  // for an additional N hit points!" (that phrasing never matched any real
+  // line; every heal crit in a reported log was silently falling through
+  // to `unmatched`, which is why the UI always showed 0 crits / 0% crit
+  // rate for every heal spell despite the raw log clearly showing them).
+  // "heal" is swapped for "spreadheal" when the cast was a group/AE heal
+  // that spreads overflow healing onto other injured targets (e.g. "Gift
+  // of the Host") — same shape otherwise. This line carries its own
+  // spellName via the same activeHealName/pendingCastName window used for
+  // heal_out below (see the main loop), since by the time it's seen we're
+  // already inside that window; it has no target of its own, so the main
+  // loop also fills in `target` from the most recently healed target —
+  // see `lastHealTarget` there for the one case (a spreadheal's bonus line
+  // printing BEFORE any of that cast's own heal_out lines) where that's a
+  // best-effort guess rather than exact.
+  ['heal_out_crit', /^Your (?:heal|spreadheal) criticals for an extra (\d+) amount of hit points!?(?:\s*\(Crit Chance:\s*([\d.]+)%\))?$/,
+    m => ({ amount: +m[1], chance: m[2] ? parseFloat(m[2]) : null })],
   // "You heal yourself for N hit points." ends in a period and names
   // "yourself" instead of a target, unlike every other heal_out line (which
   // ends "!" and names someone else) — accept both terminators like heal_in
   // already does, and normalize "yourself" to a clean "You" label.
-  ['heal_out_crit', /^You critical(?:ly)? heal (.+?) for an additional (\d+) hit points?\.?!?$/,
-    m => ({ target: m[1] === 'yourself' ? 'You' : m[1], amount: +m[2] })],
   ['heal_out', /^You heal (.+?) for (\d+) hit points?\.?!?$/,
     m => ({ target: m[1] === 'yourself' ? 'You' : m[1], amount: +m[2] })],
   ['heal_in', /^(.+?) heals you for (\d+) hit points?\.?!?$/, m => ({ healer: m[1], amount: +m[2] })],
@@ -833,6 +851,16 @@ export function parseLogText(rawText, resume) {
   // starts a fresh one.
   const HEAL_BURST_WINDOW_MS = 2500;
   let activeHealName = resume?.activeHealName ?? null, activeHealAt = resume?.activeHealAt ?? -Infinity;
+  // heal_out_crit's own line (see its rule above) never names a target —
+  // only heal_out does. Track whoever was most recently healed so the crit
+  // bonus can still be attributed to someone instead of landing with an
+  // undefined target. Exact for the overwhelmingly common case (the crit
+  // line follows the heal_out it belongs to, same tick); a best-effort
+  // guess only for a spread-heal's bonus line, which the game prints
+  // BEFORE that cast's own heal_out lines and which conceptually spreads
+  // across more than one recipient anyway — there's no single "right"
+  // target to blame it on in that case either way.
+  let lastHealTarget = resume?.lastHealTarget ?? null;
 
   for (let li = 0; li < lines.length; li++) {
     const raw = lines[li];
@@ -977,6 +1005,12 @@ export function parseLogText(rawText, resume) {
           payload.spellName = activeHealName;
           activeHealAt = clockMs; // still resolving — extend the window
         }
+        if (type === 'heal_out') {
+          lastHealTarget = payload.target;
+        } else if (!payload.target) {
+          // heal_out_crit's own regex never captures one — see above.
+          payload.target = lastHealTarget || 'Unknown';
+        }
       } else if (type === 'cc_landed') {
         // A pending pet-cast ("The X casts a spell!") only tells us *that*
         // X cast something, not what it does or who it hit — so when the
@@ -1027,7 +1061,7 @@ export function parseLogText(rawText, resume) {
       pendingCastName, pendingCastAt,
       pendingEffectName, pendingEffectAt, pendingEffectIsPet,
       activeDotName, activeDotTarget, activeDotAt,
-      activeHealName, activeHealAt,
+      activeHealName, activeHealAt, lastHealTarget,
     },
   };
 }
