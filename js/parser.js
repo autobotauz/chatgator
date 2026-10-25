@@ -25,6 +25,7 @@
 // what the date was.
 
 import { ABILITY_DATABASE } from './ability-database.js';
+import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
 
 const LINE_RE = /^\[(\d{2}):(\d{2}):(\d{2})\]\s?(.*)$/;
 const OPEN_RE = /^\*\*\*\s*Chat Log Opened:\s*(.+)$/;
@@ -763,25 +764,30 @@ function isSelfTargetingPetCast(target, pendingEffectIsPet, pendingEffectName) {
   return bare === String(pendingEffectName).toLowerCase();
 }
 
-// Is `name` positively confirmed, by ABILITY_DATABASE, to be INCAPABLE of
-// the thing being attributed to it? Used right before crediting a pending
-// cast with a nearby unnamed damage/heal result line (see the melee_plain/
-// heal_out branches below) — the one case this exists to catch is a CC/
-// debuff/buff spell (no damage or heal component at all) sitting
-// immediately before a damage/heal line from something else entirely.
-// Deliberately permissive by construction: a name ABILITY_DATABASE doesn't
-// recognize at all returns false from *both* calls below (never blocks),
-// same as a name whose damage/heal capability wasn't confidently resolved
-// at build time — see that file's header for exactly when isDamage/isHeal
-// are set. A gap in the data can only ever fail to catch a bug this way,
-// never block a real attribution.
+// Is `name` positively confirmed, by ABILITY_DATABASE and/or
+// CL_ABILITY_DATABASE (a champion-level ability can share a name with a
+// class spell — e.g. "Onslaught" — so both are always consulted, never just
+// one), to be INCAPABLE of the thing being attributed to it? Used right
+// before crediting a pending cast with a nearby unnamed damage/heal result
+// line (see the melee_plain/heal_out branches below) — the one case this
+// exists to catch is a CC/debuff/buff spell (no damage or heal component at
+// all) sitting immediately before a damage/heal line from something else
+// entirely. Deliberately permissive by construction: a name neither
+// database recognizes at all returns false from *both* calls below (never
+// blocks), same as a name whose damage/heal capability wasn't confidently
+// resolved at build time — see each file's header for exactly when
+// isDamage/isHeal are set. Only blocks when EVERY database that has an
+// entry for this name agrees it can't do the thing — one source saying
+// "yes it can" is enough to never block, same OR-permissive rule used
+// everywhere else this data is consulted. A gap in the data can only ever
+// fail to catch a bug this way, never block a real attribution.
 function confirmedCannotDamage(name) {
-  const info = ABILITY_DATABASE[name];
-  return !!info && info.isDamage === false;
+  const entries = [ABILITY_DATABASE[name], CL_ABILITY_DATABASE[name]].filter(Boolean);
+  return entries.length > 0 && entries.every(info => info.isDamage === false);
 }
 function confirmedCannotHeal(name) {
-  const info = ABILITY_DATABASE[name];
-  return !!info && info.isHeal === false;
+  const entries = [ABILITY_DATABASE[name], CL_ABILITY_DATABASE[name]].filter(Boolean);
+  return entries.length > 0 && entries.every(info => info.isHeal === false);
 }
 
 // `resume`, when given, is the `state` object returned by an earlier call —

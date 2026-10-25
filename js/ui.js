@@ -6,6 +6,7 @@
 import { statTile, barChart, legend, timelineChart, fmtNum, fmtExact, fmtClock, seriesColor } from './charts.js';
 import { describeSkill } from './skills.js';
 import { ABILITY_DATABASE } from './ability-database.js';
+import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
 
 function clear(el) { el.innerHTML = ''; }
 function h3(el, text) { const h = document.createElement('h3'); h.textContent = text; el.appendChild(h); }
@@ -524,7 +525,16 @@ const ABILITY_DATABASE_BY_LOWER = (() => {
 //      applied when inferredClass is non-null, so an unconfident/unknown
 //      class guess changes nothing — same permissive-by-default rule as
 //      everywhere else this database is consulted.
+//
+// Checked FIRST, before any of the above: is `name` a champion-level
+// ability (CL_ABILITY_DATABASE)? CL abilities are trainable by any class
+// once CL is high enough, so one can never be a cross-class ghost — and a
+// handful of them happen to share a name with an unrelated class spell in
+// ABILITY_DATABASE (e.g. "Onslaught" is also Armsman/Paladin's own style),
+// which would otherwise wrongly ghost a real CL-ability row whenever the
+// inferred class isn't one of that coincidental name's classes.
 function isAbilityGhost(name, inferredClass) {
+  if (CL_ABILITY_DATABASE[name]) return false;
   const info = ABILITY_DATABASE[name] || ABILITY_DATABASE_BY_LOWER.get(String(name).toLowerCase());
   if (!info) return false;
   // isPetSummon (not a plain `info.type.startsWith('Summon')` check) is what
@@ -555,11 +565,28 @@ function isAbilityGhost(name, inferredClass) {
 //      only when ABILITY_DATABASE positively rules it out, same
 //      permissive-by-default rule as the parser-level fix — never
 //      corrected on a name we have no data for at all.
+//   4. CL_ABILITY_DATABASE (champion-level abilities) is consulted anywhere
+//      ABILITY_DATABASE would otherwise come up empty — it has no `classes`
+//      list (not class-specific at all, see that file's header), so it's
+//      labelled "Champion Ability" in its place rather than a class name.
+//      Only reached when ABILITY_DATABASE has no entry at all for the name:
+//      a handful of CL names happen to collide with an unrelated class
+//      spell/style of the same name (e.g. "Onslaught" is also Armsman/
+//      Paladin's own style) — those still display with the class-side
+//      label here, since there's no way to tell which one a given cast
+//      actually was. isAbilityGhost above is the one place this collision
+//      is handled unconditionally regardless of which side "wins" the
+//      label, since silently dropping the row is the only mistake that
+//      can't be shrugged off as a cosmetic label pick.
 function roleOrType(name, naiveRole, skillMap) {
   const info = ABILITY_DATABASE[name];
+  const clInfo = CL_ABILITY_DATABASE[name];
   if (info && info.type) {
     const bits = [info.type, info.classes && info.classes.length ? info.classes.join('/') : null].filter(Boolean);
     return bits.join(' · ');
+  }
+  if (!info && clInfo && clInfo.type) {
+    return [clInfo.type, 'Champion Ability'].join(' · ');
   }
   const live = describeSkill(skillMap, name);
   if (live) return live;
@@ -573,6 +600,13 @@ function roleOrType(name, naiveRole, skillMap) {
     // types handling) but we do know who trains it at all, which is still
     // worth showing alongside the naive role rather than silently dropping.
     if (info.classes && info.classes.length) return [naiveRole, info.classes.join('/')].join(' · ');
+  }
+  if (!info && clInfo) {
+    const wantsDamage = naiveRole === 'Damage' || naiveRole === 'Damage + Heal';
+    const wantsHeal = naiveRole === 'Heal' || naiveRole === 'Damage + Heal';
+    if (wantsDamage && clInfo.isDamage === false) return 'Other';
+    if (wantsHeal && clInfo.isHeal === false) return 'Other';
+    return [naiveRole, 'Champion Ability'].join(' · ');
   }
   return naiveRole;
 }

@@ -6,7 +6,22 @@ import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { SAMPLE_LOGS } from './sample-data.js';
 import { fmtClock } from './charts.js';
 import { ABILITY_COOLDOWNS } from './ability-cooldowns.js';
+import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
 import { startLiveBackground, stopLiveBackground } from './live-bg.js';
+
+// Champion-level abilities with a known Recast Delay, reshaped into the same
+// { cooldownSeconds, cooldown, icon } shape ABILITY_COOLDOWNS already uses,
+// so the cooldown tracker below can look both up through one combined map
+// without caring which file an ability's data actually came from. No name
+// here collides with an ABILITY_COOLDOWNS key (checked against this build's
+// export — see tools/build-cl-ability-database.py), so there's no
+// precedence question to resolve either way.
+const CL_COOLDOWNS = Object.fromEntries(
+  Object.entries(CL_ABILITY_DATABASE)
+    .filter(([, info]) => info.cooldownSeconds != null)
+    .map(([name, info]) => [name, { cooldownSeconds: info.cooldownSeconds, cooldown: info.cooldown, icon: info.icon }])
+);
+const ALL_COOLDOWNS = { ...CL_COOLDOWNS, ...ABILITY_COOLDOWNS };
 
 const el = (id) => document.getElementById(id);
 
@@ -770,9 +785,9 @@ function computeAbilityUsage(events) {
   const usage = new Map(); // name -> clock
   for (const e of events) {
     if (e.clock == null) continue;
-    if (e.type === 'cast' && e.name && ABILITY_COOLDOWNS[e.name]) {
+    if (e.type === 'cast' && e.name && ALL_COOLDOWNS[e.name]) {
       usage.set(e.name, e.clock);
-    } else if (e.type === 'melee_weapon' && e.styleName && ABILITY_COOLDOWNS[e.styleName]) {
+    } else if (e.type === 'melee_weapon' && e.styleName && ALL_COOLDOWNS[e.styleName]) {
       usage.set(e.styleName, e.clock);
     }
   }
@@ -843,7 +858,7 @@ function renderCooldownTracker() {
 
   const rows = [];
   for (const [name, usedAtClock] of usage) {
-    const info = ABILITY_COOLDOWNS[name];
+    const info = ALL_COOLDOWNS[name];
     let remainingSec = 0; // can't compute "now" yet (no events at all) -> show ready
     if (isLive) {
       remainingSec = info.cooldownSeconds - (Date.now() - eventWallClockMs(usedAtClock)) / 1000;
