@@ -35,9 +35,11 @@ type/class (and even that one fails silently and harmlessly if it's blocked
 4. Use the dropdown at the top to look at **one encounter at a time** (the
    parser automatically splits the log into fights separated by ~45s of
    quiet) or **All combined** for session totals.
-5. Click through the tabs: Overview, Damage, Healing, Pets, Defense, Realm
+5. Click through the tabs: Overview, Punched, Healing, Pets, Defense, Realm
    Points, Spells & Styles, and Raw/Debug (which shows exactly which lines
    the parser didn't recognize, for transparency/troubleshooting).
+6. Click **What's new** in the header any time to see a short changelog of
+   recent fixes and features (see `js/changelog.js`).
 
 ### Live mode (Chrome/Edge)
 

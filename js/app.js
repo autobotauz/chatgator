@@ -8,6 +8,7 @@ import { fmtClock } from './charts.js';
 import { ABILITY_COOLDOWNS } from './ability-cooldowns.js';
 import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
 import { startLiveBackground, stopLiveBackground } from './live-bg.js';
+import { CHANGELOG } from './changelog.js';
 
 // Champion-level abilities with a known Recast Delay, reshaped into the same
 // { cooldownSeconds, cooldown, icon } shape ABILITY_COOLDOWNS already uses,
@@ -103,6 +104,29 @@ const state = {
     document.documentElement.setAttribute('data-theme', next);
     try { localStorage.setItem('chatgator:theme', next); } catch { /* ignore */ }
   });
+})();
+
+// ---------------------------------------------------------------------------
+// Changelog — a simple "what's new" dialog, available from the header
+// whether or not a log is loaded yet. See js/changelog.js for the entries
+// themselves (newest first); this just renders them into the dialog once.
+// ---------------------------------------------------------------------------
+(function initChangelog() {
+  const list = el('changelogList');
+  for (const entry of CHANGELOG) {
+    const item = document.createElement('div');
+    item.className = 'changelog-entry';
+    const bullets = entry.bullets.map(b => `<li>${b}</li>`).join('');
+    item.innerHTML = `<div class="changelog-date">${entry.date}</div><h3>${entry.title}</h3><ul>${bullets}</ul>`;
+    list.appendChild(item);
+  }
+  const dialog = el('changelogDialog');
+  el('btnChangelog').addEventListener('click', () => dialog.showModal());
+  el('btnCloseChangelog').addEventListener('click', () => dialog.close());
+  // Click on the backdrop (the native ::backdrop pseudo-element isn't a
+  // real click target, so this is just "click landed on the <dialog> element
+  // itself, not something inside it") closes it too, same as most modals.
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
 })();
 
 // ---------------------------------------------------------------------------

@@ -30,10 +30,19 @@
       </label>
       <button class="btn danger" id="btnClearLog" hidden title="Truncates the actual chat.log file on disk that's being watched — not just this view. If DAoC still has logging on, pause it in-game first so the client isn't fighting the clear.">🗑 Clear log…</button>
       <button class="btn" id="btnDownloadSnapshot" hidden>⬇ Download snapshot</button>
+      <button class="btn" id="btnChangelog" title="See what's changed recently">📋 What's new</button>
       <button class="icon-btn" id="btnTheme" title="Toggle light/dark">🌓</button>
       <button class="btn" id="btnLoadAnother" hidden>New session</button>
     </div>
   </header>
+
+  <dialog id="changelogDialog" class="changelog-dialog">
+    <div class="changelog-head">
+      <h2>What's new</h2>
+      <button class="icon-btn" id="btnCloseChangelog" title="Close">✕</button>
+    </div>
+    <div class="changelog-list" id="changelogList"></div>
+  </dialog>
 
   <section id="dropzoneSection">
     <div class="dropzone" id="dropzone">

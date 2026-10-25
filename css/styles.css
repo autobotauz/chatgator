@@ -333,3 +333,24 @@ details.debug pre { max-height: 220px; overflow: auto; background: var(--surface
 
 .watch-interval { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
 .watch-interval select#watchIntervalSelect { padding: 5px 8px; font-size: 12.5px; }
+
+.changelog-dialog {
+  width: min(560px, 92vw); max-height: 80vh; padding: 0; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--surface-1); color: var(--text-primary);
+}
+.changelog-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.changelog-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0;
+  background: var(--surface-1);
+}
+.changelog-head h2 { margin: 0; font-size: 16px; }
+.changelog-list { padding: 4px 20px 20px; overflow-y: auto; max-height: calc(80vh - 58px); }
+.changelog-entry { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.changelog-entry:last-child { border-bottom: none; }
+.changelog-entry .changelog-date {
+  font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em;
+}
+.changelog-entry h3 { margin: 3px 0 8px; font-size: 14.5px; }
+.changelog-entry ul { margin: 0; padding-left: 18px; }
+.changelog-entry li { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 3px 0; }
