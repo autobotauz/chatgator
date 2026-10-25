@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat Gator — Dexii demo</title>
+<!--
+  A pretty, shareable link (…/demo/Dexii/) for a single sample session.
+  GitHub Pages serves static files only, so this isn't a real route — it's
+  a tiny redirect stub that sends the browser straight to the real app with
+  ?demo=dexii, which js/app.js checks on load and auto-loads that sample
+  (see loadSampleByKey / the ?demo= block in js/app.js). Keeping the actual
+  loading logic in exactly one place (the root app) means this file never
+  needs to change when that logic does — only the key in the two redirects
+  below would ever need touching, and only if the sample's key itself
+  changes in js/sample-data.js.
+  A <meta refresh> fallback covers a browser with JS disabled; the inline
+  script fires first for everyone else so there's no visible flash of this
+  page before the real one loads.
+-->
+<meta http-equiv="refresh" content="0; url=../../?demo=dexii">
+<script>location.replace('../../?demo=dexii');</script>
+</head>
+<body>
+<p>Loading the Chat Gator demo… <a href="../../?demo=dexii">Click here if you're not redirected automatically.</a></p>
+</body>
+</html>

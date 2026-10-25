@@ -207,10 +207,16 @@ el('fileInput').addEventListener('change', (e) => {
   e.target.value = ''; // so picking the same file again still fires 'change'
 });
 
-el('btnSample').addEventListener('click', async () => {
-  const key = el('sampleClassSelect').value;
+// Loads one SAMPLE_LOGS entry by key — shared by the "Try a sample log"
+// button below and the ?demo=<key> auto-load at the bottom of this file
+// (and, via a tiny redirect stub, the pretty /demo/<Name>/ links people
+// actually share — see demo/Dexii/index.html and demo/Whispra/index.html).
+// Keeping this as the one place that knows how to turn a SAMPLE_LOGS key
+// into a loaded session means a shared link and the manual picker can
+// never drift apart.
+async function loadSampleByKey(key) {
   const sample = SAMPLE_LOGS[key];
-  if (!sample) return;
+  if (!sample) return false;
   // Real exported sessions (see sample-data.js) are pre-parsed JSON
   // snapshots fetched on demand, not inlined log text — route them through
   // the same importer as a user-supplied "Download snapshot" file instead
@@ -228,11 +234,30 @@ el('btnSample').addEventListener('click', async () => {
     } catch (err) {
       console.warn('[chatgator] failed to load sample snapshot', err);
       alert('Could not load the sample session. If you opened this page directly from a file instead of a web server, that\'s why — sample sessions need to be fetched, which browsers block under file://.');
+      return false;
     }
-    return;
+    return true;
   }
   ingestTexts([{ name: `${key}.log`, text: sample.text }]);
-});
+  return true;
+}
+
+el('btnSample').addEventListener('click', () => loadSampleByKey(el('sampleClassSelect').value));
+
+// A shared link for a specific sample — https://.../chatgator/?demo=dexii,
+// or the prettier /demo/Dexii/ path that redirects here with this same
+// query string — loads that sample immediately instead of making whoever
+// clicked the link pick it from the dropdown themselves. Keeps the select
+// box in sync too, so it doesn't silently disagree with what's on screen
+// if they then touch "Try a sample log" again.
+{
+  const demoKey = new URLSearchParams(location.search).get('demo')?.toLowerCase();
+  if (demoKey && SAMPLE_LOGS[demoKey]) {
+    const select = el('sampleClassSelect');
+    if (select) select.value = demoKey;
+    loadSampleByKey(demoKey);
+  }
+}
 
 el('btnLoadAnother').addEventListener('click', startNewSession);
 
