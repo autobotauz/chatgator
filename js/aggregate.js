@@ -617,7 +617,29 @@ export function buildStats(events, playerNameHint) {
   const bgBroadcasts = getBgBroadcasts(events);
 
   // ---- spans / DPS/HPS -----------------------------------------------------------
-  const clocks = events.map(e => e.clock).filter(x => x != null);
+  // Reported directly: the Overview graph (and every other timeline, since
+  // they all share this one startClock/endClock) was showing "hours worth
+  // of no data" with the x-axis starting at what looked like midnight
+  // instead of the log's real first moment of play. Root cause: this used
+  // to span EVERY event with a clock at all, combat or not — a raw chat.log
+  // routinely carries plenty of timestamped-but-not-yours noise before (and
+  // between) real play: zone-wide kill broadcasts, other players' chatter,
+  // login/zone-change lines, a /stats header left over from checking a
+  // previous session, etc. Any one of those sitting well before the
+  // player's own first real action silently dragged the whole chart's start
+  // back to it, and a long idle stretch between two real play sessions in
+  // the same file (or before the first one even begins) in a 40-bucket
+  // chart reads as a long flat nothing at the start rather than a graph
+  // that begins where activity actually does. Restricting the span to
+  // COMBAT_TYPES — the exact same "is this player's own real activity"
+  // filter segmentEncounters already uses just above — fixes both: the
+  // chart now starts at the first thing the player actually did, and any
+  // leading/trailing idle noise no longer counts toward the plotted range.
+  // Falls back to every event's clock only when there's no combat activity
+  // at all (an empty/non-combat log), so a real span is still shown instead
+  // of nothing.
+  const combatClocks = events.filter(e => COMBAT_TYPES.has(e.type)).map(e => e.clock).filter(x => x != null);
+  const clocks = combatClocks.length ? combatClocks : events.map(e => e.clock).filter(x => x != null);
   const startClock = clocks.length ? Math.min(...clocks) : null;
   const endClock = clocks.length ? Math.max(...clocks) : null;
   const durationMs = (startClock != null && endClock != null) ? Math.max(1000, endClock - startClock) : 1000;
