@@ -212,6 +212,22 @@ const RULES = [
   // tracker (kept separate from activeHealName) in case a transfer spell
   // ever hits more than one target per cast, the same way a group heal does.
   ['power_transfer', /^You transfer (\d+) power to (.+?)!$/, m => ({ amount: +m[1], target: m[2] })],
+  // Reported directly, a second time: "Gift of Arawn" itself (and "Mystic
+  // Ground", an Occultist Type "Storm") ALSO shows up as "You restore
+  // <target> for N power points!" — a totally different phrasing from the
+  // "transfer" line just above, used for a storm/AE power ability that
+  // ticks once per target in a rapid burst (the exact real excerpt this was
+  // confirmed against has over a dozen of these lines in the same logged
+  // second, several targets repeated as they're topped off). This exact
+  // text used to be matched and thrown away as pure flavor (see the
+  // ['flavor', ...'You restore...] rule further down, which now only keeps
+  // the OTHER, targetless "You restore 30 power points." shape — a plain
+  // self-only regen tick with no one to attribute it to). Reuses the same
+  // 'power_transfer' type and the same pendingCastName/activePowerName
+  // attribution as the line above rather than inventing a separate event
+  // shape, since both are identical in substance: your cast moved a real
+  // amount of power to a real target.
+  ['power_transfer', /^You restore (.+?) for (\d+) power points!$/, m => ({ target: m[1], amount: +m[2] })],
 
   // ---- defense: block / parry / evade / resist ------------------------------
   ['block', /^You block (.+?)'s attack against (.+?)!(?:\s*\(Block Chance:\s*([\d.]+)%\))?$/,
@@ -438,7 +454,12 @@ const RULES = [
   ['flavor', /^.+? is no longer protected from magic\.$/, () => ({})],
   ['flavor', /^.+? wants to hold the .+?!$/, () => ({})],
   ['flavor', /^Your (power|Power) (has (increased|decreased)\.?|was restored by .+? for \d+ points\.|returns to normal\.)$/, () => ({})],
-  ['flavor', /^You restore( \d+ power points\.| .+? for \d+ power points!)$/, () => ({})],
+  // Only the targetless "You restore 30 power points." shape stays flavor —
+  // the "You restore <target> for N power points!" shape (a storm/transfer
+  // spell actually moving power to someone) is now its own power_transfer
+  // event, matched further up before this catch-all is ever reached. See
+  // that rule's comment for the report this split came from.
+  ['flavor', /^You restore \d+ power points\.$/, () => ({})],
   ['flavor', /^.+? (power|mana) is full\.$/, () => ({})],
   ['flavor', /^.+? (wracked with pain|is dead)!$/, () => ({})],
   ['flavor', /^.+?: Foolish weaklings! Your attacks do me no harm!$/, () => ({})],
