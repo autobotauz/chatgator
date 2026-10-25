@@ -577,6 +577,45 @@ function roleOrType(name, naiveRole, skillMap) {
   return naiveRole;
 }
 
+// Combines two "source stat" objects (the shape bump()/finalizeSourceMap()
+// in aggregate.js produce) for the SAME ability name into one. Needed for a
+// name that shows up on both sides below — most commonly NOT a spell that
+// genuinely both damages and heals, but a heal/HoT whose name also picked
+// up a ccLanded/resist count in aggregate.js's dmgOutBySourceFinal (that
+// merge backstops a pure-CC ability having no damage entry at all — see its
+// own comment — and runs unconditionally, with no way to know in advance
+// whether a name is about to turn out to also be a real heal elsewhere).
+// Reported directly: real heal totals for "Greater Reviction"/"Gift of the
+// Host"/etc (tens of thousands of healing) were vanishing from this table
+// entirely, landing as if they were zero-value entries, because the OLD
+// code here only kept whichever side's object reference happened to exist
+// first (`{ ...byName[name], role: 'Damage + Heal' }`, discarding `s` — the
+// side that actually carried the real heal hits/dmg — completely) instead
+// of combining the two. Sums every count-like field (correct whichever side
+// is the zero-padded placeholder, since 0 + real is just real) and
+// recomputes the derived rates from those combined totals, the same way
+// aggregate.js itself derives them.
+export function mergeSpellStats(a, b) {
+  const hits = (a.hits || 0) + (b.hits || 0);
+  const crits = (a.crits || 0) + (b.crits || 0);
+  const dmg = (a.dmg || 0) + (b.dmg || 0);
+  const critDmg = (a.critDmg || 0) + (b.critDmg || 0);
+  const misses = (a.misses || 0) + (b.misses || 0);
+  const ccLanded = (a.ccLanded || 0) + (b.ccLanded || 0);
+  const resists = (a.resists || 0) + (b.resists || 0);
+  const mins = [a.min, b.min].filter(v => v != null);
+  const totalHits = hits + crits;
+  const attempts = totalHits + ccLanded + resists;
+  return {
+    hits, crits, dmg, critDmg, misses, ccLanded, resists, totalHits,
+    min: mins.length ? Math.min(...mins) : null,
+    max: Math.max(a.max || 0, b.max || 0),
+    avg: totalHits ? Math.round(dmg / totalHits) : 0,
+    critRate: totalHits ? +(100 * crits / totalHits).toFixed(1) : 0,
+    resistRate: attempts ? +(100 * resists / attempts).toFixed(1) : 0,
+  };
+}
+
 export function renderSpells(container, stats, ctx) {
   clear(container);
   const skillMap = ctx && ctx.skillMap || {};
@@ -595,27 +634,58 @@ export function renderSpells(container, stats, ctx) {
   // Healing spells (e.g. "Greater Restoration") are attributed by name via
   // the "You cast a ... spell!" line that precedes each heal result line —
   // merged in here alongside damage abilities so one table shows everything
-  // a character cast, whichever role it played.
+  // a character cast, whichever role it played. See mergeSpellStats above
+  // for why this has to be a real merge, not just a relabel.
   for (const [name, s] of Object.entries(stats.healOut.bySpell || {})) {
     if (name === 'Heal (spell not identified)') continue;
     if (isAbilityGhost(name, inferredClass)) continue;
     if (byName[name]) {
-      byName[name] = { ...byName[name], role: 'Damage + Heal' };
+      byName[name] = { ...byName[name], ...mergeSpellStats(byName[name], s), name, role: 'Damage + Heal' };
     } else {
       byName[name] = { name, role: 'Heal', ...s };
     }
   }
-  const rows = Object.values(byName).sort((a, b) => b.dmg - a.dmg);
+  const allRows = Object.values(byName);
+
+  // Split in two by whether the ability actually dealt any real damage or
+  // healing at all. Reported directly: a pure CC/cure spell (e.g. "Pulsing
+  // Cure Disease II") has a real entry in dmgOutBySource — aggregate.js
+  // folds its Landed(CC)/Resists count in there precisely so that count
+  // doesn't vanish (see its own comment) — but with dmg permanently 0,
+  // which was landing it in THIS table as an all-zeroes row sitting right
+  // next to genuine damage/heal spells, diluting the one table that's
+  // supposed to answer "how hard does this kit hit". Anything with dmg>0
+  // stays here; everything else (that kind of zero-damage entry, plus the
+  // plain "cast but produced no trackable result at all" names that used
+  // to be a flat list of pills below) moves into the second table instead.
+  const rows = allRows.filter(r => r.dmg > 0).sort((a, b) => b.dmg - a.dmg);
+  const zeroRows = allRows.filter(r => !(r.dmg > 0));
 
   // byName can now hold several rows for one style name (one per weapon —
   // see aggregate.js), each keyed by its own composite string, so "already
   // covered" has to be checked against the bare names actually shown, not
-  // the raw map keys.
-  const coveredNames = new Set(rows.map(r => r.name));
-  const castOnly = stats.spellsCast.filter(n => !coveredNames.has(n) && !isAbilityGhost(n, inferredClass));
+  // the raw map keys. Checked against ALL of byName (not just the nonzero
+  // `rows`), so a zero-damage entry already caught above isn't also
+  // double-listed here as if it had never been seen at all.
+  const coveredNames = new Set(allRows.map(r => r.name));
+  const castOnlyNames = stats.spellsCast.filter(n => !coveredNames.has(n) && !isAbilityGhost(n, inferredClass));
+
+  const castCountByName = stats.castCountByName || {};
+  const noDamageRows = [
+    ...zeroRows.map(r => ({
+      name: r.name, role: r.role,
+      ccLanded: r.ccLanded || 0, resists: r.resists || 0, resistRate: r.resistRate || 0,
+      castCount: castCountByName[r.name] || 0,
+    })),
+    ...castOnlyNames.map(n => ({
+      name: n, role: 'Other',
+      ccLanded: 0, resists: 0, resistRate: 0,
+      castCount: castCountByName[n] || 0,
+    })),
+  ].sort((a, b) => (b.castCount - a.castCount) || (b.ccLanded - a.ccLanded) || (b.resists - a.resists));
 
   const s = section(container);
-  h3(s, 'Spells, styles &amp; abilities used');
+  h3(s, 'Spells, styles & abilities used');
   if (inferredClass) {
     const p = document.createElement('p');
     p.className = 'sub';
@@ -640,11 +710,25 @@ export function renderSpells(container, stats, ctx) {
     rows: rows.map(r => ({ ...r, info: roleOrType(r.name, r.role, skillMap) })),
   });
 
-  if (castOnly.length) {
+  if (noDamageRows.length) {
     const s2 = section(container);
-    h3(s2, 'Also cast (no direct damage/heal logged — buffs, debuffs, CC, pets…)');
+    h3(s2, 'No damage/heal logged (buffs, debuffs, cures, CC, pet summons…)');
+    const p2 = document.createElement('p');
+    p2.className = 'sub';
+    p2.textContent = 'Everything else cast in this view — the rest of the kit a damage/heal number alone would hide. Shows how many times each one lands, gets resisted, or (for a pure buff with no trackable result at all) was simply cast.';
+    s2.appendChild(p2);
     const c2 = card(s2);
-    c2.innerHTML = castOnly.map(n => `<span class="pill" style="margin:3px">${n}</span>`).join('');
+    dataTable(c2, {
+      columns: [
+        { key: 'name', label: 'Name' },
+        { key: 'info', label: 'Type' },
+        { key: 'castCount', label: 'Times cast', num: true, fmt: v => v || '—' },
+        { key: 'ccLanded', label: 'Landed (CC)', num: true, fmt: v => v || 0 },
+        { key: 'resists', label: 'Resists', num: true, fmt: v => v || 0 },
+        { key: 'resistRate', label: 'Resist %', num: true, fmt: v => (v || 0) + '%' },
+      ],
+      rows: noDamageRows.map(r => ({ ...r, info: roleOrType(r.name, r.role, skillMap) })),
+    });
   }
 }
 

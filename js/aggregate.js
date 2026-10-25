@@ -225,7 +225,17 @@ export function buildStats(events, playerNameHint) {
 
   // ---- spells cast (for Spell vs Style/Ability tagging) -------------------
   const castNames = new Set();
-  for (const e of events) if (e.type === 'cast') castNames.add(e.name);
+  // How many times each name was actually cast — castNames above only knows
+  // it happened at least once, which is fine for class inference but not
+  // enough to show "how much is this ability actually used" for the ones
+  // that never land a trackable damage/heal/CC/resist result (a pure buff
+  // like "Aura of Deflection") -- see ui.js's renderSpells "no damage/heal"
+  // table, which this feeds.
+  const castCountByName = {};
+  for (const e of events) if (e.type === 'cast') {
+    castNames.add(e.name);
+    castCountByName[e.name] = (castCountByName[e.name] || 0) + 1;
+  }
 
   // Class-inference signal: spell casts plus melee style names. A style
   // name only ever reaches an event as e.styleName tacked onto its
@@ -706,6 +716,7 @@ export function buildStats(events, playerNameHint) {
     },
     kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal },
     spellsCast: Array.from(castNames),
+    castCountByName,
     bgBroadcasts,
   };
 }
