@@ -1,11 +1,16 @@
 // live-bg.js — a subtle animated "data flowing" background, shown only
 // while actively watching a live chat.log (see app.js's beginWatch() /
-// stopWatching()). A network of slowly-drifting green nodes, connected by
-// lines when close enough, with occasional little pulses traveling along
-// those lines — a visual cue that something is genuinely being tailed
+// stopWatching()). A network of slowly-drifting nodes, connected by edges
+// (lines) when close enough, with occasional little pulses traveling along
+// those edges — a visual cue that something is genuinely being tailed
 // right now, distinct from (and easier to notice at a glance than) the
 // green "Watching live" dot in the header. Deliberately NOT shown for a
 // static/one-time-loaded file: there's no ongoing "flow" to represent.
+//
+// The nodes/edges are tinted green by default, but app.js calls
+// setColor() (see js/realm.js) to match them to the selected player's
+// class's realm instead whenever that's known — Albion red, Midgard blue,
+// Hibernia green — so this one default is also exactly Hibernia's color.
 //
 // Respects prefers-reduced-motion (never starts at all) and pauses itself
 // while the tab is backgrounded (document.hidden), so it doesn't burn
@@ -16,7 +21,8 @@ const LINK_DIST = 140;            // px — nodes closer than this get a connect
 const NODE_SPEED = 0.12;          // px/frame of drift — gentle, not distracting
 const PULSE_SPAWN_CHANCE = 0.012; // per linked pair, per frame
 const PULSE_STEP = 0.02;          // fraction of the link traveled per frame
-const COLOR = '12, 163, 12';      // rgb triple for --status-good (#0ca30c), used in rgba()
+const DEFAULT_COLOR = '12, 163, 12'; // rgb triple for --status-good (#0ca30c), used in rgba()
+let COLOR = DEFAULT_COLOR;
 
 let canvas = null;
 let ctx = null;
@@ -139,4 +145,15 @@ export function stopLiveBackground() {
   if (rafId) cancelAnimationFrame(rafId);
   rafId = null;
   if (canvas) canvas.classList.remove('active');
+}
+
+// Sets the rgb() triple the nodes/edges/pulses are drawn with, picked up
+// on the very next frame — safe to call whether or not the background is
+// currently running (it just sits unused until it is). Pass a falsy value
+// to go back to the default green. Called from app.js every time the
+// active view re-renders, so switching to a different character/class (or
+// first getting a confident class guess at all) re-tints it immediately
+// instead of waiting for the next watch session to start.
+export function setColor(rgbTriple) {
+  COLOR = rgbTriple || DEFAULT_COLOR;
 }
