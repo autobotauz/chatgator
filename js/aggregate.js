@@ -20,7 +20,7 @@ const COMBAT_TYPES = new Set([
   'ability_hit', 'ability_crit', 'cast', 'cast_begin',
   'pet_melee', 'pet_melee_stray', 'pet_melee_crit', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
   'incoming_dmg', 'incoming_crit', 'incoming_extra',
-  'heal_out', 'heal_out_crit', 'heal_in',
+  'heal_out', 'heal_out_crit', 'heal_in', 'power_transfer',
   'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in',
   'resist_named', 'resist_generic',
   'rp_bonus', 'rp_reason', 'rp_plain',
@@ -476,6 +476,23 @@ export function buildStats(events, playerNameHint) {
     }
   }
 
+  // ---- power transfer (e.g. Occultist's "Gift of Arawn") ------------------
+  // Same bump()-produced shape as healOutBySpell/byTarget above (never a
+  // crit — power transfer has no crit variant in the real log this was
+  // confirmed against), deliberately so ui.js's renderSpells can merge this
+  // in exactly the same way it already merges healOut.bySpell, rather than
+  // needing its own bespoke handling.
+  const powerOutByTarget = {};
+  const powerOutBySpell = {};
+  let powerOutTotal = 0;
+  for (const e of events) {
+    if (e.type === 'power_transfer') {
+      bump(powerOutByTarget, e.target, e.amount, false);
+      bump(powerOutBySpell, e.spellName || 'Power transfer (spell not identified)', e.amount, false);
+      powerOutTotal += e.amount;
+    }
+  }
+
   // ---- defense (your mitigation of incoming attacks) ---------------------------
   let blocks = 0, youParries = 0, youEvades = 0, enemyParriedYou = 0, enemyEvadedYou = 0, enemyBlockedYou = 0;
   let resistCount = 0;
@@ -688,6 +705,11 @@ export function buildStats(events, playerNameHint) {
       total: healInTotal,
       bySource: finalizeSourceMap(healInBySource),
       timeline: bucketTimeline(healInPoints, startClock, endClock),
+    },
+    powerOut: {
+      total: powerOutTotal,
+      byTarget: finalizeSourceMap(powerOutByTarget),
+      bySpell: finalizeSourceMap(powerOutBySpell),
     },
     pets: {
       byPet: Object.fromEntries(Object.entries(petStats).map(([k, v]) => [k, { ...v, bySource: finalizeSourceMap(v.bySource) }])),

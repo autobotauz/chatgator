@@ -616,6 +616,17 @@ export function mergeSpellStats(a, b) {
   };
 }
 
+// Joins two role labels for a name that turns out to play more than one
+// part (e.g. a spell that both damages and heals, or — see powerOut below —
+// damages/heals AND transfers power). Idempotent: combining the same role
+// into itself twice (a name seen via more than one bySpell/bySource map
+// that both happen to already say "Heal", say) doesn't duplicate it.
+function combineRole(existing, added) {
+  if (!existing) return added;
+  const parts = existing.split(' + ');
+  return parts.includes(added) ? existing : [...parts, added].join(' + ');
+}
+
 export function renderSpells(container, stats, ctx) {
   clear(container);
   const skillMap = ctx && ctx.skillMap || {};
@@ -640,9 +651,23 @@ export function renderSpells(container, stats, ctx) {
     if (name === 'Heal (spell not identified)') continue;
     if (isAbilityGhost(name, inferredClass)) continue;
     if (byName[name]) {
-      byName[name] = { ...byName[name], ...mergeSpellStats(byName[name], s), name, role: 'Damage + Heal' };
+      byName[name] = { ...byName[name], ...mergeSpellStats(byName[name], s), name, role: combineRole(byName[name].role, 'Heal') };
     } else {
       byName[name] = { name, role: 'Heal', ...s };
+    }
+  }
+  // Power transfer (e.g. Occultist's "Gift of Arawn" — ABILITY_DATABASE
+  // type "Power Transfer") moves a real, meaningful amount just like a
+  // heal does, so it's merged in the same way rather than treated as a
+  // no-output ability — see aggregate.js's powerOut for where this comes
+  // from, and parser.js's power_transfer rule for the real log line.
+  for (const [name, s] of Object.entries(stats.powerOut?.bySpell || {})) {
+    if (name === 'Power transfer (spell not identified)') continue;
+    if (isAbilityGhost(name, inferredClass)) continue;
+    if (byName[name]) {
+      byName[name] = { ...byName[name], ...mergeSpellStats(byName[name], s), name, role: combineRole(byName[name].role, 'Power Transfer') };
+    } else {
+      byName[name] = { name, role: 'Power Transfer', ...s };
     }
   }
   const allRows = Object.values(byName);

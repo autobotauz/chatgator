@@ -199,6 +199,19 @@ const RULES = [
   ['heal_in', /^(.+?) heals you for (\d+) hit points?\.?!?$/, m => ({ healer: m[1], amount: +m[2] })],
   ['heal_in', /^You are healed by (.+?) for (\d+) hit points?\.?!?$/, m => ({ healer: m[1], amount: +m[2] })],
 
+  // ---- power transfer -------------------------------------------------------
+  // Reported directly: "Gift of Arawn" (an Occultist spell, ABILITY_DATABASE
+  // type "Power Transfer") prints "You transfer N power to <target>!" right
+  // after its own cast line, same shape as a heal_out following a heal
+  // cast — this used to be matched and thrown away as pure flavor, so the
+  // ability never showed up with any real numbers anywhere (only as a bare
+  // name, if at all). Attributed to the spell that cast it via the same
+  // pendingCastName/CAST_WINDOW_MS window heal_out uses — see the main
+  // loop's `power_transfer` branch — with its own activePowerName burst
+  // tracker (kept separate from activeHealName) in case a transfer spell
+  // ever hits more than one target per cast, the same way a group heal does.
+  ['power_transfer', /^You transfer (\d+) power to (.+?)!$/, m => ({ amount: +m[1], target: m[2] })],
+
   // ---- defense: block / parry / evade / resist ------------------------------
   ['block', /^You block (.+?)'s attack against (.+?)!(?:\s*\(Block Chance:\s*([\d.]+)%\))?$/,
     m => ({ attacker: m[1], defended: m[2], pct: m[3] ? parseFloat(m[3]) : null })],
@@ -614,7 +627,6 @@ const RULES = [
   ['flavor', /^Attack Speed: [\d.]+s$/, () => ({})],
   ['flavor', /^This chest contains treasures from your recent victory\.$/, () => ({})],
   ['flavor', /^You have emptied the exploration chest\.$/, () => ({})],
-  ['flavor', /^You transfer \d+ power to .+?!$/, () => ({})],
   ['flavor', /^You are healed by Divine Intervention for \d+!$/, () => ({})],
   ['flavor', /^A hole can be made in this wall!$/, () => ({})],
   ['flavor', /^Kill Report$/, () => ({})],
@@ -861,6 +873,11 @@ export function parseLogText(rawText, resume) {
   // across more than one recipient anyway — there's no single "right"
   // target to blame it on in that case either way.
   let lastHealTarget = resume?.lastHealTarget ?? null;
+  // Same burst-window idea as activeHealName above, kept as its own tracker
+  // (not shared with activeHealName) so a heal and a power-transfer cast
+  // happening moments apart never bleed into each other's attribution —
+  // see power_transfer's own rule/comment above for the ability this is for.
+  let activePowerName = resume?.activePowerName ?? null, activePowerAt = resume?.activePowerAt ?? -Infinity;
 
   for (let li = 0; li < lines.length; li++) {
     const raw = lines[li];
@@ -1011,6 +1028,19 @@ export function parseLogText(rawText, resume) {
           // heal_out_crit's own regex never captures one — see above.
           payload.target = lastHealTarget || 'Unknown';
         }
+      } else if (type === 'power_transfer') {
+        // Same cast-window attribution as heal_out just above, but its own
+        // activePowerName/activePowerAt burst tracker — see its declaration
+        // for why this is deliberately separate from activeHealName.
+        if (pendingCastName && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
+          payload.spellName = pendingCastName;
+          activePowerName = pendingCastName;
+          activePowerAt = clockMs;
+          pendingCastName = null;
+        } else if (activePowerName && clockMs - activePowerAt <= HEAL_BURST_WINDOW_MS) {
+          payload.spellName = activePowerName;
+          activePowerAt = clockMs; // still resolving — extend the window
+        }
       } else if (type === 'cc_landed') {
         // A pending pet-cast ("The X casts a spell!") only tells us *that*
         // X cast something, not what it does or who it hit — so when the
@@ -1062,6 +1092,7 @@ export function parseLogText(rawText, resume) {
       pendingEffectName, pendingEffectAt, pendingEffectIsPet,
       activeDotName, activeDotTarget, activeDotAt,
       activeHealName, activeHealAt, lastHealTarget,
+      activePowerName, activePowerAt,
     },
   };
 }
