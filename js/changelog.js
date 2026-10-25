@@ -12,6 +12,21 @@
 export const CHANGELOG = [
   {
     date: '2026-10-25',
+    title: 'Realm-colored live background',
+    bullets: [
+      "The animated background shown while watching a live log now tints to your class's realm",
+      'Albion = red, Midgard = blue, Hibernia = green',
+    ],
+  },
+  {
+    date: '2026-10-25',
+    title: 'Added this changelog',
+    bullets: [
+      "New \"What's new\" button in the header — click it any time to see what's changed",
+    ],
+  },
+  {
+    date: '2026-10-25',
     title: "Pets that aren't yours stop stealing credit",
     bullets: [
       "Fixed: other players' (or enemies') pets no longer show up in your own Spells & Styles list",
