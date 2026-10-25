@@ -905,6 +905,35 @@ export function parseLogText(rawText, resume) {
   // happening moments apart never bleed into each other's attribution —
   // see power_transfer's own rule/comment above for the ability this is for.
   let activePowerName = resume?.activePowerName ?? null, activePowerAt = resume?.activePowerAt ?? -Infinity;
+  // Every pet name this log has confirmed belongs to the PLAYER — i.e. it's
+  // appeared on a line that only ever makes sense for your own pet ("is now
+  // under your control", "Your X attacks...", "You command X to..."). Same
+  // signal aggregate.js's own petNames set is built from (kept in sync with
+  // that list below), just accumulated here, line by line, as the log is
+  // read, since pet_cast's attribution below needs to know this before the
+  // rest of the file has been seen.
+  //
+  // Reported directly: "The Greater Necroservant casts a spell!" (someone
+  // else's necro pet, in a reported Cleric's own log — a BG log shows every
+  // nearby pet casting, not just yours) was setting pendingEffectName/
+  // pendingEffectIsPet UNCONDITIONALLY below, with no check that this pet
+  // was ever actually the log owner's. A CC/debuff line landing on ANY
+  // target shortly after then got misattributed to that unrelated pet's
+  // cast — and since aggregate.js's merge only drops a cc_landed/resist
+  // whose source is a *confirmed* pet (so it can live on the Pets tab
+  // instead), an unconfirmed one fell through and landed in the player's
+  // OWN "Spells, styles & abilities used" table instead, as if the Cleric
+  // had cast a Necromancer pet's spell. Gating pendingEffectName on
+  // ownPetNames fixes this at the source: a pet never seen doing something
+  // only the log owner's own pet would do is never treated as "ours" at
+  // all, so it can neither absorb a CC/resist result nor stomp a real
+  // pending attribution (the player's own recent cast, or their actual
+  // pet's) that was still in its window.
+  const PET_OWNERSHIP_TYPES = new Set([
+    'pet_summon', 'pet_command', 'pet_melee', 'pet_melee_stray',
+    'pet_melee_crit', 'pet_hit', 'pet_self_heal', 'pet_lost',
+  ]);
+  const ownPetNames = new Set(resume?.ownPetNames ?? []);
 
   for (let li = 0; li < lines.length; li++) {
     const raw = lines[li];
@@ -977,13 +1006,22 @@ export function parseLogText(rawText, resume) {
         pendingStyleAt = clockMs;
         continue; // setup-only line, not an event itself
       }
+      if (PET_OWNERSHIP_TYPES.has(parsed.type)) {
+        ownPetNames.add(parsed.payload.pet);
+      }
       if (parsed.type === 'cast') {
         pendingCastName = parsed.payload.name;
         pendingCastAt = clockMs;
         pendingEffectName = parsed.payload.name;
         pendingEffectAt = clockMs;
         pendingEffectIsPet = false;
-      } else if (parsed.type === 'pet_cast') {
+      } else if (parsed.type === 'pet_cast' && ownPetNames.has(parsed.payload.pet)) {
+        // Only a pet already confirmed as the player's own (see
+        // ownPetNames above) can set the pending effect — an unconfirmed
+        // pet's "casts a spell!" line (someone else's, in the same BG)
+        // is otherwise left completely alone, exactly like any other
+        // unrelated chat line: it neither claims a later CC/resist result
+        // nor overwrites whatever attribution window was already pending.
         pendingEffectName = parsed.payload.pet;
         pendingEffectAt = clockMs;
         pendingEffectIsPet = true;
@@ -1120,6 +1158,7 @@ export function parseLogText(rawText, resume) {
       activeDotName, activeDotTarget, activeDotAt,
       activeHealName, activeHealAt, lastHealTarget,
       activePowerName, activePowerAt,
+      ownPetNames: Array.from(ownPetNames),
     },
   };
 }

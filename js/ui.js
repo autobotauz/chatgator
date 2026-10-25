@@ -209,38 +209,27 @@ function tile(label, value) {
 }
 
 // ===========================================================================
+// This tab used to open with its own "Damage done by spell / style /
+// weapon" breakdown (every one of your own abilities and swings, full
+// hit/crit/resist table) sitting right next to a near-identical breakdown
+// on the Spells & Styles tab — same per-ability numbers, same ghost
+// filtering, just two different tables answering the same question. Moved
+// that whole section (plus the "Total damage done"/"DPS"/"Melee crit
+// rate" tiles that went with it) to renderSpells below, which already
+// merges in healing/power-transfer roles and is the natural single place
+// for "what did I actually do" — see its own top-of-function comment.
+// What's left here is deliberately just the other half of the story: what
+// landed on YOU. Renamed the tab to match (see index.html) rather than
+// leave a half-empty page still called "Damage".
 export function renderDamage(container, stats, ctx) {
   clear(container);
-  const g = grid(section(container), 4);
-  statTile(g, { label: 'Total damage done', value: fmtNum(stats.damageOut.total) });
-  statTile(g, { label: 'DPS (this view)', value: fmtNum(stats.damageOut.dps) });
-  statTile(g, { label: 'Melee crit rate', value: stats.damageOut.melee.critRate + '%', sub: `${stats.damageOut.melee.crits} / ${stats.damageOut.melee.hits + stats.damageOut.melee.crits} swings` });
+  const dmgInRows = Object.values(stats.damageIn.bySource);
+  const hitsTaken = dmgInRows.reduce((a, s) => a + s.totalHits, 0);
+  const critsTaken = dmgInRows.reduce((a, s) => a + s.crits, 0);
+  const critRateTaken = hitsTaken ? +(100 * critsTaken / hitsTaken).toFixed(1) : 0;
+  const g = grid(section(container), 2);
   statTile(g, { label: 'Damage taken', value: fmtNum(stats.damageIn.total), sub: `${fmtNum(stats.damageIn.dtps)}/sec` });
-
-  const outSec = section(container);
-  h3(outSec, 'Damage done by spell / style / weapon');
-  const outCard = card(outSec);
-  const damageOutBySource = filterGhostSource(stats.damageOut.bySource, stats.meta.inferredClass);
-  const items = sourceMapToItems(damageOutBySource);
-  barChart(outCard, { items, colorFn: (_, i) => seriesColor(i) });
-  const rows = sourceMapToRows(damageOutBySource);
-  dataTable(outCard, {
-    columns: [
-      { key: 'name', label: 'Source' },
-      { key: 'weapon', label: 'Weapon', fmt: v => v || '—' },
-      { key: 'totalHits', label: 'Hits', num: true },
-      { key: 'crits', label: 'Crits', num: true },
-      { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
-      { key: 'ccLanded', label: 'Landed (CC)', num: true, fmt: v => v || 0 },
-      { key: 'resists', label: 'Resists', num: true, fmt: v => v || 0 },
-      { key: 'resistRate', label: 'Resist %', num: true, fmt: v => (v || 0) + '%' },
-      { key: 'dmg', label: 'Total dmg', num: true, fmt: fmtExact },
-      { key: 'avg', label: 'Avg', num: true },
-      { key: 'min', label: 'Min', num: true },
-      { key: 'max', label: 'Max', num: true },
-    ],
-    rows,
-  });
+  statTile(g, { label: 'Hits taken', value: fmtNum(hitsTaken), sub: `${critRateTaken}% crit` });
 
   const inSec = section(container);
   h3(inSec, 'Damage taken by attacker');
@@ -665,15 +654,37 @@ export function renderSpells(container, stats, ctx) {
   clear(container);
   const skillMap = ctx && ctx.skillMap || {};
   const inferredClass = stats.meta.inferredClass;
+
+  // Top-of-page summary tiles — moved here from the Damage tab (now just
+  // "Damage taken"/renderDamage above) along with the per-ability table
+  // below: this is the one place that answers "what did I actually do",
+  // so the headline numbers for it belong here too.
+  const g = grid(section(container), 3);
+  statTile(g, { label: 'Total damage done', value: fmtNum(stats.damageOut.total) });
+  statTile(g, { label: 'DPS (this view)', value: fmtNum(stats.damageOut.dps) });
+  statTile(g, { label: 'Melee crit rate', value: stats.damageOut.melee.critRate + '%', sub: `${stats.damageOut.melee.crits} / ${stats.damageOut.melee.hits + stats.damageOut.melee.crits} swings` });
+
   const byName = {};
   for (const [key, s] of Object.entries(stats.damageOut.bySource)) {
-    if (key.startsWith('Melee')) continue;
+    // Used to skip every "Melee"/"Melee: <weapon>" key here — a plain
+    // unstyled weapon swing isn't a *named* spell or style, so it didn't
+    // seem to belong on a "spells & styles" page. But that just meant a
+    // raw weapon-swing breakdown had nowhere to live at all once the
+    // Damage tab's identical table (which DID include it — see its own
+    // comment) got folded into this one instead of duplicating it. Rather
+    // than drop that data, this page absorbs it too: "spell / style /
+    // weapon" was the Damage tab's own description of what that table
+    // covered, and that's exactly what this table covers now.
+    //
     // Checked against the bare name (s.displayName), not the raw composite
     // "Style (Weapon)" key — see filterGhostSource's comment above for why.
+    // A plain "Melee"/"Melee: <weapon>" key has no displayName (only a
+    // named style does — see aggregate.js's dmgOutBaseName), so it falls
+    // through to the key itself, which isAbilityGhost correctly never
+    // recognizes as any class's ability and so never filters out.
     if (isAbilityGhost(s.displayName || key, inferredClass)) continue;
-    // Keep per-weapon rows distinct (same composite key as the Damage tab —
-    // see aggregate.js) but show the bare style/spell name here, same idea
-    // as sourceMapToRows.
+    // Keep per-weapon rows distinct (composite key — see aggregate.js) but
+    // show the bare style/spell name here, same idea as sourceMapToRows.
     byName[key] = { name: s.displayName || key, role: 'Damage', ...s };
   }
   // Healing spells (e.g. "Greater Restoration") are attributed by name via
