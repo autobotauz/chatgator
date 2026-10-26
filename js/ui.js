@@ -276,19 +276,22 @@ export function renderDamage(container, stats, ctx) {
 }
 
 // Links a player name to their Eden Herald profile
-// (https://eden-daoc.net/herald?n=player&k=<name>) — used for every player
+// (https://eden-daoc.net/herald?n=player&k=<name>) -- used for every player
 // name this app shows (Damage In/Out, Healing done/received, deathblow
-// victims — see each table's own `fmt: heraldLink` column). No check that
-// the name is actually a real player with herald data (a keep guard, a
-// siege hazard like "The cauldron of boiling oil", or a pet can show up
-// here just as easily as a real player): asked for directly, since a dead
-// link for something that was never a player is harmless and obvious for
-// anyone who knows the game, and Eden's own herald lookup appears to
-// require being logged into their site to even check from here. `name` is
-// escaped since it comes straight from the parsed log text, not written
-// by us.
-function heraldLink(name) {
+// victims, the character name in the encounter bar -- see each caller's own
+// `fmt: heraldLink` column or direct call). A real DAoC character name is
+// always a single word, so a name containing a space is treated as NOT a
+// real player (a keep guard, a siege hazard like "The cauldron of boiling
+// oil", a pet, etc.) and is shown as plain text with no link at all. For a
+// single-word name we still don't check that it's actually a real player
+// with herald data: asked for directly, since a dead link for something
+// that was never a player is harmless and obvious for anyone who knows the
+// game, and Eden's own herald lookup appears to require being logged into
+// their site to even check from here. `name` is escaped since it comes
+// straight from the parsed log text, not written by us.
+export function heraldLink(name) {
   const safe = escHtml(name);
+  if (/\s/.test(name)) return safe;
   const url = `https://eden-daoc.net/herald?n=player&k=${encodeURIComponent(name)}`;
   return `<a class="herald-link" href="${url}" target="_blank" rel="noopener noreferrer" title="View ${safe} on the Eden Herald">${safe}</a>`;
 }
@@ -875,7 +878,7 @@ export function renderDebug(container, stats, ctx) {
 // written for (renderDebug's unmatched-lines dump below) but not for an
 // attribute value, so this now escapes quotes too — a strict superset, so
 // every other existing use of this function is unaffected.
-function escHtml(s) {
+export function escHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 

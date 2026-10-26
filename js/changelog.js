@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Herald links: your own name, and fewer dead links',
+    bullets: [
+      'Healing yourself used to show up as the target "You" (and a dead herald link to match) — it now shows your actual character name, linked to your Eden Herald page like everyone else',
+      'Your character name at the top of the page (above the /bg ticker) now links to your Eden Herald page too',
+      'Names with a space in them (pets, NPCs, siege hazards like "The cauldron of boiling oil") no longer get a herald link at all, since a real character name is never more than one word',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'Fixed: cooldown tracker ignored the character picker',
     bullets: [
       'With more than one character\'s /stats block in the same log, the cooldown tracker now shows only the abilities for whichever character is currently selected -- it used to keep showing everyone\'s abilities mixed together no matter who you picked',

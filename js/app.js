@@ -1,6 +1,6 @@
 import { parseLogText } from './parser.js';
 import { buildStats, segmentEncounters, segmentCheckpoints, getBgBroadcasts } from './aggregate.js';
-import { renderers } from './ui.js';
+import { renderers, heraldLink, escHtml } from './ui.js';
 import { loadSkillIndex } from './skills.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { SAMPLE_LOGS } from './sample-data.js';
@@ -807,7 +807,14 @@ function renderActiveTab() {
   setLiveBackgroundColor(realmColor);
   if (realmColor) document.documentElement.style.setProperty('--watch-color', `rgb(${realmColor})`);
   else document.documentElement.style.removeProperty('--watch-color');
-  el('characterName').textContent = stats.meta.playerName ? `👤 ${stats.meta.playerName}${classSuffix}` : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
+  // Links the character name itself to their Eden Herald profile, same as
+  // every other player name shown elsewhere in the app -- heraldLink()
+  // already no-ops (plain escaped text, no link) for anything containing a
+  // space, which a real DAoC character name never does, so this is safe
+  // even on the "name not found" fallback text below.
+  el('characterName').innerHTML = stats.meta.playerName
+    ? `👤 ${heraldLink(stats.meta.playerName)}${escHtml(classSuffix)}`
+    : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
   // "the whole file" is only accurate when there's nothing to scope away —
   // a single player, no /stats-separated checkpoints. Once either kind of
   // scoping is actually narrowing the view, say so instead of overclaiming.

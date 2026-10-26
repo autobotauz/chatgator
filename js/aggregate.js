@@ -467,18 +467,29 @@ export function buildStats(events, playerNameHint) {
   }
 
   // ---- healing out / in --------------------------------------------------------
+  // "You heal yourself for N hit points." has no player name to attach at
+  // parse time, so js/parser.js normalizes its target to the placeholder
+  // "You" (see heal_out there). Swap that placeholder for the real player
+  // name wherever we already know it (resolved above, from playerNameHint
+  // or a /stats header) so the healing-done-by-target table shows the
+  // player's actual name instead of the literal word "You" -- and, just as
+  // importantly, so it becomes a real Eden Herald link like every other
+  // name in that table instead of a dead link to .../herald?...k=You.
+  // Left as the "You" placeholder only in the rare case we never learn who
+  // this is (no playerNameHint and no /stats block anywhere in this log).
+  const healTargetKey = name => (name === 'You' && playerName) ? playerName : name;
   const healOutByTarget = {};
   const healOutBySpell = {};
   const healOutPoints = [];
   let healOutTotal = 0, healOutHits = 0, healOutCrits = 0;
   for (const e of events) {
     if (e.type === 'heal_out') {
-      bump(healOutByTarget, e.target, e.amount, false);
+      bump(healOutByTarget, healTargetKey(e.target), e.amount, false);
       bump(healOutBySpell, e.spellName || 'Heal (spell not identified)', e.amount, false);
       healOutTotal += e.amount; healOutHits++;
       healOutPoints.push({ clock: e.clock, amount: e.amount });
     } else if (e.type === 'heal_out_crit') {
-      bump(healOutByTarget, e.target, e.amount, true);
+      bump(healOutByTarget, healTargetKey(e.target), e.amount, true);
       bump(healOutBySpell, e.spellName || 'Heal (spell not identified)', e.amount, true);
       healOutTotal += e.amount; healOutCrits++;
       healOutPoints.push({ clock: e.clock, amount: e.amount });
