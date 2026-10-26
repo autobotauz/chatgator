@@ -1038,7 +1038,19 @@ function fmtCooldownRemaining(sec) {
 function renderCooldownTracker() {
   const tracker = el('cooldownTracker');
   const list = el('cooldownTrackerList');
-  const usage = computeAbilityUsage(state.rawEvents);
+  // state.scopedEvents (the resolved player+checkpoint selection -- see
+  // refreshScopedEncounters), NOT the raw whole-file state.rawEvents: with
+  // more than one character's /stats checkpoints in the same file, the
+  // tracker used to keep showing whichever abilities happened to be used
+  // anywhere in the WHOLE file regardless of which player was selected,
+  // while every other tab correctly followed the player/checkpoint picker
+  // (they already went through currentStats(), which reads scopedEvents).
+  // Deliberately NOT narrowed further to the single-encounter state.scope,
+  // though -- unlike the per-tab stats breakdown, the cooldown tracker is
+  // meant to reflect the whole selected play session regardless of which
+  // past encounter you're browsing (see the comment above on why this is a
+  // static, persistent-across-encounters roster).
+  const usage = computeAbilityUsage(state.scopedEvents);
 
   if (!usage.size) { list.innerHTML = ''; tracker.hidden = true; return; }
 
@@ -1046,9 +1058,12 @@ function renderCooldownTracker() {
   // browser's own Date.now() (see eventWallClockMs above). Static load (no
   // watcher, or no anchor resolved yet): fall back to the frozen
   // end-of-file clock, same as before -- there's no "real now" to compare
-  // against for a file that isn't actually being watched.
+  // against for a file that isn't actually being watched. Scoped the same
+  // way as `usage` above, for the same reason -- "now" for a statically
+  // viewed character should be that character's own last line, not
+  // whichever player's line happens to be last in the whole file.
   const isLive = !!(state.watcher && state.liveSync && state.liveSync.clock != null);
-  const frozenNowClock = isLive ? null : lastKnownClock(state.rawEvents);
+  const frozenNowClock = isLive ? null : lastKnownClock(state.scopedEvents);
 
   const rows = [];
   for (const [name, usedAtClock] of usage) {

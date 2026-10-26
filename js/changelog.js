@@ -12,6 +12,13 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Fixed: cooldown tracker ignored the character picker',
+    bullets: [
+      'With more than one character\'s /stats block in the same log, the cooldown tracker now shows only the abilities for whichever character is currently selected -- it used to keep showing everyone\'s abilities mixed together no matter who you picked',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'Watching a log now survives a page refresh',
     bullets: [
       'Reload the page (say, to pick up a new update) while watching a live chat.log and Chat Gator picks right back up — same data, same tab/encounter selection, usually with no extra clicks',
