@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Herald links on the Punched tab',
+    bullets: [
+      "Every attacker in \"Damage taken by attacker\" now links to their Eden Herald page",
+      "No check that the name is a real player — an NPC or siege hazard will link to a page with no data, same as searching for them on the herald yourself",
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'In-game spell, style & ability icons',
     bullets: [
       'The cooldown tracker and the Spells & Styles / Healing tables now show the real in-game icon next to each ability',

@@ -360,3 +360,6 @@ details.debug pre { max-height: 220px; overflow: auto; background: var(--surface
 .changelog-entry h3 { margin: 3px 0 8px; font-size: 14.5px; }
 .changelog-entry ul { margin: 0; padding-left: 18px; }
 .changelog-entry li { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 3px 0; }
+
+table.data-table .herald-link { text-decoration: none; }
+table.data-table .herald-link:hover { text-decoration: underline; }

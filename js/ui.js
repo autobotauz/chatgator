@@ -245,7 +245,7 @@ export function renderDamage(container, stats, ctx) {
   barChart(inCard, { items: inItems, maxItems: 12, colorFn: () => 'var(--series-8)' });
   dataTable(inCard, {
     columns: [
-      { key: 'name', label: 'Attacker' },
+      { key: 'name', label: 'Attacker', fmt: heraldLink },
       { key: 'totalHits', label: 'Hits', num: true },
       { key: 'crits', label: 'Crits', num: true },
       { key: 'dmg', label: 'Total dmg', num: true, fmt: fmtExact },
@@ -254,6 +254,22 @@ export function renderDamage(container, stats, ctx) {
     ],
     rows: sourceMapToRows(stats.damageIn.bySource),
   });
+}
+
+// Links an attacker's name on the Punched tab to their Eden Herald profile
+// (https://eden-daoc.net/herald?n=player&k=<name>) — no check that the
+// name is actually a real player with herald data (a keep guard, a siege
+// hazard like "The cauldron of boiling oil", or a pet can show up here
+// just as easily as a real player): asked for directly, since a dead link
+// for something that was never a player is harmless and obvious for
+// anyone who knows the game, and Eden's own herald lookup appears to
+// require being logged into their site to even check from here. `name` is
+// escaped since it comes straight from the parsed log text, not written
+// by us.
+function heraldLink(name) {
+  const safe = escHtml(name);
+  const url = `https://eden-daoc.net/herald?n=player&k=${encodeURIComponent(name)}`;
+  return `<a class="herald-link" href="${url}" target="_blank" rel="noopener noreferrer" title="View ${safe} on the Eden Herald">${safe}</a>`;
 }
 
 // ===========================================================================
@@ -828,7 +844,19 @@ export function renderDebug(container, stats, ctx) {
     </details>
   `;
 }
-function escHtml(s) { return String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+// Escapes for both HTML text content AND a double-quoted HTML attribute —
+// renderDamage's heraldLink() above uses this inside a title="..." attribute,
+// where a bare `"` in the name (nothing stops a shared/crafted log or
+// snapshot file — see README's "Share a session" — from having one) would
+// otherwise close the attribute early and let the rest of the name's text
+// be parsed as more attributes on that element. escHtml used to only cover
+// &/</>, which is enough for the plain text content it was originally
+// written for (renderDebug's unmatched-lines dump below) but not for an
+// attribute value, so this now escapes quotes too — a strict superset, so
+// every other existing use of this function is unaffected.
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
 export const renderers = {
   overview: renderOverview,
