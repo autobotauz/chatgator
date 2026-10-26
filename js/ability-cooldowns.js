@@ -4,8 +4,8 @@
 // (see that script's header) — the next real regeneration from a fresh
 // charplan export supersedes this patch.
 // Flat map of ability name -> { cooldownSeconds, cooldown (display string), icon }.
-// `icon` is the numeric icon id from the client's spell-icon atlas; there is no
-// id -> image mapping yet (future work), so the UI just shows the bare id for now.
+// `icon` is charplan's raw value (a spell-effect id for spells, an icon id
+// otherwise) — the UI shows pictures via js/icons.js / js/ability-icons.js instead.
 //
 // A handful of ability names are deliberately left out of this map:
 //   - names with a multi-rank cooldown (Adrenaline Rush, Charge, Concentration,

@@ -1,0 +1,1216 @@
+{
+  "Aura of Defense": [
+    {
+      "count": 3,
+      "icon": 11
+    },
+    {
+      "count": 1,
+      "icon": 996
+    }
+  ],
+  "Aura of Deflection": [
+    {
+      "count": 3,
+      "icon": 14
+    },
+    {
+      "count": 1,
+      "icon": 995
+    }
+  ],
+  "Aura of Reflection": [
+    {
+      "count": 3,
+      "icon": 307
+    },
+    {
+      "count": 1,
+      "icon": 1106
+    }
+  ],
+  "Back Crush": [
+    {
+      "count": 5,
+      "icon": 72
+    },
+    {
+      "count": 5,
+      "icon": 269
+    }
+  ],
+  "Barrier of Negation": [
+    {
+      "count": 3,
+      "icon": 1246
+    },
+    {
+      "count": 1,
+      "icon": 3531
+    }
+  ],
+  "Barrier of Power": [
+    {
+      "count": 3,
+      "icon": 1269
+    },
+    {
+      "count": 1,
+      "icon": 3334
+    }
+  ],
+  "Bludgeon": [
+    {
+      "count": 5,
+      "icon": 74
+    },
+    {
+      "count": 5,
+      "icon": 265
+    },
+    {
+      "count": 1,
+      "icon": 1865
+    }
+  ],
+  "Body Lock": [
+    {
+      "count": 1,
+      "icon": 872
+    },
+    {
+      "count": 1,
+      "icon": 897
+    }
+  ],
+  "Bolster Bones": [
+    {
+      "count": 1,
+      "icon": 1188
+    },
+    {
+      "count": 1,
+      "icon": 1984
+    }
+  ],
+  "Bone Crusher": [
+    {
+      "count": 5,
+      "icon": 83
+    },
+    {
+      "count": 5,
+      "icon": 270
+    }
+  ],
+  "Bringer of Death": [
+    {
+      "count": 1,
+      "icon": 1191
+    },
+    {
+      "count": 1,
+      "icon": 1929
+    }
+  ],
+  "Bruiser": [
+    {
+      "count": 5,
+      "icon": 75
+    },
+    {
+      "count": 5,
+      "icon": 261
+    }
+  ],
+  "Burning Cloud": [
+    {
+      "count": 3,
+      "icon": 507
+    },
+    {
+      "count": 1,
+      "icon": 1302
+    }
+  ],
+  "Cadence of Focus": [
+    {
+      "count": 1,
+      "icon": 2308
+    },
+    {
+      "count": 1,
+      "icon": 2309
+    }
+  ],
+  "Chant of Persistence": [
+    {
+      "count": 2,
+      "icon": 1543
+    },
+    {
+      "count": 1,
+      "icon": 1542
+    }
+  ],
+  "Chant of Stamina": [
+    {
+      "count": 2,
+      "icon": 1542
+    },
+    {
+      "count": 1,
+      "icon": 1541
+    }
+  ],
+  "Cleave": [
+    {
+      "count": 7,
+      "icon": 65
+    },
+    {
+      "count": 6,
+      "icon": 177
+    }
+  ],
+  "Conflagration": [
+    {
+      "count": 1,
+      "icon": 399
+    },
+    {
+      "count": 1,
+      "icon": 1343
+    }
+  ],
+  "Contamination": [
+    {
+      "count": 1,
+      "icon": 1100
+    },
+    {
+      "count": 1,
+      "icon": 1101
+    }
+  ],
+  "Contusions": [
+    {
+      "count": 5,
+      "icon": 77
+    },
+    {
+      "count": 5,
+      "icon": 260
+    }
+  ],
+  "Copperhead": [
+    {
+      "count": 6,
+      "icon": 283
+    },
+    {
+      "count": 2,
+      "icon": 360
+    }
+  ],
+  "Crushing Blow": [
+    {
+      "count": 5,
+      "icon": 162
+    },
+    {
+      "count": 5,
+      "icon": 273
+    }
+  ],
+  "Cure Disease": [
+    {
+      "count": 9,
+      "icon": 396
+    },
+    {
+      "count": 3,
+      "icon": 3604
+    }
+  ],
+  "Cure Poison": [
+    {
+      "count": 9,
+      "icon": 395
+    },
+    {
+      "count": 3,
+      "icon": 3603
+    }
+  ],
+  "Dazzling Flash": [
+    {
+      "count": 1,
+      "icon": 1956
+    },
+    {
+      "count": 1,
+      "icon": 3423
+    }
+  ],
+  "Dead Flesh Living": [
+    {
+      "count": 1,
+      "icon": 1933
+    },
+    {
+      "count": 1,
+      "icon": 1934
+    }
+  ],
+  "Demolish": [
+    {
+      "count": 5,
+      "icon": 168
+    },
+    {
+      "count": 2,
+      "icon": 301
+    }
+  ],
+  "Diamondback": [
+    {
+      "count": 6,
+      "icon": 284
+    },
+    {
+      "count": 2,
+      "icon": 357
+    }
+  ],
+  "Disperse Strength": [
+    {
+      "count": 3,
+      "icon": 1131
+    },
+    {
+      "count": 1,
+      "icon": 1240
+    }
+  ],
+  "Doubler": [
+    {
+      "count": 2,
+      "icon": 113
+    },
+    {
+      "count": 2,
+      "icon": 192
+    }
+  ],
+  "Dread Commander Bladeturn": [
+    {
+      "count": 2,
+      "icon": 1247
+    },
+    {
+      "count": 2,
+      "icon": 1410
+    }
+  ],
+  "Edge of Hatred": [
+    {
+      "count": 1,
+      "icon": 890
+    },
+    {
+      "count": 1,
+      "icon": 891
+    }
+  ],
+  "Engage": [
+    {
+      "count": 13,
+      "icon": 421
+    },
+    {
+      "count": 2,
+      "icon": 208
+    }
+  ],
+  "Enrage": [
+    {
+      "count": 7,
+      "icon": 59
+    },
+    {
+      "count": 1,
+      "icon": 1588
+    }
+  ],
+  "Fury": [
+    {
+      "count": 3,
+      "icon": 54
+    },
+    {
+      "count": 2,
+      "icon": 108
+    }
+  ],
+  "Fury of Nature": [
+    {
+      "count": 1,
+      "icon": 991
+    },
+    {
+      "count": 1,
+      "icon": 3053
+    }
+  ],
+  "Gift of Essence": [
+    {
+      "count": 1,
+      "icon": 1916
+    },
+    {
+      "count": 1,
+      "icon": 1917
+    }
+  ],
+  "Gift of Force": [
+    {
+      "count": 1,
+      "icon": 1917
+    },
+    {
+      "count": 1,
+      "icon": 1918
+    }
+  ],
+  "Gift of Power": [
+    {
+      "count": 1,
+      "icon": 1915
+    },
+    {
+      "count": 1,
+      "icon": 1917
+    }
+  ],
+  "Gift of Vim": [
+    {
+      "count": 1,
+      "icon": 1915
+    },
+    {
+      "count": 1,
+      "icon": 1918
+    }
+  ],
+  "Grasping Creepers": [
+    {
+      "count": 1,
+      "icon": 870
+    },
+    {
+      "count": 1,
+      "icon": 3577
+    }
+  ],
+  "Greater Aura of Reflection": [
+    {
+      "count": 3,
+      "icon": 308
+    },
+    {
+      "count": 1,
+      "icon": 1106
+    }
+  ],
+  "Greater Body Lock": [
+    {
+      "count": 1,
+      "icon": 873
+    },
+    {
+      "count": 1,
+      "icon": 898
+    }
+  ],
+  "Greater Regeneration": [
+    {
+      "count": 3,
+      "icon": 811
+    },
+    {
+      "count": 1,
+      "icon": 3284
+    }
+  ],
+  "Greater Renewal": [
+    {
+      "count": 2,
+      "icon": 385
+    },
+    {
+      "count": 1,
+      "icon": 3282
+    }
+  ],
+  "Greater Restoration": [
+    {
+      "count": 3,
+      "icon": 812
+    },
+    {
+      "count": 2,
+      "icon": 822
+    }
+  ],
+  "Greater Resuscitation": [
+    {
+      "count": 3,
+      "icon": 813
+    },
+    {
+      "count": 2,
+      "icon": 386
+    }
+  ],
+  "Greater Revival": [
+    {
+      "count": 3,
+      "icon": 810
+    },
+    {
+      "count": 2,
+      "icon": 386
+    }
+  ],
+  "Ice Blast": [
+    {
+      "count": 2,
+      "icon": 1043
+    },
+    {
+      "count": 1,
+      "icon": 1396
+    }
+  ],
+  "Ice Storm": [
+    {
+      "count": 8,
+      "icon": 155
+    },
+    {
+      "count": 3,
+      "icon": 327
+    },
+    {
+      "count": 1,
+      "icon": 3645
+    }
+  ],
+  "Inflame": [
+    {
+      "count": 2,
+      "icon": 119
+    },
+    {
+      "count": 2,
+      "icon": 1588
+    }
+  ],
+  "Lesser Body Lock": [
+    {
+      "count": 1,
+      "icon": 871
+    },
+    {
+      "count": 1,
+      "icon": 896
+    }
+  ],
+  "Magical Buffer": [
+    {
+      "count": 3,
+      "icon": 1268
+    },
+    {
+      "count": 1,
+      "icon": 3334
+    }
+  ],
+  "Major Amelioration": [
+    {
+      "count": 2,
+      "icon": 810
+    },
+    {
+      "count": 1,
+      "icon": 820
+    }
+  ],
+  "Major Apotheosis": [
+    {
+      "count": 1,
+      "icon": 804
+    },
+    {
+      "count": 1,
+      "icon": 814
+    },
+    {
+      "count": 1,
+      "icon": 829
+    }
+  ],
+  "Major Deliverance": [
+    {
+      "count": 1,
+      "icon": 2762
+    },
+    {
+      "count": 1,
+      "icon": 2763
+    },
+    {
+      "count": 1,
+      "icon": 2764
+    }
+  ],
+  "Major Emendation": [
+    {
+      "count": 2,
+      "icon": 814
+    },
+    {
+      "count": 1,
+      "icon": 824
+    }
+  ],
+  "Major Purification": [
+    {
+      "count": 2,
+      "icon": 811
+    },
+    {
+      "count": 1,
+      "icon": 821
+    }
+  ],
+  "Major Reconstitution": [
+    {
+      "count": 2,
+      "icon": 810
+    },
+    {
+      "count": 1,
+      "icon": 820
+    }
+  ],
+  "Major Reconstruction": [
+    {
+      "count": 2,
+      "icon": 813
+    },
+    {
+      "count": 1,
+      "icon": 823
+    }
+  ],
+  "Major Recovery": [
+    {
+      "count": 2,
+      "icon": 811
+    },
+    {
+      "count": 1,
+      "icon": 821
+    }
+  ],
+  "Major Regeneration": [
+    {
+      "count": 1,
+      "icon": 801
+    },
+    {
+      "count": 1,
+      "icon": 811
+    },
+    {
+      "count": 1,
+      "icon": 826
+    }
+  ],
+  "Major Regrowth": [
+    {
+      "count": 1,
+      "icon": 801
+    },
+    {
+      "count": 1,
+      "icon": 811
+    },
+    {
+      "count": 1,
+      "icon": 826
+    }
+  ],
+  "Major Renascence": [
+    {
+      "count": 1,
+      "icon": 803
+    },
+    {
+      "count": 1,
+      "icon": 813
+    },
+    {
+      "count": 1,
+      "icon": 828
+    }
+  ],
+  "Major Reparation": [
+    {
+      "count": 2,
+      "icon": 811
+    },
+    {
+      "count": 1,
+      "icon": 822
+    }
+  ],
+  "Major Restoration": [
+    {
+      "count": 3,
+      "icon": 380
+    },
+    {
+      "count": 3,
+      "icon": 812
+    },
+    {
+      "count": 1,
+      "icon": 802
+    },
+    {
+      "count": 1,
+      "icon": 822
+    },
+    {
+      "count": 1,
+      "icon": 827
+    }
+  ],
+  "Major Resurgance": [
+    {
+      "count": 1,
+      "icon": 800
+    },
+    {
+      "count": 1,
+      "icon": 810
+    },
+    {
+      "count": 1,
+      "icon": 825
+    }
+  ],
+  "Major Resuscitation": [
+    {
+      "count": 3,
+      "icon": 381
+    },
+    {
+      "count": 1,
+      "icon": 802
+    },
+    {
+      "count": 1,
+      "icon": 812
+    },
+    {
+      "count": 1,
+      "icon": 827
+    }
+  ],
+  "Major Revival": [
+    {
+      "count": 3,
+      "icon": 381
+    },
+    {
+      "count": 1,
+      "icon": 800
+    },
+    {
+      "count": 1,
+      "icon": 810
+    },
+    {
+      "count": 1,
+      "icon": 825
+    }
+  ],
+  "Mana Burst": [
+    {
+      "count": 3,
+      "icon": 1395
+    },
+    {
+      "count": 1,
+      "icon": 1301
+    }
+  ],
+  "Mangle": [
+    {
+      "count": 13,
+      "icon": 227
+    },
+    {
+      "count": 1,
+      "icon": 96
+    }
+  ],
+  "Minor Reconstitution": [
+    {
+      "count": 3,
+      "icon": 350
+    },
+    {
+      "count": 3,
+      "icon": 355
+    }
+  ],
+  "Minor Renewal": [
+    {
+      "count": 3,
+      "icon": 350
+    },
+    {
+      "count": 3,
+      "icon": 351
+    }
+  ],
+  "Minor Restoration": [
+    {
+      "count": 3,
+      "icon": 350
+    },
+    {
+      "count": 3,
+      "icon": 352
+    },
+    {
+      "count": 3,
+      "icon": 353
+    }
+  ],
+  "Minor Resuscitation": [
+    {
+      "count": 3,
+      "icon": 352
+    },
+    {
+      "count": 3,
+      "icon": 353
+    }
+  ],
+  "Minor Revival": [
+    {
+      "count": 3,
+      "icon": 351
+    },
+    {
+      "count": 3,
+      "icon": 352
+    }
+  ],
+  "Minor Thickett of Decay": [
+    {
+      "count": 1,
+      "icon": 1117
+    },
+    {
+      "count": 1,
+      "icon": 1118
+    }
+  ],
+  "Misty Gloom": [
+    {
+      "count": 3,
+      "icon": 320
+    },
+    {
+      "count": 2,
+      "icon": 122
+    }
+  ],
+  "Molten Earth": [
+    {
+      "count": 2,
+      "icon": 1043
+    },
+    {
+      "count": 1,
+      "icon": 2185
+    }
+  ],
+  "Nature's Retaliation": [
+    {
+      "count": 2,
+      "icon": 893
+    },
+    {
+      "count": 1,
+      "icon": 1511
+    }
+  ],
+  "Nature's Shield": [
+    {
+      "count": 1,
+      "icon": 394
+    },
+    {
+      "count": 1,
+      "icon": 1412
+    }
+  ],
+  "Odin's Wrath": [
+    {
+      "count": 2,
+      "icon": 219
+    },
+    {
+      "count": 1,
+      "icon": 972
+    }
+  ],
+  "Onslaught": [
+    {
+      "count": 3,
+      "icon": 462
+    },
+    {
+      "count": 2,
+      "icon": 107
+    }
+  ],
+  "Power Vacuum": [
+    {
+      "count": 1,
+      "icon": 1910
+    },
+    {
+      "count": 1,
+      "icon": 1911
+    }
+  ],
+  "Protecting Spirit": [
+    {
+      "count": 1,
+      "icon": 5
+    },
+    {
+      "count": 1,
+      "icon": 1410
+    }
+  ],
+  "Provoke": [
+    {
+      "count": 5,
+      "icon": 167
+    },
+    {
+      "count": 1,
+      "icon": 1585
+    }
+  ],
+  "Reception from Valhalla": [
+    {
+      "count": 1,
+      "icon": 375
+    },
+    {
+      "count": 1,
+      "icon": 376
+    }
+  ],
+  "Reconstitution": [
+    {
+      "count": 3,
+      "icon": 365
+    },
+    {
+      "count": 1,
+      "icon": 375
+    }
+  ],
+  "Recuperation": [
+    {
+      "count": 3,
+      "icon": 366
+    },
+    {
+      "count": 1,
+      "icon": 3280
+    }
+  ],
+  "Reflection": [
+    {
+      "count": 3,
+      "icon": 368
+    },
+    {
+      "count": 2,
+      "icon": 125
+    }
+  ],
+  "Regeneration": [
+    {
+      "count": 3,
+      "icon": 366
+    },
+    {
+      "count": 1,
+      "icon": 347
+    },
+    {
+      "count": 1,
+      "icon": 3283
+    }
+  ],
+  "Renewal": [
+    {
+      "count": 3,
+      "icon": 365
+    },
+    {
+      "count": 3,
+      "icon": 366
+    },
+    {
+      "count": 1,
+      "icon": 346
+    },
+    {
+      "count": 1,
+      "icon": 3282
+    }
+  ],
+  "Restoration": [
+    {
+      "count": 6,
+      "icon": 367
+    },
+    {
+      "count": 3,
+      "icon": 365
+    },
+    {
+      "count": 1,
+      "icon": 3281
+    }
+  ],
+  "Restore Spirit": [
+    {
+      "count": 1,
+      "icon": 1018
+    },
+    {
+      "count": 1,
+      "icon": 1188
+    }
+  ],
+  "Revival": [
+    {
+      "count": 3,
+      "icon": 366
+    },
+    {
+      "count": 3,
+      "icon": 367
+    }
+  ],
+  "Revive": [
+    {
+      "count": 3,
+      "icon": 355
+    },
+    {
+      "count": 1,
+      "icon": 1018
+    }
+  ],
+  "Slam": [
+    {
+      "count": 13,
+      "icon": 228
+    },
+    {
+      "count": 5,
+      "icon": 164
+    },
+    {
+      "count": 5,
+      "icon": 263
+    }
+  ],
+  "Song of Clarity": [
+    {
+      "count": 1,
+      "icon": 912
+    },
+    {
+      "count": 1,
+      "icon": 1462
+    }
+  ],
+  "Song of Empowering": [
+    {
+      "count": 1,
+      "icon": 914
+    },
+    {
+      "count": 1,
+      "icon": 1464
+    }
+  ],
+  "Song of Energy": [
+    {
+      "count": 1,
+      "icon": 911
+    },
+    {
+      "count": 1,
+      "icon": 1461
+    }
+  ],
+  "Song of Healing": [
+    {
+      "count": 1,
+      "icon": 826
+    },
+    {
+      "count": 1,
+      "icon": 1371
+    }
+  ],
+  "Song of Power": [
+    {
+      "count": 1,
+      "icon": 910
+    },
+    {
+      "count": 1,
+      "icon": 1460
+    }
+  ],
+  "Song of the Mind": [
+    {
+      "count": 1,
+      "icon": 913
+    },
+    {
+      "count": 1,
+      "icon": 1463
+    }
+  ],
+  "Spirit of Ire": [
+    {
+      "count": 1,
+      "icon": 2385
+    },
+    {
+      "count": 1,
+      "icon": 3675
+    }
+  ],
+  "Steel Mind": [
+    {
+      "count": 3,
+      "icon": 997
+    },
+    {
+      "count": 1,
+      "icon": 2308
+    }
+  ],
+  "Stunning Shout": [
+    {
+      "count": 1,
+      "icon": 931
+    },
+    {
+      "count": 1,
+      "icon": 1330
+    }
+  ],
+  "Superior Body Lock": [
+    {
+      "count": 1,
+      "icon": 874
+    },
+    {
+      "count": 1,
+      "icon": 899
+    }
+  ],
+  "Theft of Energy": [
+    {
+      "count": 1,
+      "icon": 1128
+    },
+    {
+      "count": 1,
+      "icon": 1129
+    }
+  ],
+  "Thorns of Retribution": [
+    {
+      "count": 2,
+      "icon": 890
+    },
+    {
+      "count": 1,
+      "icon": 3618
+    }
+  ],
+  "Unending Death": [
+    {
+      "count": 1,
+      "icon": 1110
+    },
+    {
+      "count": 1,
+      "icon": 1111
+    }
+  ],
+  "Uppercut": [
+    {
+      "count": 7,
+      "icon": 58
+    },
+    {
+      "count": 3,
+      "icon": 513
+    }
+  ],
+  "Ward of Power": [
+    {
+      "count": 3,
+      "icon": 1268
+    },
+    {
+      "count": 1,
+      "icon": 3332
+    }
+  ],
+  "Weakened Armor": [
+    {
+      "count": 1,
+      "icon": 1954
+    },
+    {
+      "count": 1,
+      "icon": 2969
+    }
+  ]
+}
