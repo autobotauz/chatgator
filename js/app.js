@@ -11,6 +11,7 @@ import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
 import { startLiveBackground, stopLiveBackground, setColor as setLiveBackgroundColor } from './live-bg.js';
 import { CHANGELOG } from './changelog.js';
 import { realmColorForClass } from './realm.js';
+import { saveSession, loadSession, clearSession } from './session-store.js';
 
 // Champion-level abilities with a known Recast Delay, reshaped into the same
 // { cooldownSeconds, cooldown, icon } shape ABILITY_COOLDOWNS already uses,
@@ -58,6 +59,14 @@ const state = {
   activeTab: 'overview',
   skillMap: {},
   watcher: null,
+  // The raw FileSystemFileHandle backing `watcher`, kept separately because
+  // it's what gets persisted for resuming across a page refresh (see
+  // js/session-store.js and the "Resume a watched session" section below) —
+  // LogWatcher wraps its own copy internally, but app.js needs one too to
+  // hand to saveSession() without reaching into the watcher's internals.
+  // null whenever watcher is (plain upload, snapshot import, or just not
+  // watching yet).
+  watcherHandle: null,
   // Live-clock sync point for the cooldown tracker: the log's own `clock`
   // is a synthetic elapsed-ms value anchored to the first timestamp in the
   // file (see parser.js), never a real calendar date — so to turn "time
@@ -500,6 +509,55 @@ function ingestAppend(chunkText) {
 }
 
 // ---------------------------------------------------------------------------
+// Repaints the screen from a session saved by schedulePersistSession()
+// below, as part of resuming a watched log across a page refresh — see the
+// "Resume a watched session" section further down for the full picture.
+// This is deliberately NOT a re-parse: it trusts the already-parsed events
+// exactly as they were saved, so the view can come back instantly without
+// waiting on the file handle's permission check (which may need a click —
+// see tryResumeSession). If that check succeeds, beginWatch() runs right
+// after this and fully replaces everything here with a fresh read of the
+// file's current contents anyway, so this is only ever the bridge until
+// then (or, if the handle can't be resumed, the view the user is left
+// looking at — static, same as any one-time load).
+// ---------------------------------------------------------------------------
+function applyRestoredSnapshot(snapshot) {
+  state.rawEvents = snapshot.rawEvents || [];
+  state.unmatched = snapshot.unmatched || [];
+  state.playerScope = snapshot.playerScope ?? null;
+  state.checkpointScope = snapshot.checkpointScope ?? 'all';
+  state.scope = snapshot.scope ?? 'all';
+  state.isSnapshot = false;
+  state.liveSync = null; // static until/unless beginWatch confirms live access below
+  state.parseResumeState = null; // beginWatch does a fresh full parse, not an append, so this isn't needed
+  state.lastUpdatedAt = snapshot.lastUpdatedAt ?? null;
+  refreshCheckpointsAndScope();
+
+  el('dropzoneSection').hidden = true;
+  el('appMain').hidden = false;
+  el('btnLoadAnother').hidden = false;
+  el('btnDownloadSnapshot').hidden = false;
+  el('snapshotPill').hidden = true;
+
+  const tabName = snapshot.activeTab;
+  const tabBtn = tabName && document.querySelector(`.tab[data-tab="${tabName}"]`);
+  if (tabBtn) {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tabBtn.classList.add('active');
+    state.activeTab = tabName;
+    el('panel-' + tabName).classList.add('active');
+  }
+
+  buildPlayerSelect();
+  buildCheckpointSelect();
+  buildEncounterSelect();
+  renderActiveTab();
+
+  loadSkillIndex().then((map) => { state.skillMap = map; renderActiveTab(); });
+}
+
+// ---------------------------------------------------------------------------
 // Player / checkpoint / encounter pickers
 //
 // Three nested levels, outermost first: a PLAYER (a name any "Statistics
@@ -774,6 +832,16 @@ function renderActiveTab() {
       eventCount: scopeEventCount,
     });
   }
+
+  // renderActiveTab runs after every change that actually matters for a
+  // resumed session (new/appended events, or the player/checkpoint/
+  // encounter/tab selection changing) — but NOT from the once-a-second
+  // cooldown/last-updated tick (that calls renderCooldownTracker/
+  // renderLastUpdated directly, never this), which is exactly the
+  // distinction schedulePersistSession's debouncing needs: this fires only
+  // on real changes, not every second regardless. See its own comment for
+  // why saves are debounced at all.
+  if (state.watcher) schedulePersistSession();
 }
 
 // ---------------------------------------------------------------------------
@@ -1102,6 +1170,57 @@ setInterval(() => {
 }, 1000);
 
 // ---------------------------------------------------------------------------
+// Persisting the watched session across a page refresh — saves the live
+// file handle (structured-cloneable, so IndexedDB can hold it directly —
+// see js/session-store.js) plus enough of `state` to redraw the view
+// instantly on the next load, before we even know whether the handle's
+// permission survived the reload (see tryResumeSession further below).
+//
+// Only ever meaningful while state.watcher is set — a one-time upload or a
+// browser without the File System Access API has no handle to resume from,
+// so there's nothing worth persisting for those.
+//
+// Debounced: renderActiveTab() (the one call site below) runs on every
+// poll that actually found new lines, which during active combat can be
+// every second or two for a whole play session — re-serializing the whole
+// (possibly large) rawEvents array to IndexedDB that often would be wasted
+// work for data that's about to be overwritten again a moment later.
+// schedulePersistSession() coalesces a burst of these into one write ~1.5s
+// after the last one, with an 8s maxWait so a long, continuously-busy
+// session doesn't go that whole time without a save.
+// ---------------------------------------------------------------------------
+let persistDebounceTimer = null;
+let persistMaxWaitTimer = null;
+function schedulePersistSession() {
+  if (!state.watcher || !state.watcherHandle) return;
+  if (persistDebounceTimer) clearTimeout(persistDebounceTimer);
+  persistDebounceTimer = setTimeout(runScheduledPersist, 1500);
+  if (!persistMaxWaitTimer) persistMaxWaitTimer = setTimeout(runScheduledPersist, 8000);
+}
+function runScheduledPersist() {
+  if (persistDebounceTimer) { clearTimeout(persistDebounceTimer); persistDebounceTimer = null; }
+  if (persistMaxWaitTimer) { clearTimeout(persistMaxWaitTimer); persistMaxWaitTimer = null; }
+  persistSessionNow();
+}
+function cancelScheduledPersist() {
+  if (persistDebounceTimer) { clearTimeout(persistDebounceTimer); persistDebounceTimer = null; }
+  if (persistMaxWaitTimer) { clearTimeout(persistMaxWaitTimer); persistMaxWaitTimer = null; }
+}
+function persistSessionNow() {
+  if (!state.watcher || !state.watcherHandle) return;
+  saveSession(state.watcherHandle, {
+    rawEvents: state.rawEvents,
+    unmatched: state.unmatched,
+    playerScope: state.playerScope,
+    checkpointScope: state.checkpointScope,
+    scope: state.scope,
+    activeTab: state.activeTab,
+    lastUpdatedAt: state.lastUpdatedAt,
+    fileName: state.watcherHandle.name,
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Watch mode (File System Access API — Chrome/Edge). There's no separate
 // "start watching" action anymore: picking or dropping a .log file IS
 // watching it, whenever the browser can give us a reusable handle — see
@@ -1128,6 +1247,7 @@ async function beginWatch(handle) {
     await watcher.startWithHandle(handle);
     const initialText = await watcher.readAll();
     state.watcher = watcher;
+    state.watcherHandle = handle;
     state.lastPolledAt = Date.now(); // the readAll() above was itself a check
     ingestTexts([{ name: 'live', text: initialText }]);
     el('watchStatus').hidden = false;
@@ -1138,12 +1258,25 @@ async function beginWatch(handle) {
     el('clearLogOptWrap').hidden = false;
     el('btnClearLog').hidden = false;
     startLiveBackground();
+    // Saved right away (not just via the debounced hook above) so a
+    // refresh seconds after starting to watch — including the exact
+    // "refresh to pick up a new build" case this feature exists for —
+    // always has something to resume, rather than a window where nothing's
+    // been saved yet.
+    persistSessionNow();
   } catch (err) {
     if (err && err.name !== 'AbortError') console.warn('[chatgator] could not start watch mode', err);
   }
 }
 function stopWatching() {
   if (state.watcher) { state.watcher.stop(); state.watcher = null; }
+  state.watcherHandle = null;
+  cancelScheduledPersist();
+  // Explicitly stopping means there's nothing left to resume on a later
+  // refresh — leave the data on screen (same as always), but don't let a
+  // refresh after this silently start watching again against the user's
+  // own choice to stop.
+  clearSession();
   state.liveSync = null; // back to a frozen end-of-file snapshot for the cooldown tracker
   state.lastPolledAt = null;
   stopLiveBackground();
@@ -1155,6 +1288,97 @@ function stopWatching() {
   el('staleWatchBanner').hidden = true;
   el('btnClearLog').hidden = true;
 }
+
+// ---------------------------------------------------------------------------
+// Resume a watched session across a page refresh/reload (a new tab, or just
+// hitting F5 to pick up a freshly-deployed update) using the file handle
+// persistSessionNow()/schedulePersistSession() above saved to IndexedDB —
+// see js/session-store.js.
+//
+// Whether this can finish silently depends entirely on what the browser
+// did to the handle's permission grant since it was saved, which is out of
+// our hands:
+//   - A same-tab refresh soon after starting to watch USUALLY leaves the
+//     grant intact — handle.queryPermission() reports 'granted' with no UI
+//     at all — so this resumes live watching completely silently. That's
+//     the literal case this exists for.
+//   - Anything that actually revokes the grant (closing every tab for this
+//     origin, or the tab sitting backgrounded long enough) means getting
+//     it back needs a real requestPermission() call — and the File System
+//     Access API requires transient user activation (a real click) to show
+//     that permission prompt at all; calling it unprompted from a page-load
+//     handler throws SecurityError outright, with no way around that from
+//     here. So in that case this still restores the last-saved data
+//     immediately (no blank dropzone while we find out) and shows a single
+//     "Resume watching…" button that supplies the click requestPermission
+//     needs — ignorable (dismiss, or just use "New session" as always) if
+//     that's not what you want right now.
+// ---------------------------------------------------------------------------
+let pendingResume = null; // { handle, snapshot, savedAt } while the resume button is showing
+
+(async function tryResumeSession() {
+  if (!isWatchSupported()) return;
+  // An explicit shared-sample link (?demo=...) takes priority over
+  // resuming whatever was being watched before — someone who followed a
+  // demo link wants that demo, not to be dropped back into their own last
+  // session instead.
+  if (new URLSearchParams(location.search).get('demo')) return;
+
+  let record;
+  try { record = await loadSession(); } catch { record = null; }
+  if (!record || !record.handle || !record.snapshot) return;
+  // Something's already loaded by the time this resolves (in principle, a
+  // very fast manual pick) — don't clobber it.
+  if (state.rawEvents.length) return;
+
+  applyRestoredSnapshot(record.snapshot);
+  const restoredEventsRef = state.rawEvents; // see the guard right after the await below
+
+  let granted = false;
+  try {
+    granted = (await record.handle.queryPermission({ mode: 'read' })) === 'granted';
+  } catch { granted = false; }
+
+  // However unlikely, the user could have taken their own action (picked a
+  // different file, tried a sample) during that await — ingestTexts/
+  // ingestAppend/ingestSnapshotEvents always assign state.rawEvents a new
+  // array, so a reference change here means exactly that happened. Don't
+  // override whatever they're looking at now with the stale resume.
+  if (state.rawEvents !== restoredEventsRef) return;
+
+  if (granted) {
+    beginWatch(record.handle);
+    return;
+  }
+
+  pendingResume = record;
+  const banner = el('resumeSessionBanner');
+  if (banner) {
+    el('resumeSessionText').textContent =
+      `This is where you left off watching ${record.snapshot.fileName || 'your chat.log'} — click to resume live updates.`;
+    banner.hidden = false;
+  }
+})();
+
+el('resumeSessionBtn')?.addEventListener('click', async () => {
+  if (!pendingResume) return;
+  const { handle } = pendingResume;
+  pendingResume = null;
+  el('resumeSessionBanner').hidden = true;
+  try {
+    const perm = await handle.requestPermission({ mode: 'read' });
+    if (perm === 'granted') { await beginWatch(handle); return; }
+  } catch (err) {
+    console.warn('[chatgator] could not resume watching', err);
+  }
+  clearSession();
+  alert('Couldn\'t resume watching that file — use "New session" to pick it again.');
+});
+
+el('resumeSessionDismiss')?.addEventListener('click', () => {
+  pendingResume = null;
+  el('resumeSessionBanner').hidden = true;
+});
 
 // ---------------------------------------------------------------------------
 // Clear the watched log file itself (not just this view) — truncates the

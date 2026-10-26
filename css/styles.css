@@ -104,7 +104,7 @@ a { color: var(--series-1); }
    render — empty or not — even while `hidden` is set. Caught via a
    Playwright check that found "Watching live" and an empty refresh-interval
    dropdown rendering in the header before any session had even started. */
-.watch-status[hidden], .watch-interval[hidden], .bg-ticker[hidden], .cooldown-tracker[hidden], .pill[hidden], .clear-log-opt[hidden], .stale-watch-banner[hidden] {
+.watch-status[hidden], .watch-interval[hidden], .bg-ticker[hidden], .cooldown-tracker[hidden], .pill[hidden], .clear-log-opt[hidden], .stale-watch-banner[hidden], .resume-session-banner[hidden] {
   display: none;
 }
 
@@ -247,6 +247,16 @@ a { color: var(--series-1); }
   border-radius: var(--radius-sm); padding: 10px 14px; margin: -8px 0 16px 2px;
   font-size: 13px; font-weight: 500;
 }
+.resume-session-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: color-mix(in srgb, var(--series-1) 14%, var(--surface-1));
+  border: 1px solid var(--series-1); color: var(--text-primary);
+  border-radius: var(--radius-sm); padding: 10px 14px; margin: -8px 0 16px 2px;
+  font-size: 13px; font-weight: 500;
+}
+.resume-session-banner span { flex: 1; }
+.resume-session-banner .btn, .resume-session-banner .icon-btn { flex: none; }
+
 .bg-ticker-list .bg-ticker-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ---------- cards / grid ---------- */

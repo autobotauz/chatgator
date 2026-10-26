@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Watching a log now survives a page refresh',
+    bullets: [
+      'Reload the page (say, to pick up a new update) while watching a live chat.log and Chat Gator picks right back up — same data, same tab/encounter selection, usually with no extra clicks',
+      'If your browser needs a fresh OK to keep reading the file, you\'ll see a one-click "Resume watching" button instead of losing anything',
+      '"New session" still works exactly as before, and clears this so a later refresh starts clean',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'Fixed: restarting the watch could reset ability cooldowns',
     bullets: [
       'Clicking "New session" and re-picking the same chat.log mid-cooldown no longer resets abilities back to a fresh cooldown',
