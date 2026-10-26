@@ -11,6 +11,14 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-10-26',
+    title: 'In-game spell, style & ability icons',
+    bullets: [
+      'The cooldown tracker and the Spells & Styles / Healing tables now show the real in-game icon next to each ability',
+      'New "🖼 New icons / Classic icons" button in the header switches between the current and classic icon art',
+    ],
+  },
+  {
     date: '2026-10-25',
     title: 'Realm-colored live background',
     bullets: [

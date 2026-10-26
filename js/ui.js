@@ -7,6 +7,7 @@ import { statTile, barChart, legend, timelineChart, fmtNum, fmtExact, fmtClock, 
 import { describeSkill } from './skills.js';
 import { ABILITY_DATABASE } from './ability-database.js';
 import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
+import { iconHtml } from './icons.js';
 
 function clear(el) { el.innerHTML = ''; }
 function h3(el, text) { const h = document.createElement('h3'); h.textContent = text; el.appendChild(h); }
@@ -32,6 +33,12 @@ function sortableValue(v, isNum) {
   const n = parseFloat(String(v).replace(/[,%]/g, ''));
   return isNaN(n) ? -Infinity : n;
 }
+
+// Column options: key, label, num, fmt(value) — plus html(row), display-only
+// markup for the cell (e.g. an icon before the name). Filtering and sorting
+// always use the plain value/fmt text, never html, so an icon's markup can't
+// leak into "Filter…" matches.
+const nameWithIcon = (row) => `${iconHtml(row.name)}${row.name}`;
 
 function dataTable(parent, { columns, rows, filterable = true }) {
   const wrap = document.createElement('div');
@@ -87,7 +94,7 @@ function dataTable(parent, { columns, rows, filterable = true }) {
     }
     for (const row of displayRows) {
       const tr = document.createElement('tr');
-      tr.innerHTML = columns.map(c => `<td class="${c.num ? 'num' : ''}">${c.fmt ? c.fmt(row[c.key]) : row[c.key]}</td>`).join('');
+      tr.innerHTML = columns.map(c => `<td class="${c.num ? 'num' : ''}">${c.html ? c.html(row) : c.fmt ? c.fmt(row[c.key]) : row[c.key]}</td>`).join('');
       tbody.appendChild(tr);
     }
   }
@@ -266,7 +273,7 @@ export function renderHealing(container, stats, ctx) {
   barChart(spellCard, { items: spellItems, colorFn: (_, i) => seriesColor(i + 2) });
   dataTable(spellCard, {
     columns: [
-      { key: 'name', label: 'Spell' },
+      { key: 'name', label: 'Spell', html: nameWithIcon },
       { key: 'totalHits', label: 'Heals', num: true },
       { key: 'crits', label: 'Crit heals', num: true },
       { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
@@ -765,7 +772,7 @@ export function renderSpells(container, stats, ctx) {
   const c = card(s);
   dataTable(c, {
     columns: [
-      { key: 'name', label: 'Name' },
+      { key: 'name', label: 'Name', html: nameWithIcon },
       { key: 'weapon', label: 'Weapon', fmt: v => v || '—' },
       { key: 'info', label: 'Type' },
       { key: 'totalHits', label: 'Hits', num: true },
@@ -790,7 +797,7 @@ export function renderSpells(container, stats, ctx) {
     const c2 = card(s2);
     dataTable(c2, {
       columns: [
-        { key: 'name', label: 'Name' },
+        { key: 'name', label: 'Name', html: nameWithIcon },
         { key: 'info', label: 'Type' },
         { key: 'castCount', label: 'Times cast', num: true, fmt: v => v || '—' },
         { key: 'ccLanded', label: 'Landed (CC)', num: true, fmt: v => v || 0 },

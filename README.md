@@ -117,3 +117,28 @@ Built for the DAoC community, following on from
 [daoc-chat-gator](https://github.com/autobotauz/daoc-chat-gator).
 Spell/realm-ability metadata, when reachable, comes from Eden's public
 [charplan.json](https://eden-daoc.net/chrplan/charplan.json).
+
+## Ability icons
+
+Icons come from the game client itself, not charplan. Two things to know:
+
+- charplan's `icon` on a **spell** (skillType 2) is a *spell effect id* — the
+  key into the client's `spells.csv` — not an icon id (Animist "Spirit of
+  Anger" is 11130, whose real icon is 2385). Realm abilities, styles and
+  abilities already carry real icon ids.
+- A real icon id is a row in the client's `icons.csv` (inside
+  `gamedata.mpk`): a base picture from the `icons/*.bmp` sheets (320×320,
+  10×10 grid of 32×32 tiles, file number = first picture on the sheet), plus
+  an optional border and corner markers.
+
+`js/ability-icons.js` (ability name → resolved icon id) and `img/icons/{new,classic}/<id>.png`
+are generated. To rebuild after a game/Eden patch or a new charplan export:
+
+```
+python tools/extract-daoc-icons.py "C:\Program Files (x86)\Electronic Arts\Dark Age of Camelot" <icons_out>
+python tools/build-ability-icons.py charplan_1_0_62.json charplan_cl_1_0_62.json <icons_out>
+```
+
+The first step needs Python + Pillow and a local game install; the second
+only copies the icons actually used (~2,100 per skin). `js/icons.js` is the
+only thing the UI imports.

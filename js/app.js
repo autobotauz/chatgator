@@ -6,6 +6,7 @@ import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { SAMPLE_LOGS } from './sample-data.js';
 import { fmtClock } from './charts.js';
 import { ABILITY_COOLDOWNS } from './ability-cooldowns.js';
+import { iconImg, getIconSkin, setIconSkin } from './icons.js';
 import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
 import { startLiveBackground, stopLiveBackground, setColor as setLiveBackgroundColor } from './live-bg.js';
 import { CHANGELOG } from './changelog.js';
@@ -104,6 +105,17 @@ const state = {
     const next = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     try { localStorage.setItem('chatgator:theme', next); } catch { /* ignore */ }
+  });
+
+  // Classic vs. new in-game icon art (js/icons.js). Same ids either way, so
+  // switching is just a re-render.
+  const skinBtn = el('btnIconSkin');
+  const label = () => { skinBtn.textContent = getIconSkin() === 'classic' ? '🖼 Classic icons' : '🖼 New icons'; };
+  label();
+  skinBtn.addEventListener('click', () => {
+    setIconSkin(getIconSkin() === 'classic' ? 'new' : 'classic');
+    label();
+    if (state.rawEvents.length) { renderActiveTab(); renderCooldownTracker(); }
   });
 })();
 
@@ -930,10 +942,10 @@ function renderCooldownTracker() {
     li.className = 'cooldown-pill ' + (onCooldown ? 'on-cooldown' : 'ready') +
       (onCooldown && a.remainingSec <= COOLDOWN_READY_SOON_SEC ? ' ready-soon' : '');
 
-    const icon = document.createElement('span');
-    icon.className = 'cooldown-pill-icon';
-    icon.textContent = `#${a.icon}`;
-    icon.title = `icon id ${a.icon} — no id → image mapping yet`;
+    // Real in-game icon (see js/icons.js); falls back to an empty slot of the
+    // same size so pills stay aligned when a name has no known icon.
+    const icon = iconImg(a.name, 'cooldown-pill-icon') || document.createElement('span');
+    if (!icon.classList.contains('cooldown-pill-icon')) icon.className = 'cooldown-pill-icon cooldown-pill-icon-empty';
 
     const name = document.createElement('span');
     name.className = 'cooldown-pill-name';
