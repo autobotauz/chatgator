@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Fixed: restarting the watch could reset ability cooldowns',
+    bullets: [
+      'Clicking "New session" and re-picking the same chat.log mid-cooldown no longer resets abilities back to a fresh cooldown',
+      'Already-elapsed time is now preserved correctly, so the countdown picks up where it really should be instead of starting over',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'Damage Out is back, renamed the tab back to "Damage"',
     bullets: [
       'The Damage tab now shows "Damage Out" (who you hit) alongside "Damage In" (who hit you) — both by player, not by spell/style (that\'s on Spells & Styles)',

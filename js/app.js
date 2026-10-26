@@ -69,9 +69,18 @@ const state = {
   // on a backgrounded tab, Chrome throttles timers hard, so it often does).
   // Reset to null on a static (non-watched) load, where the tracker just
   // shows a frozen snapshot as of the end of that file instead; and
-  // unconditionally re-seeded fresh on any full reload (new file, or the
-  // watched file being rotated/restarted) — only the pure-append path
-  // (ingestAppend) advances it forward-only instead of re-seeding.
+  // unconditionally re-seeded on any full reload (new file, OR the watched
+  // file being rotated/restarted, OR simply restarting the watch itself —
+  // "New session" + re-picking the same still-unchanged file) — only the
+  // pure-append path (ingestAppend) advances it forward-only instead of
+  // re-seeding. That re-seed is NOT a naive "the newest known line just
+  // happened" guess (it used to be, which is exactly the bug: restarting
+  // the watch against a file that hadn't grown since you last looked at
+  // it silently reset every ability's apparent cast time to "now",
+  // discarding however much real time had actually already elapsed and
+  // showing a freshly-full cooldown instead of correctly-reduced time
+  // left) — see estimateInitialAnchor() below for how it derives the
+  // newest event's real moment properly instead.
   liveSync: null,
   // Carried parser state (day-rollover clock, pending style/cast/heal
   // attribution — see parseLogText's `resume` param) from the most recent
@@ -433,12 +442,14 @@ function ingestTexts(fileTexts) {
   refreshCheckpointsAndScope();
 
   // If we're actively watching a live log file, anchor the cooldown
-  // tracker's live-clock sync point to the newest line we just read, paired
-  // with the real time we read it — see the `liveSync` comment above. A
-  // plain static load (state.watcher is null here) leaves it unset, so the
-  // tracker renders a frozen end-of-file snapshot instead of ticking.
+  // tracker's live-clock sync point to the newest line we just read,
+  // paired with our best estimate of when it REALLY happened — see
+  // estimateInitialAnchor() below (and the `liveSync` comment above for
+  // why this isn't simply "paired with right now"). A plain static load
+  // (state.watcher is null here) leaves it unset, so the tracker renders
+  // a frozen end-of-file snapshot instead of ticking.
   state.liveSync = state.watcher
-    ? { clock: lastKnownClock(allEvents), wallTime: Date.now() }
+    ? estimateInitialAnchor(lastKnownClock(allEvents))
     : null;
 
   el('dropzoneSection').hidden = true;
@@ -814,6 +825,51 @@ function lastKnownClock(events) {
     if (events[i].clock != null) return events[i].clock;
   }
   return null;
+}
+
+// Bug fixed here: restarting the watch ("New session" + re-picking the
+// same file, or a page reload once that's supported) against a file
+// that HASN'T grown since you last looked at it used to pair the
+// newest known line with Date.now() unconditionally — i.e. "that line
+// just happened", even when it actually happened minutes ago and
+// nothing since has moved. Every ability's apparent cast time silently
+// reset to "now", showing a freshly-full cooldown instead of correctly
+// reduced time left — not using current system time at all, really: it
+// was using current system time for BOTH sides of the subtraction.
+//
+// The fix uses the same fact eventWallClockMs relies on below — the
+// game's own [HH:MM:SS] tracks real wall-clock time, confirmed against
+// a real session's chat.log — to derive the newest line's actual real
+// moment directly: today's midnight (local time) plus its time-of-day
+// (clock mod 24h strips out any day-rollover offset parser.js already
+// folded in, getting back to a plain HH:MM:SS-shaped value). That's
+// correct for the one case this matters — a file that's genuinely
+// being tailed live right now, which can only be from today — with no
+// "just happened" guess anywhere in it.
+//
+// Sanity-guarded against the other case: an old, already-finished log
+// opened via the watch picker by mistake (it'll just never grow, but
+// nothing stops a user from picking last week's backup). If the
+// derived moment lands implausibly far from right now — more than a
+// generous few hours either way, well past any normal overnight
+// session or just-past-midnight rollover — this falls back to the old
+// "treat it as having just happened" behavior, which is at least
+// internally consistent and keeps ticking sensibly from that point,
+// rather than showing a nonsense multi-day countdown.
+const ANCHOR_PLAUSIBLE_WINDOW_MS = 6 * 3600 * 1000;
+const DAY_MS = 86400000;
+function estimateInitialAnchor(newestClock) {
+  const now = Date.now();
+  if (newestClock == null) return { clock: newestClock, wallTime: now };
+  const d = new Date(now);
+  const todayMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const timeOfDayMs = ((newestClock % DAY_MS) + DAY_MS) % DAY_MS; // guard a stray negative before parser.js ever produces one
+  const derivedMoment = todayMidnight + timeOfDayMs;
+  const wallTime = Math.abs(now - derivedMoment) <= ANCHOR_PLAUSIBLE_WINDOW_MS ? derivedMoment : now;
+  // Pairing wallTime with newestClock itself (not some other clock
+  // value) means eventWallClockMs(newestClock) reduces to exactly
+  // wallTime, same formula advanceLiveSync already relies on below.
+  return { clock: newestClock, wallTime };
 }
 
 // Advances the live-clock sync point forward only — never rewinds it.
