@@ -92,9 +92,6 @@ const RULES = [
   // been observed in the available logs.
   ['pet_hit', /^Your (.+?) hit (.+?) for (\d+)(?:\s*\(([+-]\d+)\))? damage!$/,
     m => ({ pet: m[1], target: m[2], dmg: +m[3], mod: m[4] ? +m[4] : null })],
-  // "Your <pet> critical hits <target> for an additional N damage! (Crit Chance: N%)"
-  ['pet_melee_crit', /^Your (.+?) critical(?:ly)? hits (.+?) for an additional (\d+) damage!(?:\s*\(Crit Chance:\s*([\d.]+)%\))?$/,
-    m => ({ pet: m[1], target: m[2], dmg: +m[3], pct: m[4] ? parseFloat(m[4]) : null })],
   // "Your <pet> heals itself for N hit points."
   ['pet_self_heal', /^Your (.+?) heals itself for (\d+) hit points?\.$/, m => ({ pet: m[1], amount: +m[2] })],
   // "The <pet> casts a spell!" — counted per pet (once we know it's really
@@ -114,7 +111,7 @@ const RULES = [
 
   // ---- named ability (spell / style / RA / proc) damage -----------------
   // crit MUST be matched before the plain hit rule (both start the same way)
-  ['ability_crit', /^Your (.+?) critical(?:ly)? hits (.+?) for an additional (\d+) damage!(?:\s*\(([\d.]+)%\))?$/,
+  ['ability_crit', /^Your (.+?) critical(?:ly)? hits (.+?) for an additional (\d+) damage!(?:\s*\((?:Crit Chance:\s*)?([\d.]+)%\))?$/,
     m => ({ name: m[1], target: m[2], dmg: +m[3], pct: m[4] ? parseFloat(m[4]) : null })],
   // Trailing "(±N)" is the target's armor/resist damage-reduction modifier —
   // every sibling melee rule (melee_plain, melee_weapon, incoming_dmg) already
@@ -931,7 +928,7 @@ export function parseLogText(rawText, resume) {
   // pet's) that was still in its window.
   const PET_OWNERSHIP_TYPES = new Set([
     'pet_summon', 'pet_command', 'pet_melee', 'pet_melee_stray',
-    'pet_melee_crit', 'pet_hit', 'pet_self_heal', 'pet_lost',
+    'pet_hit', 'pet_self_heal', 'pet_lost',
   ]);
   const ownPetNames = new Set(resume?.ownPetNames ?? []);
 

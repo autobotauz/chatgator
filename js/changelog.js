@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Damage Out is back, renamed the tab back to "Damage"',
+    bullets: [
+      'The Damage tab now shows "Damage Out" (who you hit) alongside "Damage In" (who hit you) — both by player, not by spell/style (that\'s on Spells & Styles)',
+      'Renamed the tab from "Punched" back to "Damage"',
+      'Every player name shown anywhere in the app — attackers, heal targets/healers, deathblow victims — now links to their Eden Herald page',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'Watching-live indicator matches your realm',
     bullets: [
       'The green "Watching live" dot and label in the header now tint to your class\'s realm, same as the live background',

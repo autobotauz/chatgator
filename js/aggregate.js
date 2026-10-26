@@ -18,7 +18,7 @@ const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts t
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
   'ability_hit', 'ability_crit', 'cast', 'cast_begin',
-  'pet_melee', 'pet_melee_stray', 'pet_melee_crit', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
+  'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
   'incoming_dmg', 'incoming_crit', 'incoming_extra',
   'heal_out', 'heal_out_crit', 'heal_in', 'power_transfer',
   'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in',
@@ -195,7 +195,7 @@ export function buildStats(events, playerNameHint) {
   const petNames = new Set();
   for (const e of events) {
     if (e.type === 'pet_summon' || e.type === 'pet_command' || e.type === 'pet_melee' ||
-        e.type === 'pet_melee_stray' || e.type === 'pet_melee_crit' || e.type === 'pet_hit' ||
+        e.type === 'pet_melee_stray' || e.type === 'pet_hit' ||
         e.type === 'pet_self_heal' || e.type === 'pet_lost') {
       petNames.add(e.pet);
     }
@@ -251,6 +251,13 @@ export function buildStats(events, playerNameHint) {
 
   // ---- damage out -----------------------------------------------------------
   const dmgOutBySource = {};
+  // Same damage-out events, bucketed by the player on the receiving end
+  // instead of by spell/style/weapon — the Damage tab's "Damage Out"
+  // table (js/ui.js) wants "who did I hit", not "what did I hit with",
+  // which already lives on the Spells & Styles tab. Pet damage is
+  // deliberately excluded, same as dmgOutBySource itself only ever holds
+  // the player's own hits — pets have their own tab.
+  const dmgOutByTarget = {};
   const dmgOutPoints = [];
   const petStats = {}; // name -> { dmg, heals, hits, crits, bySource:{} }
   function petBucket(name) {
@@ -263,6 +270,7 @@ export function buildStats(events, playerNameHint) {
   let lastMeleeLabel = 'Melee'; // bucket key the most recent swing landed in — crit/extra follow-ups reuse it,
                                  // so a style's crit or a spell's "extra damage" line lands on the same row
   let lastMeleeWeapon = null;   // weapon behind that same swing, for crit/extra follow-up lines
+  let lastMeleeTarget = null;   // target of that same swing, for the generic crit follow-up line (no target of its own)
   // Whether `lastMeleeLabel` is actually a spell's bucket rather than a
   // real melee one — a melee_plain line with e.spellName set (parser.js
   // attributed it to a recent cast/AE tick/DoT, not a weapon swing) is
@@ -303,7 +311,9 @@ export function buildStats(events, playerNameHint) {
         if (e.styleName) dmgOutBaseName[key] = e.styleName;
         lastMeleeLabel = key;
         lastMeleeIsSpell = false; // always a real weapon swing
+        lastMeleeTarget = e.target;
         bump(dmgOutBySource, key, e.dmg, false);
+        if (e.target) bump(dmgOutByTarget, e.target, e.dmg, false);
         trackWeapon(key, e.weapon);
         totalMeleeHits++; totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
@@ -320,7 +330,9 @@ export function buildStats(events, playerNameHint) {
         lastMeleeIsSpell = !!e.spellName;
         if (!e.spellName) { lastMeleeWeapon = pendingWeapon; trackWeapon(key, pendingWeapon); }
         else lastMeleeWeapon = null;
+        lastMeleeTarget = e.target;
         bump(dmgOutBySource, key, e.dmg, false);
+        if (e.target) bump(dmgOutByTarget, e.target, e.dmg, false);
         // Only count toward the melee-specific totals (crit rate tile) when
         // this genuinely was a swing — a spell's damage is already counted
         // under its own name in dmgOutBySource just above, via `key`; double
@@ -336,6 +348,8 @@ export function buildStats(events, playerNameHint) {
       }
       case 'melee_extra': {
         bump(dmgOutBySource, lastMeleeLabel, e.dmg, false);
+        if (e.target) bump(dmgOutByTarget, e.target, e.dmg, false);
+        lastMeleeTarget = e.target;
         trackWeapon(lastMeleeLabel, lastMeleeWeapon);
         if (!lastMeleeIsSpell) totalMeleeDmg += e.dmg;
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
@@ -344,6 +358,8 @@ export function buildStats(events, playerNameHint) {
       case 'melee_crit_named':
       case 'melee_crit_generic': {
         bump(dmgOutBySource, lastMeleeLabel, e.dmg, true);
+        const critTarget = e.target || lastMeleeTarget;
+        if (critTarget) { bump(dmgOutByTarget, critTarget, e.dmg, true); lastMeleeTarget = critTarget; }
         trackWeapon(lastMeleeLabel, lastMeleeWeapon);
         if (!lastMeleeIsSpell) { totalMeleeCrits++; totalMeleeDmg += e.dmg; }
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
@@ -376,18 +392,27 @@ export function buildStats(events, playerNameHint) {
           bump(p.bySource, 'Proc', e.dmg, false);
         } else {
           bump(dmgOutBySource, e.name, e.dmg, false);
+          if (e.target) bump(dmgOutByTarget, e.target, e.dmg, false);
         }
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
       case 'ability_crit': {
         if (petNames.has(e.name)) {
-          // Same reasoning as ability_hit above — this is the pet's own
-          // critical proc/spell hit, not a melee crit.
+          // Same reasoning as ability_hit above, plus one more: this text
+          // shape ("Your X critically hits Y for an additional N damage!")
+          // is also exactly what a pet's own melee-swing crit looks like —
+          // there used to be a separate, earlier-matching 'pet_melee_crit'
+          // rule for that in parser.js, which this absorbed (see its own
+          // comment on why). Bucketed as 'Melee' rather than 'Proc' to
+          // match that removed case exactly, not because this line is
+          // actually distinguishable from a pet's proc-spell crit — it
+          // isn't, in the log text itself.
           const p = petBucket(e.name); p.dmg += e.dmg; p.crits++;
-          bump(p.bySource, 'Proc', e.dmg, true);
+          bump(p.bySource, 'Melee', e.dmg, true);
         } else {
           bump(dmgOutBySource, e.name, e.dmg, true);
+          if (e.target) bump(dmgOutByTarget, e.target, e.dmg, true);
         }
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
@@ -402,12 +427,6 @@ export function buildStats(events, playerNameHint) {
       case 'pet_melee_stray': {
         const p = petBucket(e.pet); p.dmg += e.dmg; p.hits++;
         bump(p.bySource, 'Melee (stray)', e.dmg, false);
-        dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
-        break;
-      }
-      case 'pet_melee_crit': {
-        const p = petBucket(e.pet); p.dmg += e.dmg; p.crits++;
-        bump(p.bySource, 'Melee', e.dmg, true);
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
@@ -703,6 +722,7 @@ export function buildStats(events, playerNameHint) {
     damageOut: {
       total: totalDmgOut,
       bySource: dmgOutBySourceFinal,
+      byTarget: finalizeSourceMap(dmgOutByTarget),
       dps: durationSec ? +(totalDmgOut / durationSec).toFixed(1) : 0,
       melee: { hits: totalMeleeHits, crits: totalMeleeCrits, misses: totalMeleeMisses, dmg: totalMeleeDmg,
         critRate: (totalMeleeHits + totalMeleeCrits) ? +(100 * totalMeleeCrits / (totalMeleeHits + totalMeleeCrits)).toFixed(1) : 0 },

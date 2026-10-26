@@ -216,30 +216,49 @@ function tile(label, value) {
 }
 
 // ===========================================================================
-// This tab used to open with its own "Damage done by spell / style /
-// weapon" breakdown (every one of your own abilities and swings, full
-// hit/crit/resist table) sitting right next to a near-identical breakdown
-// on the Spells & Styles tab — same per-ability numbers, same ghost
-// filtering, just two different tables answering the same question. Moved
-// that whole section (plus the "Total damage done"/"DPS"/"Melee crit
-// rate" tiles that went with it) to renderSpells below, which already
-// merges in healing/power-transfer roles and is the natural single place
-// for "what did I actually do" — see its own top-of-function comment.
-// What's left here is deliberately just the other half of the story: what
-// landed on YOU. Renamed the tab to match (see index.html) rather than
-// leave a half-empty page still called "Damage".
+// Damage by PLAYER, not by spell/style/weapon — that per-ability breakdown
+// (every one of your own abilities and swings, full hit/crit/resist table)
+// lives on the Spells & Styles tab instead (see renderSpells below), since
+// "what did I hit with" is already answered there and showing it twice was
+// just two tables answering the same question. This tab answers the other
+// question: who did it land on, and who landed it on you.
 export function renderDamage(container, stats, ctx) {
   clear(container);
+  const dmgOutRows = Object.values(stats.damageOut.byTarget || {});
+  const hitsDealt = dmgOutRows.reduce((a, s) => a + s.totalHits, 0);
+  const critsDealt = dmgOutRows.reduce((a, s) => a + s.crits, 0);
+  const critRateDealt = hitsDealt ? +(100 * critsDealt / hitsDealt).toFixed(1) : 0;
+
   const dmgInRows = Object.values(stats.damageIn.bySource);
   const hitsTaken = dmgInRows.reduce((a, s) => a + s.totalHits, 0);
   const critsTaken = dmgInRows.reduce((a, s) => a + s.crits, 0);
   const critRateTaken = hitsTaken ? +(100 * critsTaken / hitsTaken).toFixed(1) : 0;
-  const g = grid(section(container), 2);
+
+  const g = grid(section(container), 4);
+  statTile(g, { label: 'Damage done', value: fmtNum(stats.damageOut.total), sub: `${fmtNum(stats.damageOut.dps)}/sec` });
+  statTile(g, { label: 'Hits dealt', value: fmtNum(hitsDealt), sub: `${critRateDealt}% crit` });
   statTile(g, { label: 'Damage taken', value: fmtNum(stats.damageIn.total), sub: `${fmtNum(stats.damageIn.dtps)}/sec` });
   statTile(g, { label: 'Hits taken', value: fmtNum(hitsTaken), sub: `${critRateTaken}% crit` });
 
+  const outSec = section(container);
+  h3(outSec, 'Damage Out');
+  const outCard = card(outSec);
+  const outItems = sourceMapToItems(stats.damageOut.byTarget || {});
+  barChart(outCard, { items: outItems, maxItems: 12, colorFn: () => 'var(--series-1)' });
+  dataTable(outCard, {
+    columns: [
+      { key: 'name', label: 'Target', fmt: heraldLink },
+      { key: 'totalHits', label: 'Hits', num: true },
+      { key: 'crits', label: 'Crits', num: true },
+      { key: 'dmg', label: 'Total dmg', num: true, fmt: fmtExact },
+      { key: 'avg', label: 'Avg', num: true },
+      { key: 'max', label: 'Max', num: true },
+    ],
+    rows: sourceMapToRows(stats.damageOut.byTarget || {}),
+  });
+
   const inSec = section(container);
-  h3(inSec, 'Damage taken by attacker');
+  h3(inSec, 'Damage In');
   const inCard = card(inSec);
   const inItems = sourceMapToItems(stats.damageIn.bySource);
   barChart(inCard, { items: inItems, maxItems: 12, colorFn: () => 'var(--series-8)' });
@@ -256,12 +275,14 @@ export function renderDamage(container, stats, ctx) {
   });
 }
 
-// Links an attacker's name on the Punched tab to their Eden Herald profile
-// (https://eden-daoc.net/herald?n=player&k=<name>) — no check that the
-// name is actually a real player with herald data (a keep guard, a siege
-// hazard like "The cauldron of boiling oil", or a pet can show up here
-// just as easily as a real player): asked for directly, since a dead link
-// for something that was never a player is harmless and obvious for
+// Links a player name to their Eden Herald profile
+// (https://eden-daoc.net/herald?n=player&k=<name>) — used for every player
+// name this app shows (Damage In/Out, Healing done/received, deathblow
+// victims — see each table's own `fmt: heraldLink` column). No check that
+// the name is actually a real player with herald data (a keep guard, a
+// siege hazard like "The cauldron of boiling oil", or a pet can show up
+// here just as easily as a real player): asked for directly, since a dead
+// link for something that was never a player is harmless and obvious for
 // anyone who knows the game, and Eden's own herald lookup appears to
 // require being logged into their site to even check from here. `name` is
 // escaped since it comes straight from the parsed log text, not written
@@ -307,7 +328,7 @@ export function renderHealing(container, stats, ctx) {
   barChart(outCard, { items, colorFn: (_, i) => seriesColor(i + 2) });
   dataTable(outCard, {
     columns: [
-      { key: 'name', label: 'Target' },
+      { key: 'name', label: 'Target', fmt: heraldLink },
       { key: 'totalHits', label: 'Heals', num: true },
       { key: 'crits', label: 'Crit heals', num: true },
       { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
@@ -325,7 +346,7 @@ export function renderHealing(container, stats, ctx) {
   barChart(inCard, { items: inItems, colorFn: () => 'var(--series-3)' });
   dataTable(inCard, {
     columns: [
-      { key: 'name', label: 'Healer' },
+      { key: 'name', label: 'Healer', fmt: heraldLink },
       { key: 'totalHits', label: 'Heals', num: true },
       { key: 'dmg', label: 'Total received', num: true, fmt: fmtExact },
       { key: 'avg', label: 'Avg', num: true },
@@ -486,7 +507,7 @@ export function renderRealm(container, stats, ctx) {
     dataTable(dbCard, {
       columns: [
         { key: 'time', label: 'Time' },
-        { key: 'victim', label: 'Killed' },
+        { key: 'victim', label: 'Killed', fmt: heraldLink },
         { key: 'zone', label: 'Zone' },
         { key: 'rp', label: 'RP', num: true },
       ],
