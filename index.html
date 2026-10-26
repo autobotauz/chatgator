@@ -121,6 +121,10 @@
       <span class="cooldown-tracker-icon">⏱</span>
       <ul class="cooldown-tracker-list" id="cooldownTrackerList"></ul>
     </div>
+    <div class="enemies-targeted" id="enemiesTargetedRow" hidden title="The last 5 enemy players confirmed by examining them in-game (not just anyone you targeted) — shown on every tab. Newest comes in from the right; the oldest drops off the left past 5. Click a name to view them on the Eden Herald.">
+      <span class="enemies-targeted-icon">🎯</span>
+      <ul class="enemies-targeted-list" id="enemiesTargetedList"></ul>
+    </div>
     <div class="last-updated" id="lastUpdated" hidden>
       <span id="lastUpdatedText" title="When this view last picked up NEW lines from the log. If this lags while 'File checked' stays fresh, the file on disk genuinely hasn't grown yet — most likely the game client is still buffering those lines and hasn't flushed them to disk, not a problem with Chat Gator's polling."></span>
       <span id="lastCheckedText" hidden title="When we last successfully asked the OS for the watched file's current state, whether or not it had grown. This should track your refresh interval closely — if THIS lags too, the poll loop itself has stalled (e.g. this tab got backgrounded and the browser throttled its timers, or the file handle needs permission re-granted)."></span>

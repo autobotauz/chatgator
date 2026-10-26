@@ -149,6 +149,32 @@ export function getBgBroadcasts(events) {
   return [...map.values()].sort((a, b) => (b.clock ?? 0) - (a.clock ?? 0));
 }
 
+// "Last N enemies targeted" -- a rolling window of the last 5 players
+// confirmed as real enemies via the game's own examine action (see
+// js/parser.js's 'examine_enemy' rule: "You examine X. He is a member of
+// an enemy realm!"). Exported standalone (not only reached via buildStats)
+// so the header-area card row can show the latest targets for the whole
+// session regardless of which encounter/tab is currently selected -- same
+// reasoning as getBgBroadcasts just above.
+//
+// Immediate repeats (examining the same still-targeted enemy again right
+// away) update the existing entry's clock instead of adding a duplicate
+// card, but the same name CAN reappear as a fresh entry later if something
+// else was targeted in between -- this is a recency window, not a unique
+// roster, so re-targeting an old enemy legitimately bumps them back to the
+// front. Returned oldest-first/newest-last, matching the card row's visual
+// order (new cards enter from the right).
+export function getEnemiesTargeted(events, limit = 5) {
+  const list = [];
+  for (const e of events) {
+    if (e.type !== 'examine_enemy') continue;
+    const last = list[list.length - 1];
+    if (last && last.name === e.name) { last.clock = e.clock; continue; }
+    list.push({ name: e.name, clock: e.clock });
+  }
+  return list.slice(-limit);
+}
+
 function emptySourceStat() {
   return { hits: 0, crits: 0, dmg: 0, critDmg: 0, min: null, max: 0, misses: 0, resists: 0 };
 }

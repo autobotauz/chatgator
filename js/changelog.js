@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'New: Enemies targeted row',
+    bullets: [
+      'Shows the last 5 enemy players you\'ve actually confirmed by examining them in-game — not just anyone you clicked on',
+      'Each one links to their Eden Herald page, same as every other player name in the app',
+      'New enemies slide in from the right; once there are 5, the oldest drops off the left',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'Herald links: your own name, and fewer dead links',
     bullets: [
       'Healing yourself used to show up as the target "You" (and a dead herald link to match) — it now shows your actual character name, linked to your Eden Herald page like everyone else',

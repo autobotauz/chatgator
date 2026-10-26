@@ -1,5 +1,5 @@
 import { parseLogText } from './parser.js';
-import { buildStats, segmentEncounters, segmentCheckpoints, getBgBroadcasts } from './aggregate.js';
+import { buildStats, segmentEncounters, segmentCheckpoints, getBgBroadcasts, getEnemiesTargeted } from './aggregate.js';
 import { renderers, heraldLink, escHtml } from './ui.js';
 import { loadSkillIndex } from './skills.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
@@ -324,6 +324,8 @@ function startNewSession() {
   el('btnDownloadSnapshot').hidden = true;
   el('snapshotPill').hidden = true;
   el('bgTicker').hidden = true;
+  el('enemiesTargetedRow').hidden = true;
+  lastRenderedNewestKey = null;
   el('cooldownTracker').hidden = true;
   el('lastUpdated').hidden = true;
   state.rawEvents = []; state.unmatched = [];
@@ -793,6 +795,7 @@ function renderActiveTab() {
   if (!state.rawEvents.length) return;
   const stats = currentStats();
   renderBgTicker();
+  renderEnemiesTargeted();
   renderCooldownTracker();
   renderLastUpdated();
 
@@ -879,6 +882,49 @@ function renderBgTicker() {
     li.appendChild(text);
     list.appendChild(li);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Enemies targeted — persistent across every tab, same reasoning as the /bg
+// ticker just above: always built from the *whole* session, independent of
+// the encounter picker. Shows the last ENEMIES_TARGETED_LIMIT real enemy
+// players confirmed via the game's own examine action (see parser.js's
+// 'examine_enemy' rule and aggregate.js's getEnemiesTargeted) as a row of
+// small cards. New cards enter from the right and push older ones left;
+// once there are more than the limit, the oldest (leftmost) is simply
+// dropped by getEnemiesTargeted's own slice before we ever render it.
+//
+// lastRenderedNewestKey remembers which entry was newest last time we
+// rendered, purely so we can tell whether THIS render's newest entry is
+// actually new (and deserves the slide-in animation) or just the same
+// entry being redrawn again (e.g. the player switched tabs, which re-runs
+// renderActiveTab but hasn't targeted anyone new) -- without this, every
+// render would replay the entrance animation on the rightmost card.
+// ---------------------------------------------------------------------------
+const ENEMIES_TARGETED_LIMIT = 5;
+let lastRenderedNewestKey = null;
+
+function renderEnemiesTargeted() {
+  const enemies = getEnemiesTargeted(state.rawEvents, ENEMIES_TARGETED_LIMIT);
+  const row = el('enemiesTargetedRow');
+  const list = el('enemiesTargetedList');
+  list.innerHTML = '';
+  if (!enemies.length) { row.hidden = true; return; }
+  row.hidden = false;
+  const newest = enemies[enemies.length - 1];
+  const newestKey = `${newest.name}@${newest.clock}`;
+  const isFreshEntry = lastRenderedNewestKey !== null && newestKey !== lastRenderedNewestKey;
+  enemies.forEach((enemy, i) => {
+    const card = document.createElement('div');
+    card.className = 'enemy-card';
+    if (i === enemies.length - 1 && isFreshEntry) card.classList.add('enemy-card-enter');
+    // heraldLink() already escapes the name and skips linking anything
+    // containing a space (never a real player) -- same safety net every
+    // other player name in this app gets.
+    card.innerHTML = heraldLink(enemy.name);
+    list.appendChild(card);
+  });
+  lastRenderedNewestKey = newestKey;
 }
 
 // ---------------------------------------------------------------------------
