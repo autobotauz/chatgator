@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Watching-live indicator matches your realm',
+    bullets: [
+      'The green "Watching live" dot and label in the header now tint to your class\'s realm, same as the live background',
+      'Albion = red, Midgard = blue, Hibernia = green',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'Herald links on the Punched tab',
     bullets: [
       "Every attacker in \"Damage taken by attacker\" now links to their Eden Herald page",

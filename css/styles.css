@@ -26,6 +26,7 @@
   --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-450: #2a78d6; --seq-650: #104281;
 
   --status-good: #0ca30c;
+  --watch-color: var(--status-good); /* tinted per-realm in app.js, see js/realm.js */
   --status-warning: #fab219;
   --status-serious: #ec835a;
   --status-critical: #d03b3b;
@@ -322,16 +323,16 @@ details.debug summary { cursor: pointer; }
 details.debug pre { max-height: 220px; overflow: auto; background: var(--surface-2); padding: 10px; border-radius: var(--radius-sm); white-space: pre-wrap; }
 
 .watch-status { display:flex; align-items:center; gap:9px; font-size: 14px; font-weight: 600; color: var(--text-secondary); }
-.watch-status:has(.watch-dot.live) { color: var(--status-good); }
+.watch-status:has(.watch-dot.live) { color: var(--watch-color); transition: color .2s; }
 .watch-dot { width:12px; height:12px; border-radius:50%; background: var(--text-muted); transition: background .2s; }
 .watch-dot.live {
-  background: var(--status-good);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-good) 25%, transparent);
+  background: var(--watch-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--watch-color) 25%, transparent);
   animation: watch-pulse 1.6s ease-in-out infinite;
 }
 @keyframes watch-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-good) 25%, transparent); }
-  50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--status-good) 12%, transparent); }
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--watch-color) 25%, transparent); }
+  50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--watch-color) 12%, transparent); }
 }
 @media (prefers-reduced-motion: reduce) {
   .watch-dot.live { animation: none; }

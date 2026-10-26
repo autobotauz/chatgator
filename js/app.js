@@ -730,10 +730,14 @@ function renderActiveTab() {
   // inferredClass (see aggregate.js's inferClass) is only ever set when
   // confident, so appending it here is never a guess shown as a fact.
   const classSuffix = stats.meta.inferredClass ? ` (${stats.meta.inferredClass.name})` : '';
-  // Re-tint the live background (if it's running) to the selected player's
-  // class's realm — see js/realm.js. Harmless to call even when the
-  // background isn't currently showing; it just sits unused until it is.
-  setLiveBackgroundColor(realmColorForClass(stats.meta.inferredClass?.name));
+  // Re-tint the live background (if it's running), and the "Watching
+  // live" dot/label in the header, to the selected player's class's
+  // realm — see js/realm.js. Harmless to call even when the background
+  // isn't currently showing; it just sits unused until it is.
+  const realmColor = realmColorForClass(stats.meta.inferredClass?.name);
+  setLiveBackgroundColor(realmColor);
+  if (realmColor) document.documentElement.style.setProperty('--watch-color', `rgb(${realmColor})`);
+  else document.documentElement.style.removeProperty('--watch-color');
   el('characterName').textContent = stats.meta.playerName ? `👤 ${stats.meta.playerName}${classSuffix}` : '👤 (name not found — look for a /stats block, or it\'s just not in this log)';
   // "the whole file" is only accurate when there's nothing to scope away —
   // a single player, no /stats-separated checkpoints. Once either kind of
