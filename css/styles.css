@@ -88,6 +88,27 @@ a { color: var(--series-1); }
 }
 #liveBgCanvas.active { display: block; }
 
+/* AdSense side rails -- only shown once the viewport is wide enough to fit
+   the 1180px content column plus both 160px rails and a comfortable gutter
+   on each side, so they never crowd or overlap the app itself. Fixed so
+   they stay in view while the page scrolls, like a typical side-rail ad. */
+.ad-rail {
+  display: none;
+  position: fixed; top: 140px; width: 160px; min-height: 300px;
+  z-index: 2;
+}
+.ad-rail-left { left: 12px; }
+.ad-rail-right { right: 12px; }
+.ad-rail .adsbygoogle { display: block; width: 160px; min-height: 300px; }
+@media (min-width: 1550px) {
+  .ad-rail { display: block; }
+}
+
+/* AdSense bottom banner -- sits inside .app-shell's own column, below the
+   footer note, so it's always present regardless of viewport width. */
+.ad-rail-bottom { margin: 28px 0 0; }
+.ad-rail-bottom .adsbygoogle { display: block; width: 100%; min-height: 90px; }
+
 /* ---------- header ---------- */
 .app-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
 .app-title { display: flex; align-items: baseline; gap: 10px; }
