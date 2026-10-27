@@ -259,15 +259,29 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
   // hoverable dots would mostly just shadow one another. Hovering the chart
   // anywhere (below) reports a plain count for whichever bucket it lands
   // in instead, which degrades gracefully no matter how many land together.
-  markers.forEach((m) => {
+  //
+  // A `solid` marker (e.g. a checkpoint boundary) is a seam in the data
+  // itself rather than something that happened, so it's drawn full-height
+  // and undashed, at lower opacity, and -- crucially -- rendered in its own
+  // pass BEFORE the dashed event markers below, so a checkpoint line never
+  // visually sits on top of (and dims out) a death/deathblow rule that
+  // lands at the same moment.
+  const solidMarkers = markers.filter(m => m.solid);
+  const dashedMarkers = markers.filter(m => !m.solid);
+  [...solidMarkers, ...dashedMarkers].forEach((m) => {
     const mx = x(m.t);
     const rule = document.createElementNS(svgNS, 'line');
     rule.setAttribute('x1', mx); rule.setAttribute('x2', mx);
     rule.setAttribute('y1', pad.top); rule.setAttribute('y2', pad.top + innerH);
     rule.setAttribute('stroke', m.color || 'var(--series-7)');
-    rule.setAttribute('stroke-width', '1.5');
-    rule.setAttribute('stroke-dasharray', '3,3');
-    rule.setAttribute('opacity', '0.75');
+    if (m.solid) {
+      rule.setAttribute('stroke-width', '1');
+      rule.setAttribute('opacity', '0.35');
+    } else {
+      rule.setAttribute('stroke-width', '1.5');
+      rule.setAttribute('stroke-dasharray', '3,3');
+      rule.setAttribute('opacity', '0.75');
+    }
     svg.appendChild(rule);
   });
 
@@ -303,7 +317,10 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
       return `<div class="tt-row"><span><span class="swatch" style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${s.color};margin-right:5px;"></span>${esc(s.name)}</span><span>${p ? fmtExact(p.v) : 0}</span></div>`;
     }).join('');
     const bucketCenter = basePoints[idx] ? basePoints[idx].t : t;
-    const nearbyMarkers = markers.filter(m => Math.abs(m.t - bucketCenter) <= bucketWidth / 2);
+    // excludeFromTooltip markers (checkpoint boundaries) are a seam in the
+    // data, not an event -- "1 checkpoint" in the hover readout wouldn't
+    // tell anyone anything useful the solid line itself doesn't already.
+    const nearbyMarkers = markers.filter(m => !m.excludeFromTooltip && Math.abs(m.t - bucketCenter) <= bucketWidth / 2);
     const markerRows = [];
     for (const m of nearbyMarkers) {
       const existing = markerRows.find(r => r.label === (m.label || 'Event'));

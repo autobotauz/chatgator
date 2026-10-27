@@ -175,6 +175,8 @@ export function renderOverview(container, stats, ctx) {
     { color: 'var(--series-8)', label: 'Damage taken' },
     { color: 'var(--series-4)', label: 'Realm points' },
     { color: 'var(--series-7)', label: 'Deathblow' },
+    { color: 'var(--status-critical)', label: 'Death' },
+    { color: 'var(--text-primary)', label: 'Checkpoint' },
   ]);
   timelineChart(tlCard, {
     series: [
@@ -183,12 +185,31 @@ export function renderOverview(container, stats, ctx) {
       { name: 'Damage taken', color: 'var(--series-8)', points: stats.damageIn.timeline.map(p => ({ t: p.t, v: p.v })) },
       { name: 'Realm points', color: 'var(--series-4)', points: stats.realmPoints.timeline.map(p => ({ t: p.t, v: p.v })) },
     ],
-    // Deathblows are discrete "it happened" moments, not a quantity worth
-    // its own line — plotted as markers so they can be read against the
-    // damage/heal/RP lines rather than against each other. No victim name
-    // here by design (just the dot + time); the Realm Points tab's
-    // Deathblows table has the per-kill detail.
-    markers: stats.kills.deathblowLog.map(d => ({ t: d.clock, color: 'var(--series-7)', label: 'Deathblow' })),
+    // Deathblows and your own deaths are both discrete "it happened"
+    // moments, not a quantity worth their own line — plotted as markers so
+    // they can be read against the damage/heal/RP lines rather than
+    // against each other. No victim/killer name here by design (just the
+    // dot + time); the Realm Points tab's Deathblows table has the
+    // per-kill detail.
+    //
+    // Checkpoint boundaries (each 'Statistics for X this Session:' header
+    // within whatever's currently in view) are a different kind of thing
+    // entirely -- not an event that happened TO you, but a seam in the data
+    // itself -- so they're drawn as solid full-height lines instead of
+    // dashed colored ones, underneath everything else (see timelineChart),
+    // and deliberately left out of the per-bucket hover tooltip's event
+    // count: a count of "how many checkpoints are in this one bucket" isn't
+    // a useful thing to tell someone, unlike "how many deathblows".
+    // Encounter boundaries were the other option here, but a single
+    // farming session can have dozens of them a few seconds apart -- so
+    // dense they'd turn the chart into a picket fence instead of adding
+    // signal. Checkpoints (a re-run /stats, or truly a new one) are far
+    // rarer and far more meaningful as a "something changed here" marker.
+    markers: [
+      ...stats.meta.checkpointStarts.map(t => ({ t, color: 'var(--text-primary)', solid: true, excludeFromTooltip: true })),
+      ...stats.kills.deathblowLog.map(d => ({ t: d.clock, color: 'var(--series-7)', label: 'Deathblow' })),
+      ...stats.kills.deathLog.map(d => ({ t: d.clock, color: 'var(--status-critical)', label: 'Death' })),
+    ],
   });
 
   if (stats.meta.latestSnapshot) {

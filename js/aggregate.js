@@ -269,9 +269,21 @@ export function buildStats(events, playerNameHint) {
   // ---- /stats snapshots (most recent wins) --------------------------------
   let playerName = playerNameHint || null;
   const statsSnapshots = [];
+  // Each 'stats_header' line is a checkpoint boundary (see segmentCheckpoints
+  // above) within whatever events were handed to us -- when the Overview
+  // chart is showing every checkpoint concatenated (checkpointScope 'all'),
+  // these are the seams between them, surfaced to app.js as vertical marker
+  // lines so a re-run /stats mid-session (or the start of a genuinely new
+  // one) is visible against the activity around it, not just implied by the
+  // checkpoint picker. The very first one is still included -- it just lands
+  // at (or near) the chart's own left edge, where it's harmless.
+  const checkpointStarts = [];
   let curSnap = null;
   for (const e of events) {
-    if (e.type === 'stats_header') { curSnap = { player: e.player }; statsSnapshots.push(curSnap); playerName = playerName || e.player; }
+    if (e.type === 'stats_header') {
+      curSnap = { player: e.player }; statsSnapshots.push(curSnap); playerName = playerName || e.player;
+      if (e.clock != null) checkpointStarts.push(e.clock);
+    }
     else if (curSnap) {
       if (e.type === 'stats_total_rp') curSnap.totalRP = e.value;
       else if (e.type === 'stats_deathblows') curSnap.deathblows = e.value;
@@ -663,10 +675,17 @@ export function buildStats(events, playerNameHint) {
   // ---- kills / deaths ------------------------------------------------------------
   let deathblows = 0, deaths = 0, resurrectedCount = 0;
   const killVictims = [];
+  // Your own deaths, timestamped -- the mirror image of deathblowLog just
+  // below (that one's kill_feed with YOU as killer; this is kill_feed with
+  // YOU as victim). Feeds the Overview chart's red "Death" marker lines,
+  // same reasoning as that chart's existing deathblow markers: a death is a
+  // discrete "it happened" moment worth correlating against the
+  // damage/heal/RP lines around it, not a quantity with its own line.
+  const deathLog = [];
   for (const e of events) {
     if (e.type === 'kill_feed' && playerName) {
       if (normalizeName(e.killer) === normalizeName(playerName)) { deathblows++; killVictims.push(e.victim); }
-      if (normalizeName(e.victim) === normalizeName(playerName)) deaths++;
+      if (normalizeName(e.victim) === normalizeName(playerName)) { deaths++; deathLog.push({ killer: e.killer, zone: e.zone, clock: e.clock }); }
     }
     if (e.type === 'resurrected_by') resurrectedCount++;
   }
@@ -791,7 +810,7 @@ export function buildStats(events, playerNameHint) {
   return {
     meta: {
       playerName, startClock, endClock, durationMs,
-      statsSnapshots, latestSnapshot,
+      statsSnapshots, latestSnapshot, checkpointStarts,
       petNames: Array.from(petNames),
       inferredClass,
     },
@@ -854,7 +873,7 @@ export function buildStats(events, playerNameHint) {
         Object.entries(rpPointsByReason).map(([reason, pts]) => [reason, bucketTimeline(pts, startClock, endClock)])
       ),
     },
-    kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal },
+    kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal, deathLog },
     spellsCast: Array.from(castNames),
     castCountByName,
     bgBroadcasts,

@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-27',
+    title: 'Overview chart: death and checkpoint markers',
+    bullets: [
+      'Added a red dashed line for each of your own deaths, right alongside the existing deathblow marker',
+      'Added a solid line for each checkpoint boundary (a /stats re-run, or a genuinely new one) so you can see where the data seams are',
+    ],
+  },
+  {
+    date: '2026-10-27',
     title: 'Fixed: most targeted enemies were missing from the row',
     bullets: [
       'DAoC confirms an enemy with "...is a member of an enemy realm!" when they\'re solo, but "...an enemy group!" when they\'re grouped -- we were only recognizing the solo wording',
