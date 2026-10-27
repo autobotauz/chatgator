@@ -174,20 +174,44 @@ export function getBgBroadcasts(events) {
 // card, but the same name CAN reappear as a fresh entry later if something
 // else was targeted in between -- this is a recency window, not a unique
 // roster, so re-targeting an old enemy legitimately bumps them back to the
-// front. Returned oldest-first/newest-last, matching the card row's visual
-// order (new cards enter from the right).
-export function getEnemiesTargeted(events, limit = 5) {
+// front. Returned oldest-first/newest-last; app.js is the one that flips
+// this for display now that new cards enter on the left instead of the
+// right, and uses each entry's `seq` (not name+clock, which an immediate
+// repeat's clock bump would change without this actually being a new
+// entry) to tell a genuinely new card from the same one re-rendering.
+//
+// `playerName`, when given, also sets `killed: true` on an entry when a
+// kill_feed line ("<victim> was just killed by <killer> in <zone>.")
+// shows this player as the killer, that victim matching this entry's
+// name, at or after this entry's own clock -- i.e. you finished off THIS
+// confirmed target, not a same-named enemy you'd killed earlier before
+// targeting this (possibly respawned) one.
+export function getEnemiesTargeted(events, limit = 5, playerName = null) {
   const list = [];
   let lastTargetName = null;
+  let seq = 0;
   for (const e of events) {
     if (e.type === 'target') { lastTargetName = e.target; continue; }
     if (e.type !== 'examine_enemy' || !lastTargetName) continue;
     const name = lastTargetName;
     const last = list[list.length - 1];
     if (last && last.name === name) { last.clock = e.clock; continue; }
-    list.push({ name, clock: e.clock });
+    list.push({ name, clock: e.clock, seq: seq++, killed: false });
   }
-  return list.slice(-limit);
+  const trimmed = list.slice(-limit);
+  if (playerName) {
+    const normPlayer = normalizeName(playerName);
+    for (const entry of trimmed) {
+      const normName = normalizeName(entry.name);
+      entry.killed = events.some(e =>
+        e.type === 'kill_feed' &&
+        e.clock != null && entry.clock != null && e.clock >= entry.clock &&
+        normalizeName(e.killer) === normPlayer &&
+        normalizeName(e.victim) === normName
+      );
+    }
+  }
+  return trimmed;
 }
 
 function emptySourceStat() {

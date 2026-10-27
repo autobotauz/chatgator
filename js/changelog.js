@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Enemies targeted: fills left-to-right, red on a kill',
+    bullets: [
+      'New targets now slide in from the left and push older ones right, instead of the other way around',
+      'The row shows all 5 slots right away as dashed placeholders, filling in one by one as you confirm real targets',
+      'Once you land the deathblow on someone in the row, their name turns red (with a \u{1F480}) so you can see you got them',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'Fixed: Enemies targeted showed race, not player, names',
     bullets: [
       'The enemies-targeted cards were showing words like "Norseman", "Dwarf", "Kobold", and "Frostalf" -- that\'s the enemy\'s race, not their name',

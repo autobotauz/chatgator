@@ -325,7 +325,9 @@ function startNewSession() {
   el('snapshotPill').hidden = true;
   el('bgTicker').hidden = true;
   el('enemiesTargetedRow').hidden = true;
-  lastRenderedNewestKey = null;
+  el('enemiesTargetedList').innerHTML = '';
+  lastRenderedNewestSeq = null;
+  lastRenderedRealCount = 0;
   el('cooldownTracker').hidden = true;
   el('lastUpdated').hidden = true;
   state.rawEvents = []; state.unmatched = [];
@@ -795,7 +797,7 @@ function renderActiveTab() {
   if (!state.rawEvents.length) return;
   const stats = currentStats();
   renderBgTicker();
-  renderEnemiesTargeted();
+  renderEnemiesTargeted(stats.meta.playerName);
   renderCooldownTracker();
   renderLastUpdated();
 
@@ -890,41 +892,136 @@ function renderBgTicker() {
 // the encounter picker. Shows the last ENEMIES_TARGETED_LIMIT real enemy
 // players confirmed via the game's own examine action (see parser.js's
 // 'examine_enemy' rule and aggregate.js's getEnemiesTargeted) as a row of
-// small cards. New cards enter from the right and push older ones left;
-// once there are more than the limit, the oldest (leftmost) is simply
-// dropped by getEnemiesTargeted's own slice before we ever render it.
+// small cards, newest on the LEFT. New cards enter from the left and push
+// older ones right; the empty slots not yet filled by a real target show as
+// dashed placeholder cards (so the row doesn't keep resizing as you play),
+// and once all ENEMIES_TARGETED_LIMIT slots are real cards, a new target
+// pushes the oldest (now rightmost) one out off the right edge instead of
+// consuming a placeholder.
 //
-// lastRenderedNewestKey remembers which entry was newest last time we
-// rendered, purely so we can tell whether THIS render's newest entry is
-// actually new (and deserves the slide-in animation) or just the same
-// entry being redrawn again (e.g. the player switched tabs, which re-runs
-// renderActiveTab but hasn't targeted anyone new) -- without this, every
-// render would replay the entrance animation on the rightmost card.
+// lastRenderedNewestSeq/lastRenderedRealCount remember the previous
+// render's state purely so we can tell whether THIS render's newest entry
+// is actually new (deserves the slide-in-from-left animation, and -- if
+// we were already full -- bumps the old rightmost card out) or just the
+// same data being redrawn again (e.g. the player switched tabs, which
+// re-runs renderActiveTab but hasn't targeted anyone new) -- without this,
+// every render would replay the entrance/exit animations. `seq` (not
+// name+clock) is what getEnemiesTargeted gives each entry specifically so
+// an immediate repeat-examine of the current target, which only bumps that
+// entry's clock in place, is never mistaken for a new card.
 // ---------------------------------------------------------------------------
 const ENEMIES_TARGETED_LIMIT = 5;
-let lastRenderedNewestKey = null;
+const ENEMY_CARD_ANIM_MS = 260;
+let lastRenderedNewestSeq = null;
+let lastRenderedRealCount = 0;
 
-function renderEnemiesTargeted() {
-  const enemies = getEnemiesTargeted(state.rawEvents, ENEMIES_TARGETED_LIMIT);
+function renderEnemiesTargeted(playerName) {
+  const real = getEnemiesTargeted(state.rawEvents, ENEMIES_TARGETED_LIMIT, playerName).slice().reverse(); // newest-first for display
   const row = el('enemiesTargetedRow');
   const list = el('enemiesTargetedList');
-  list.innerHTML = '';
-  if (!enemies.length) { row.hidden = true; return; }
+
+  if (!real.length) {
+    row.hidden = true;
+    list.innerHTML = '';
+    lastRenderedNewestSeq = null;
+    lastRenderedRealCount = 0;
+    return;
+  }
   row.hidden = false;
-  const newest = enemies[enemies.length - 1];
-  const newestKey = `${newest.name}@${newest.clock}`;
-  const isFreshEntry = lastRenderedNewestKey !== null && newestKey !== lastRenderedNewestKey;
-  enemies.forEach((enemy, i) => {
+
+  const newestSeq = real[0].seq;
+  const isFreshEntry = lastRenderedNewestSeq !== null && newestSeq !== lastRenderedNewestSeq;
+  const wasAtCapacity = lastRenderedRealCount >= ENEMIES_TARGETED_LIMIT;
+  paintEnemyCards(list, real, {
+    animateEnter: isFreshEntry,
+    animateExit: isFreshEntry && wasAtCapacity,
+  });
+
+  lastRenderedNewestSeq = newestSeq;
+  lastRenderedRealCount = real.length;
+}
+
+// Rebuilds #enemiesTargetedList's children to match `real` (newest-first)
+// padded with dashed placeholder slots up to ENEMIES_TARGETED_LIMIT, using
+// the FLIP technique so cards that are simply shifting right (to make room
+// for a new one entering on the left) visibly slide into their new spot
+// instead of snapping there -- only the truly new entry and, when full, the
+// truly displaced one get their own dedicated enter/exit animation.
+function paintEnemyCards(list, real, { animateEnter, animateExit }) {
+  // 1. Measure every current card's position *before* touching the DOM,
+  // keyed by something stable across renders: the enemy name for a real
+  // card, or its slot index for a placeholder (so a placeholder quietly
+  // shifting right along with everything else still gets FLIP'd, while one
+  // disappearing off the end because a real card took its place just
+  // doesn't match anything new and is dropped with no animation -- fine
+  // for an empty slot).
+  const oldRects = new Map();
+  Array.from(list.children).forEach(child => {
+    if (child.dataset.key) oldRects.set(child.dataset.key, child.getBoundingClientRect());
+  });
+
+  // 2. The card about to be bumped out (only when already full) keeps
+  // playing its exit animation after everything else below has already
+  // moved on without it -- detach it now so the rebuild doesn't just
+  // delete it outright, and reattach it as a trailing extra element once
+  // the new content is in place.
+  const exitingNode = animateExit ? list.lastElementChild : null;
+  if (exitingNode) list.removeChild(exitingNode);
+
+  // 3. Rebuild: real cards first (newest-left), then dashed placeholders
+  // filling the rest of the row.
+  list.innerHTML = '';
+  real.forEach((enemy, i) => {
     const card = document.createElement('div');
     card.className = 'enemy-card';
-    if (i === enemies.length - 1 && isFreshEntry) card.classList.add('enemy-card-enter');
+    card.dataset.key = enemy.name;
+    if (enemy.killed) card.classList.add('enemy-card-killed');
     // heraldLink() already escapes the name and skips linking anything
     // containing a space (never a real player) -- same safety net every
     // other player name in this app gets.
-    card.innerHTML = heraldLink(enemy.name);
+    card.innerHTML = (enemy.killed ? '💀 ' : '') + heraldLink(enemy.name);
+    if (i === 0 && animateEnter) card.classList.add('enemy-card-enter');
     list.appendChild(card);
   });
-  lastRenderedNewestKey = newestKey;
+  for (let i = real.length; i < ENEMIES_TARGETED_LIMIT; i++) {
+    const ph = document.createElement('div');
+    ph.className = 'enemy-card enemy-card-placeholder';
+    ph.dataset.key = `placeholder-${i - real.length}`;
+    ph.textContent = '···';
+    list.appendChild(ph);
+  }
+
+  // 4. FLIP: for every card that survived (same key, old and new), jump it
+  // to where it used to be with no transition, then let it transition back
+  // to its real (new) spot -- the entering card is skipped since its own
+  // enter keyframe already covers it, and the exiting one isn't in the new
+  // set at all.
+  Array.from(list.children).forEach(child => {
+    if (!child.dataset.key || child.classList.contains('enemy-card-enter')) return;
+    const oldRect = oldRects.get(child.dataset.key);
+    if (!oldRect) return;
+    const newRect = child.getBoundingClientRect();
+    const delta = oldRect.left - newRect.left;
+    if (Math.abs(delta) < 1) return;
+    child.style.transition = 'none';
+    child.style.transform = `translateX(${delta}px)`;
+    requestAnimationFrame(() => {
+      child.style.transition = `transform ${ENEMY_CARD_ANIM_MS}ms ease`;
+      child.style.transform = '';
+    });
+    child.addEventListener('transitionend', () => {
+      child.style.transition = '';
+    }, { once: true });
+  });
+
+  // 5. Re-attach the displaced card as a trailing 6th element so it visibly
+  // slides further right and fades, clipped by the row's overflow:hidden,
+  // then actually remove it once the animation finishes.
+  if (exitingNode) {
+    exitingNode.classList.add('enemy-card-exit');
+    list.appendChild(exitingNode);
+    exitingNode.addEventListener('animationend', () => exitingNode.remove(), { once: true });
+  }
 }
 
 // ---------------------------------------------------------------------------

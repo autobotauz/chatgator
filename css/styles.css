@@ -273,12 +273,24 @@ a { color: var(--series-1); }
   padding: 5px 10px; font-size: 12.5px; max-width: 160px;
 }
 .enemy-card .herald-link { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 140px; }
-/* New cards enter from the right -- the FIFO window itself (capping at 5,
-   dropping the oldest off the left) is handled in getEnemiesTargeted();
-   this is purely the entrance animation applied to the newest card by
-   renderEnemiesTargeted() in app.js. */
-@keyframes enemyCardEnter { from { transform: translateX(28px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.enemy-card-killed, .enemy-card-killed .herald-link { color: var(--status-critical); font-weight: 700; }
+/* Dashed empty slot shown for capacity not yet filled by a real confirmed
+   target, so the row holds its full width (ENEMIES_TARGETED_LIMIT cards)
+   from the moment it first appears instead of growing one card at a time. */
+.enemy-card-placeholder {
+  justify-content: center; border-style: dashed; color: var(--text-muted); opacity: 0.6;
+}
+/* New cards enter from the LEFT and push older ones right; the FIFO
+   window itself (capping at ENEMIES_TARGETED_LIMIT, dropping the oldest
+   off the right once full) is handled in getEnemiesTargeted(). This pair
+   is the dedicated entrance/exit animation for the one truly new card and
+   -- only once already full -- the one truly displaced card; every other
+   card that's merely shifting right a slot is animated separately via the
+   FLIP transform set in app.js's paintEnemyCards(). */
+@keyframes enemyCardEnter { from { transform: translateX(-28px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 .enemy-card-enter { animation: enemyCardEnter 260ms ease-out; }
+@keyframes enemyCardExit { from { transform: translateX(0); opacity: 1; } to { transform: translateX(32px); opacity: 0; } }
+.enemy-card-exit { animation: enemyCardExit 260ms ease-in forwards; }
 
 .last-updated { font-size: 11.5px; color: var(--text-muted); margin: -8px 0 16px 2px; }
 .last-updated #lastUpdatedText.stale, .last-updated #lastCheckedText.stale { color: var(--status-warning); }
