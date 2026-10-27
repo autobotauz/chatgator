@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-26',
+    title: 'Fixed: Enemies targeted showed race, not player, names',
+    bullets: [
+      'The enemies-targeted cards were showing words like "Norseman", "Dwarf", "Kobold", and "Frostalf" -- that\'s the enemy\'s race, not their name',
+      'Now shows the actual player name from the "You target [Name]." line right before it, same as everywhere else',
+    ],
+  },
+  {
+    date: '2026-10-26',
     title: 'New: Enemies targeted row',
     bullets: [
       'Shows the last 5 enemy players you\'ve actually confirmed by examining them in-game — not just anyone you clicked on',

@@ -157,6 +157,18 @@ export function getBgBroadcasts(events) {
 // session regardless of which encounter/tab is currently selected -- same
 // reasoning as getBgBroadcasts just above.
 //
+// Reported directly against a real log: the NAME in that examine line is
+// NOT the player's character name -- it's their RACE ("Frostalf", "Kobold",
+// "Dwarf", "Norseman", ...), always the same handful of words repeating
+// across totally different people. The real name is in the "You target
+// [Name]." line that always fires immediately before it (same timestamp,
+// every single occurrence checked), which is exactly how you'd end up
+// examining them in the first place. So this tracks the most recent
+// 'target' event's name (lastTargetName, carried forward the same way
+// e.g. lastMeleeTarget is elsewhere in this file) and attributes each
+// confirmed-enemy examine to THAT name, ignoring the examine line's own
+// (race) text entirely.
+//
 // Immediate repeats (examining the same still-targeted enemy again right
 // away) update the existing entry's clock instead of adding a duplicate
 // card, but the same name CAN reappear as a fresh entry later if something
@@ -166,11 +178,14 @@ export function getBgBroadcasts(events) {
 // order (new cards enter from the right).
 export function getEnemiesTargeted(events, limit = 5) {
   const list = [];
+  let lastTargetName = null;
   for (const e of events) {
-    if (e.type !== 'examine_enemy') continue;
+    if (e.type === 'target') { lastTargetName = e.target; continue; }
+    if (e.type !== 'examine_enemy' || !lastTargetName) continue;
+    const name = lastTargetName;
     const last = list[list.length - 1];
-    if (last && last.name === e.name) { last.clock = e.clock; continue; }
-    list.push({ name: e.name, clock: e.clock });
+    if (last && last.name === name) { last.clock = e.clock; continue; }
+    list.push({ name, clock: e.clock });
   }
   return list.slice(-limit);
 }
