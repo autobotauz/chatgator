@@ -257,16 +257,20 @@ const RULES = [
   ['item_use', /^(.+?) uses? (.+?)\.$/, m => ({ who: m[1], item: m[2] })],
   ['resurrection_cured', /^(.+?) cures your resurrection sickness\.$/, m => ({ who: m[1] })],
   ['target', /^You target \[(.+?)\]\.$/, m => ({ target: m[1] })],
-  // "You examine <Name>. He/She/It is a member of an enemy realm!" is the
-  // one examine outcome that actually confirms the thing you just targeted
-  // is a real enemy player -- as opposed to a friendly player, a pet, an
-  // NPC, or a neutral mob, none of which print this exact line. Feeds
-  // js/aggregate.js's getEnemiesTargeted(), which drives the "Enemies
-  // targeted" card row. Every OTHER examine outcome (your own realm, a
-  // guard's faction text, etc.) still falls through to the generic
-  // 'You examine ' flavor rule just below, unused -- this only needs to
-  // catch the one case we act on.
-  ['examine_enemy', /^You examine (.+?)\. (?:He|She|It) is a member of an enemy realm!$/, m => ({ name: m[1] })],
+  // "You examine <Name>. He/She/It is a member of an enemy realm/group!"
+  // is the one examine outcome that actually confirms the thing you just
+  // targeted is a real enemy player -- as opposed to a friendly player, a
+  // pet, an NPC, or a neutral mob, none of which print this exact line.
+  // "enemy realm" is the solo wording; "enemy group" is what DAoC prints
+  // for an enemy who's grouped -- confirmed directly against a real log
+  // where "enemy group" outnumbered "enemy realm" more than 60 to 1, so
+  // the original realm-only regex was silently dropping almost every
+  // targeted enemy. Feeds js/aggregate.js's getEnemiesTargeted(), which
+  // drives the "Enemies targeted" card row. Every OTHER examine outcome
+  // (your own realm, a guard's faction text, etc.) still falls through to
+  // the generic 'You examine ' flavor rule just below, unused -- this only
+  // needs to catch the two cases we act on.
+  ['examine_enemy', /^You examine (.+?)\. (?:He|She|It) is a member of an enemy (?:realm|group)!$/, m => ({ name: m[1] })],
 
   // ---- pure flavor text: recognized so it doesn't clutter the "unknown line" debug list,
   // but deliberately not counted toward any stat ----------------------------------------

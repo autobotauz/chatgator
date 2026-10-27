@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-27',
+    title: 'Fixed: most targeted enemies were missing from the row',
+    bullets: [
+      'DAoC confirms an enemy with "...is a member of an enemy realm!" when they\'re solo, but "...an enemy group!" when they\'re grouped -- we were only recognizing the solo wording',
+      'Since most enemies you run into are grouped, this was silently dropping the large majority of real targets from the Enemies targeted row',
+    ],
+  },
+  {
+    date: '2026-10-27',
     title: 'Empty ad slots no longer leave a blank gap',
     bullets: [
       'If an ad spot has nothing to show, it now disappears entirely instead of sitting there as an empty box',
