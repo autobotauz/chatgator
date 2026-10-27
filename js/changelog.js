@@ -11,6 +11,13 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-10-27',
+    title: 'Empty ad slots no longer leave a blank gap',
+    bullets: [
+      'If an ad spot has nothing to show, it now disappears entirely instead of sitting there as an empty box',
+    ],
+  },
+  {
     date: '2026-10-26',
     title: 'Enemies targeted: fills left-to-right, red on a kill',
     bullets: [

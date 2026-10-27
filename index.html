@@ -178,6 +178,26 @@
   (adsbygoogle = window.adsbygoogle || []).push({});
   (adsbygoogle = window.adsbygoogle || []).push({});
   (adsbygoogle = window.adsbygoogle || []).push({});
+
+  // Hide an ad slot's whole container -- not just the <ins> -- the moment
+  // AdSense marks it "unfilled" (nothing to show), so an empty 160px-wide
+  // rail or 90px-tall banner never just sits there reserving space. AdSense
+  // sets data-ad-status on the <ins> itself asynchronously once it's
+  // decided, well after this script runs, so this watches for that
+  // attribute to appear/change rather than checking it once right here.
+  // Uses an inline style (not the `hidden` attribute) because .ad-rail's
+  // own responsive `display` is already set by a media query in
+  // styles.css, which an attribute selector of equal specificity wouldn't
+  // reliably beat.
+  document.querySelectorAll('.adsbygoogle').forEach(ins => {
+    const container = ins.closest('.ad-rail, .ad-rail-bottom');
+    if (!container) return;
+    const hideIfUnfilled = () => {
+      if (ins.dataset.adStatus === 'unfilled') container.style.display = 'none';
+    };
+    hideIfUnfilled();
+    new MutationObserver(hideIfUnfilled).observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });
+  });
 </script>
 </body>
 </html>
