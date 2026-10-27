@@ -277,7 +277,13 @@ a { color: var(--series-1); }
   padding: 5px 10px; font-size: 12.5px; width: 132px;
 }
 .enemy-card .herald-link { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
-.enemy-card-killed, .enemy-card-killed .herald-link { color: var(--status-critical); font-weight: 700; }
+.enemy-card[data-realm] .herald-link { color: rgb(var(--enemy-realm-rgb)); font-weight: 600; }
+.enemy-card[data-realm] { border-left: 3px solid rgb(var(--enemy-realm-rgb)); }
+/* Unknown realm (e.g. Minotaur): neutral text, so the default link blue isn't mistaken for Midgard. */
+.enemy-card:not([data-realm]) .herald-link { color: var(--text-primary); }
+/* Deathblow: the 💀 (added in app.js) is the marker. The name used to turn
+   red here too, but that's now Albion's realm color, so it just goes bold. */
+.enemy-card-killed .herald-link { font-weight: 800; }
 /* Dashed empty slot shown for capacity not yet filled by a real confirmed
    target, so the row holds its full width (however many cards currently
    fit -- see computeEnemyCapacity in app.js) from the moment it first

@@ -50,3 +50,29 @@ export function realmColorForClass(className) {
   const realm = className ? CLASS_REALM[className] : null;
   return realm ? REALM_COLORS[realm] : null;
 }
+
+// Race -> realm, for enemy players. The game's examine line ("You examine
+// Kobold. He is a member of an enemy realm!") only ever reveals an enemy's
+// RACE, never their class (see aggregate.js's getEnemiesTargeted), and every
+// playable race belongs to exactly one realm -- except Minotaur, which all
+// three realms share, so plain "Minotaur" is left unmapped rather than
+// guessed. Its realm-specific names (Korazh / Deifrang / Graoch) are mapped
+// in case the client ever prints those instead. Keys are lowercase with
+// spaces/hyphens removed; look up through realmForRace(), not directly.
+export const RACE_REALM = {
+  // Albion
+  briton: 'Albion', avalonian: 'Albion', highlander: 'Albion', saracen: 'Albion',
+  inconnu: 'Albion', halfogre: 'Albion', korazh: 'Albion',
+  // Midgard
+  norseman: 'Midgard', norsewoman: 'Midgard', troll: 'Midgard', dwarf: 'Midgard',
+  kobold: 'Midgard', valkyn: 'Midgard', frostalf: 'Midgard', deifrang: 'Midgard',
+  // Hibernia
+  celt: 'Hibernia', firbolg: 'Hibernia', elf: 'Hibernia', lurikeen: 'Hibernia',
+  shar: 'Hibernia', sylvan: 'Hibernia', graoch: 'Hibernia',
+};
+
+// 'Albion' | 'Midgard' | 'Hibernia', or null for an unknown/shared race.
+export function realmForRace(race) {
+  if (!race) return null;
+  return RACE_REALM[race.toLowerCase().replace(/[\s-]+/g, '')] || null;
+}

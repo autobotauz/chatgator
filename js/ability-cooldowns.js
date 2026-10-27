@@ -1,18 +1,15 @@
 // ability-cooldowns.js — GENERATED FILE, do not hand-edit.
-// Produced by tools/build-ability-cooldowns.py from a charplan export, with
-// a one-time whitespace-key fix applied by tools/fix-ability-name-whitespace.py
-// (see that script's header) — the next real regeneration from a fresh
-// charplan export supersedes this patch.
+// Produced by tools/build-ability-cooldowns.py from a charplan export.
 // Flat map of ability name -> { cooldownSeconds, cooldown (display string), icon }.
 // `icon` is charplan's raw value (a spell-effect id for spells, an icon id
 // otherwise) — the UI shows pictures via js/icons.js / js/ability-icons.js instead.
 //
 // A handful of ability names are deliberately left out of this map:
-//   - names with a multi-rank cooldown (Adrenaline Rush, Charge, Concentration,
-//     Purge, Second Wind) — we don't know which rank a character has trained,
+//   - names with a multi-rank cooldown (Adrenaline Rush, Charge, Concentration, Purge, Second Wind)
+//     — we don't know which rank a character has trained,
 //     see ability_cooldown_ignored_dynamic.json.
 //   - names that mean different things on different classes with conflicting
-//     cooldown/icon data (Disperse Strength, Major Deliverance, Stunning Shout)
+//     cooldown/icon data (Bolstering Roar, Disperse Strength, Major Deliverance, Stunning Shout)
 //     — see ability_cooldown_duplicates.json. Re-add once we can disambiguate
 //     by the character's class.
 export const ABILITY_COOLDOWNS = 
@@ -632,6 +629,11 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 300,
     "icon": 1845
   },
+  "Bludgeon": {
+    "cooldown": "5:00 min",
+    "cooldownSeconds": 300,
+    "icon": 1865
+  },
   "Blunt Arrows": {
     "cooldown": "1.00s",
     "cooldownSeconds": 1.0,
@@ -961,6 +963,11 @@ export const ABILITY_COOLDOWNS =
     "cooldown": "5:00 min",
     "cooldownSeconds": 300,
     "icon": 7011
+  },
+  "Climbing Spikes": {
+    "cooldown": "10:00 min",
+    "cooldownSeconds": 600,
+    "icon": 4135
   },
   "Close Path": {
     "cooldown": "20s",
@@ -2472,6 +2479,11 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 300,
     "icon": 3061
   },
+  "Fury": {
+    "cooldown": "15:00 min",
+    "cooldownSeconds": 900,
+    "icon": 54
+  },
   "Fury of Nature": {
     "cooldown": "10:00 min",
     "cooldownSeconds": 600,
@@ -3117,6 +3129,11 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 30.0,
     "icon": 9417
   },
+  "Immolation": {
+    "cooldown": "10s",
+    "cooldownSeconds": 10.0,
+    "icon": 1129
+  },
   "Impair Strength": {
     "cooldown": "10s",
     "cooldownSeconds": 10.0,
@@ -3411,6 +3428,11 @@ export const ABILITY_COOLDOWNS =
     "cooldown": "20s",
     "cooldownSeconds": 20.0,
     "icon": 69
+  },
+  "Leeching Bolt": {
+    "cooldown": "45s",
+    "cooldownSeconds": 45.0,
+    "icon": 3290
   },
   "Lessen Strength": {
     "cooldown": "10s",
@@ -4802,6 +4824,11 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 600,
     "icon": 3009
   },
+  "Rampage": {
+    "cooldown": "5:00 min",
+    "cooldownSeconds": 300,
+    "icon": 2384
+  },
   "Rampant Speed": {
     "cooldown": "2:00 min",
     "cooldownSeconds": 120,
@@ -4876,6 +4903,11 @@ export const ABILITY_COOLDOWNS =
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 10538
+  },
+  "Remedy": {
+    "cooldown": "5:00 min",
+    "cooldownSeconds": 300,
+    "icon": 3059
   },
   "Remove Defenses": {
     "cooldown": "15s",
@@ -5102,6 +5134,11 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 300,
     "icon": 1843
   },
+  "Shadow Strike": {
+    "cooldown": "5:00 min",
+    "cooldownSeconds": 300,
+    "icon": 3072
+  },
   "Shadow's Acuteness": {
     "cooldown": "15s",
     "cooldownSeconds": 15.0,
@@ -5321,6 +5358,11 @@ export const ABILITY_COOLDOWNS =
     "cooldown": "30s",
     "cooldownSeconds": 30.0,
     "icon": 14037
+  },
+  "Snapshot": {
+    "cooldown": "10:00 min",
+    "cooldownSeconds": 600,
+    "icon": 3037
   },
   "Snaring Exhaustion": {
     "cooldown": "1:00 min",
@@ -5737,10 +5779,20 @@ export const ABILITY_COOLDOWNS =
     "cooldownSeconds": 5.0,
     "icon": 10507
   },
+  "Tactics": {
+    "cooldown": "10:00 min",
+    "cooldownSeconds": 600,
+    "icon": 3055
+  },
   "Talons of Kelgor": {
     "cooldown": "5s",
     "cooldownSeconds": 5.0,
     "icon": 10505
+  },
+  "Taunting Shout": {
+    "cooldown": "20s",
+    "cooldownSeconds": 20.0,
+    "icon": 3464
   },
   "Taxing Embrace": {
     "cooldown": "15s",
@@ -5971,6 +6023,11 @@ export const ABILITY_COOLDOWNS =
     "cooldown": "1.00s",
     "cooldownSeconds": 1.0,
     "icon": 4020
+  },
+  "Tracker's Alacrity": {
+    "cooldown": "7:00 min",
+    "cooldownSeconds": 420,
+    "icon": 2024
   },
   "Tribute from Eir": {
     "cooldown": "5:00 min",

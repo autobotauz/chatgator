@@ -1,4 +1,21 @@
 {
+  "Bolstering Roar": [
+    {
+      "cooldown": "10:00 min",
+      "icon": 428,
+      "source": "skillGroup:Armsman/Armsman/Armsman's Bolstering Roar"
+    },
+    {
+      "cooldown": "7:30 min",
+      "icon": 428,
+      "source": "skillGroup:Hero/Hero/Hero's Bolstering Roar"
+    },
+    {
+      "cooldown": "5:00 min",
+      "icon": 428,
+      "source": "skillGroup:Warrior/Warrior/Warrior's Bolstering Roar"
+    }
+  ],
   "Disperse Strength": [
     {
       "cooldown": "10s",

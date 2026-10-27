@@ -195,8 +195,10 @@ export function getEnemiesTargeted(events, limit = 5, playerName = null) {
     if (e.type !== 'examine_enemy' || !lastTargetName) continue;
     const name = lastTargetName;
     const last = list[list.length - 1];
-    if (last && last.name === name) { last.clock = e.clock; continue; }
-    list.push({ name, clock: e.clock, seq: seq++, killed: false });
+    // e.name is the examine line's own text -- the enemy's RACE (see the
+    // comment above) -- kept as `race` so the card can be tinted by realm.
+    if (last && last.name === name) { last.clock = e.clock; last.race = e.name || last.race; continue; }
+    list.push({ name, race: e.name || null, clock: e.clock, seq: seq++, killed: false });
   }
   const trimmed = list.slice(-limit);
   if (playerName) {

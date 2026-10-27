@@ -10,7 +10,7 @@ import { iconImg, getIconSkin, setIconSkin } from './icons.js';
 import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
 import { startLiveBackground, stopLiveBackground, setColor as setLiveBackgroundColor } from './live-bg.js';
 import { CHANGELOG } from './changelog.js';
-import { realmColorForClass } from './realm.js';
+import { realmColorForClass, realmForRace, REALM_COLORS } from './realm.js';
 import { saveSession, loadSession, clearSession } from './session-store.js';
 
 // Champion-level abilities with a known Recast Delay, reshaped into the same
@@ -1036,6 +1036,16 @@ function paintEnemyCards(list, real, capacity, { animateEnter, animateExit }) {
     card.className = 'enemy-card';
     card.dataset.key = enemy.name;
     if (enemy.killed) card.classList.add('enemy-card-killed');
+    // Name tinted by the enemy's realm, worked out from the race the
+    // examine line gave us (Albion red, Midgard blue, Hibernia green --
+    // same colors as the live background). Unknown/shared races (Minotaur)
+    // keep the default link color.
+    const realm = realmForRace(enemy.race);
+    if (realm) {
+      card.dataset.realm = realm;
+      card.style.setProperty('--enemy-realm-rgb', REALM_COLORS[realm]);
+    }
+    card.title = [enemy.name, enemy.race, realm].filter(Boolean).join(' · ') + (enemy.killed ? ' · deathblow' : '');
     // heraldLink() already escapes the name and skips linking anything
     // containing a space (never a real player) -- same safety net every
     // other player name in this app gets.

@@ -491,6 +491,10 @@
     "cooldown": "5:00 min",
     "icon": 1845
   },
+  "Bludgeon": {
+    "cooldown": "5:00 min",
+    "icon": 1865
+  },
   "Blunt Arrows": {
     "cooldown": "1.00s",
     "icon": 7460
@@ -754,6 +758,10 @@
   "Cleansing Light": {
     "cooldown": "5:00 min",
     "icon": 7011
+  },
+  "Climbing Spikes": {
+    "cooldown": "10:00 min",
+    "icon": 4135
   },
   "Close Path": {
     "cooldown": "20s",
@@ -1963,6 +1971,10 @@
     "cooldown": "5:00 min",
     "icon": 3061
   },
+  "Fury": {
+    "cooldown": "15:00 min",
+    "icon": 54
+  },
   "Fury of Nature": {
     "cooldown": "10:00 min",
     "icon": 7054
@@ -2479,6 +2491,10 @@
     "cooldown": "30s",
     "icon": 9417
   },
+  "Immolation": {
+    "cooldown": "10s",
+    "icon": 1129
+  },
   "Impair Strength": {
     "cooldown": "10s",
     "icon": 2765
@@ -2714,6 +2730,10 @@
   "Lava's Fury": {
     "cooldown": "20s",
     "icon": 69
+  },
+  "Leeching Bolt": {
+    "cooldown": "45s",
+    "icon": 3290
   },
   "Lessen Strength": {
     "cooldown": "10s",
@@ -3827,6 +3847,10 @@
     "cooldown": "10:00 min",
     "icon": 3009
   },
+  "Rampage": {
+    "cooldown": "5:00 min",
+    "icon": 2384
+  },
   "Rampant Speed": {
     "cooldown": "2:00 min",
     "icon": 11224
@@ -3886,6 +3910,10 @@
   "Relentless Blows": {
     "cooldown": "5s",
     "icon": 10538
+  },
+  "Remedy": {
+    "cooldown": "5:00 min",
+    "icon": 3059
   },
   "Remove Defenses": {
     "cooldown": "15s",
@@ -4067,6 +4095,10 @@
     "cooldown": "5:00 min",
     "icon": 1843
   },
+  "Shadow Strike": {
+    "cooldown": "5:00 min",
+    "icon": 3072
+  },
   "Shadow's Acuteness": {
     "cooldown": "15s",
     "icon": 13073
@@ -4242,6 +4274,10 @@
   "Smoldering Embers": {
     "cooldown": "30s",
     "icon": 14037
+  },
+  "Snapshot": {
+    "cooldown": "10:00 min",
+    "icon": 3037
   },
   "Snaring Exhaustion": {
     "cooldown": "1:00 min",
@@ -4575,9 +4611,17 @@
     "cooldown": "5s",
     "icon": 10507
   },
+  "Tactics": {
+    "cooldown": "10:00 min",
+    "icon": 3055
+  },
   "Talons of Kelgor": {
     "cooldown": "5s",
     "icon": 10505
+  },
+  "Taunting Shout": {
+    "cooldown": "20s",
+    "icon": 3464
   },
   "Taxing Embrace": {
     "cooldown": "15s",
@@ -4762,6 +4806,10 @@
   "Torment Spores": {
     "cooldown": "1.00s",
     "icon": 4020
+  },
+  "Tracker's Alacrity": {
+    "cooldown": "7:00 min",
+    "icon": 2024
   },
   "Tribute from Eir": {
     "cooldown": "5:00 min",

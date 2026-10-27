@@ -12,6 +12,23 @@
 export const CHANGELOG = [
   {
     date: '2026-10-27',
+    title: 'Enemies targeted: names colored by realm',
+    bullets: [
+      'Each enemy\'s name is now tinted by their realm -- red for Albion, blue for Midgard, green for Hibernia -- worked out from the race DAoC shows when you examine them',
+      'Hover a card to see the race and realm; Minotaurs stay uncolored since all three realms have them',
+      'A deathblow still adds the \u{1F480}, but the name no longer turns red, so it can\'t be mistaken for an Albion player',
+    ],
+  },
+  {
+    date: '2026-10-27',
+    title: 'Fixed: Tactics and other class abilities missing from cooldowns',
+    bullets: [
+      'Tactics, Fury, Rampage, Snapshot, Climbing Spikes, Taunting Shout, Remedy, Shadow Strike, Bludgeon, Tracker\'s Alacrity, Immolation and Leeching Bolt never showed up in the cooldown tracker',
+      'Their reuse timer is stored in a different format in the game data, which we weren\'t reading',
+    ],
+  },
+  {
+    date: '2026-10-27',
     title: 'Enemies targeted: fills the whole row, not just 5',
     bullets: [
       'The row now shows however many cards actually fit across its width instead of always stopping at a fixed 5 -- on most screens that\'s noticeably more',

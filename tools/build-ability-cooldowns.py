@@ -72,10 +72,42 @@ def record(name, cooldown, icon, source):
 
 
 def extract_recast_delay(attributes):
+    # Format 1 (spells/styles): a list of [key, value] pairs,
+    #   e.g. ["Recast Delay", "10:00 min"].
     for a in (attributes or []):
         if len(a) == 2 and a[0] == "Recast Delay":
             return a[1]
+    # Format 2 (class abilities such as the Armsman's Tactics, Fury,
+    # Rampage, Bolstering Roar, Snapshot...): ONE list of free-text
+    # description lines, with the timer written out in prose, e.g.
+    #   ["Increases group member's ability to ...", "", "Value: 10%",
+    #    "Reuse: 10 minutes", "Casting Time: Instant"]
+    # Format 1 never matches these, which is why Tactics was missing from
+    # the cooldown map entirely. Normalised into format 1's own strings
+    # ("10:00 min", "20s") so the same ability coming from either format
+    # reconciles as one entry rather than a false duplicate.
+    for a in (attributes or []):
+        for line in (a if isinstance(a, list) else []):
+            if not isinstance(line, str):
+                continue
+            m = re.fullmatch(r"\s*(?:Reuse|Recast Delay)\s*:\s*(.+?)\.?\s*", line)
+            if m:
+                return prose_duration_to_cooldown(m.group(1))
     return None
+
+
+def prose_duration_to_cooldown(text):
+    """'10 minutes' -> '10:00 min', '7.5 minutes' -> '7:30 min',
+    '20 seconds' -> '20s'. Anything unrecognised is passed through as-is
+    (and then reported by the unparsed-cooldown warning further down)."""
+    m = re.fullmatch(r"(\d+(?:\.\d+)?)\s*(seconds?|secs?|s|minutes?|mins?|m|hours?|h)", text.strip(), re.I)
+    if not m:
+        return text
+    n, unit = float(m.group(1)), m.group(2).lower()
+    if unit.startswith("s"):
+        return f"{n:g}s"
+    secs = round(n * (3600 if unit.startswith("h") else 60))
+    return f"{secs // 60}:{secs % 60:02d} min"
 
 
 def walk_skill(sk, source):
@@ -182,11 +214,11 @@ js_lines.append("// `icon` is charplan's raw value (a spell-effect id for spells
 js_lines.append("// otherwise) — the UI shows pictures via js/icons.js / js/ability-icons.js instead.")
 js_lines.append("//")
 js_lines.append("// A handful of ability names are deliberately left out of this map:")
-js_lines.append("//   - names with a multi-rank cooldown (Adrenaline Rush, Charge, Concentration,")
-js_lines.append("//     Purge, Second Wind) — we don't know which rank a character has trained,")
+js_lines.append("//   - names with a multi-rank cooldown (" + ", ".join(sorted(ignored_list)) + ")")
+js_lines.append("//     — we don't know which rank a character has trained,")
 js_lines.append("//     see ability_cooldown_ignored_dynamic.json.")
 js_lines.append("//   - names that mean different things on different classes with conflicting")
-js_lines.append("//     cooldown/icon data (Disperse Strength, Major Deliverance, Stunning Shout)")
+js_lines.append("//     cooldown/icon data (" + ", ".join(sorted(duplicates)) + ")")
 js_lines.append("//     — see ability_cooldown_duplicates.json. Re-add once we can disambiguate")
 js_lines.append("//     by the character's class.")
 js_lines.append("export const ABILITY_COOLDOWNS = ")
