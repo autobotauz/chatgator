@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-27',
+    title: 'Enemies targeted: fills the whole row, not just 5',
+    bullets: [
+      'The row now shows however many cards actually fit across its width instead of always stopping at a fixed 5 -- on most screens that\'s noticeably more',
+      'A narrower window still works correctly, just with fewer slots -- never more than genuinely fit',
+    ],
+  },
+  {
+    date: '2026-10-27',
     title: 'Fixed: Overview chart could show hours of dead space',
     bullets: [
       'A /stats checkpoint logged well before your real first action (like the all-zero reset the moment the log file opens) used to stretch the whole chart back to cover it, squeezing all your actual activity into a sliver at the edge',

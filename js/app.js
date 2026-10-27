@@ -889,15 +889,24 @@ function renderBgTicker() {
 // ---------------------------------------------------------------------------
 // Enemies targeted — persistent across every tab, same reasoning as the /bg
 // ticker just above: always built from the *whole* session, independent of
-// the encounter picker. Shows the last ENEMIES_TARGETED_LIMIT real enemy
-// players confirmed via the game's own examine action (see parser.js's
-// 'examine_enemy' rule and aggregate.js's getEnemiesTargeted) as a row of
-// small cards, newest on the LEFT. New cards enter from the left and push
-// older ones right; the empty slots not yet filled by a real target show as
-// dashed placeholder cards (so the row doesn't keep resizing as you play),
-// and once all ENEMIES_TARGETED_LIMIT slots are real cards, a new target
-// pushes the oldest (now rightmost) one out off the right edge instead of
-// consuming a placeholder.
+// the encounter picker. Shows the last N real enemy players confirmed via
+// the game's own examine action (see parser.js's 'examine_enemy' rule and
+// aggregate.js's getEnemiesTargeted) as a row of small cards, newest on the
+// LEFT. New cards enter from the left and push older ones right; the empty
+// slots not yet filled by a real target show as dashed placeholder cards (so
+// the row doesn't keep resizing as you play), and once every slot is a real
+// card, a new target pushes the oldest (now rightmost) one out off the right
+// edge instead of consuming a placeholder.
+//
+// N itself (`capacity`, computed by computeEnemyCapacity below) is NOT a
+// fixed number -- it's however many fixed-width cards actually fit across
+// the row's current measured width, so the row fills the space it's given
+// instead of always stopping at some arbitrary count regardless of how much
+// room is sitting empty to the right of it (the original fixed-5 design,
+// which on anything wider than a narrow laptop left a very visible dead
+// strip). Recomputed on every render and whenever the row's own width
+// changes (enemyRowResizeObserver, set up once below) -- e.g. the browser
+// window resizing, not just new log lines coming in.
 //
 // lastRenderedNewestSeq/lastRenderedRealCount remember the previous
 // render's state purely so we can tell whether THIS render's newest entry
@@ -910,17 +919,64 @@ function renderBgTicker() {
 // an immediate repeat-examine of the current target, which only bumps that
 // entry's clock in place, is never mistaken for a new card.
 // ---------------------------------------------------------------------------
-const ENEMIES_TARGETED_LIMIT = 5;
+// Keep these two in sync with .enemy-card's width and .enemies-targeted-list's
+// gap in css/styles.css -- they're what computeEnemyCapacity uses to turn a
+// measured pixel width into a number of slots.
+const ENEMY_CARD_WIDTH = 132;
+const ENEMY_CARD_GAP = 8;
+// Used only when the width can't be measured yet (e.g. the instant after
+// unhiding, before layout has settled) -- matches the old fixed design's
+// own value. NOT a floor applied on top of a real measurement: the list
+// has `overflow: hidden`, so forcing more slots than genuinely fit would
+// just silently clip the extras instead of showing them, which is worse
+// than showing fewer. On a real (even very narrow) measurement, however
+// few cards actually fit is exactly how many are shown, down to 1.
+const ENEMIES_TARGETED_FALLBACK = 5;
 const ENEMY_CARD_ANIM_MS = 260;
 let lastRenderedNewestSeq = null;
 let lastRenderedRealCount = 0;
+let lastEnemyRowPlayerName = null;
+let enemyRowResizeObserver = null;
+
+// n cards at ENEMY_CARD_WIDTH each, with (n-1) gaps of ENEMY_CARD_GAP
+// between them, fit in `width` when n*(CARD+GAP) - GAP <= width --
+// i.e. n <= (width + GAP) / (CARD + GAP).
+function computeEnemyCapacity(list) {
+  const w = list.clientWidth;
+  if (!w) return ENEMIES_TARGETED_FALLBACK; // layout not settled yet (e.g. just unhidden) -- fall back rather than show 0
+  const fit = Math.floor((w + ENEMY_CARD_GAP) / (ENEMY_CARD_WIDTH + ENEMY_CARD_GAP));
+  return Math.max(1, fit);
+}
+
+// Re-renders (no new animation -- newestSeq/realCount are unchanged, so
+// renderEnemiesTargeted's own freshness check already keeps this silent)
+// whenever the row's measured width actually changes, so resizing the
+// browser window grows/shrinks the row's slot count immediately instead of
+// only catching up on the next new log line.
+function ensureEnemyRowResizeObserver(row) {
+  if (enemyRowResizeObserver) return;
+  let pending = false;
+  enemyRowResizeObserver = new ResizeObserver(() => {
+    if (pending || lastEnemyRowPlayerName == null) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      if (!row.hidden) renderEnemiesTargeted(lastEnemyRowPlayerName);
+    });
+  });
+  enemyRowResizeObserver.observe(row);
+}
 
 function renderEnemiesTargeted(playerName) {
-  const real = getEnemiesTargeted(state.rawEvents, ENEMIES_TARGETED_LIMIT, playerName).slice().reverse(); // newest-first for display
+  lastEnemyRowPlayerName = playerName;
   const row = el('enemiesTargetedRow');
   const list = el('enemiesTargetedList');
 
-  if (!real.length) {
+  // Cheap existence check (the limit value here doesn't affect whether
+  // there's any real target at all) before touching layout/visibility --
+  // avoids an unhide-then-immediately-rehide flash when there's nothing to
+  // show, regardless of how much room the row would have.
+  if (!getEnemiesTargeted(state.rawEvents, 1, playerName).length) {
     row.hidden = true;
     list.innerHTML = '';
     lastRenderedNewestSeq = null;
@@ -928,11 +984,15 @@ function renderEnemiesTargeted(playerName) {
     return;
   }
   row.hidden = false;
+  ensureEnemyRowResizeObserver(row);
+
+  const capacity = computeEnemyCapacity(list);
+  const real = getEnemiesTargeted(state.rawEvents, capacity, playerName).slice().reverse(); // newest-first for display
 
   const newestSeq = real[0].seq;
   const isFreshEntry = lastRenderedNewestSeq !== null && newestSeq !== lastRenderedNewestSeq;
-  const wasAtCapacity = lastRenderedRealCount >= ENEMIES_TARGETED_LIMIT;
-  paintEnemyCards(list, real, {
+  const wasAtCapacity = lastRenderedRealCount >= capacity;
+  paintEnemyCards(list, real, capacity, {
     animateEnter: isFreshEntry,
     animateExit: isFreshEntry && wasAtCapacity,
   });
@@ -942,12 +1002,12 @@ function renderEnemiesTargeted(playerName) {
 }
 
 // Rebuilds #enemiesTargetedList's children to match `real` (newest-first)
-// padded with dashed placeholder slots up to ENEMIES_TARGETED_LIMIT, using
+// padded with dashed placeholder slots up to `capacity`, using
 // the FLIP technique so cards that are simply shifting right (to make room
 // for a new one entering on the left) visibly slide into their new spot
 // instead of snapping there -- only the truly new entry and, when full, the
 // truly displaced one get their own dedicated enter/exit animation.
-function paintEnemyCards(list, real, { animateEnter, animateExit }) {
+function paintEnemyCards(list, real, capacity, { animateEnter, animateExit }) {
   // 1. Measure every current card's position *before* touching the DOM,
   // keyed by something stable across renders: the enemy name for a real
   // card, or its slot index for a placeholder (so a placeholder quietly
@@ -983,7 +1043,7 @@ function paintEnemyCards(list, real, { animateEnter, animateExit }) {
     if (i === 0 && animateEnter) card.classList.add('enemy-card-enter');
     list.appendChild(card);
   });
-  for (let i = real.length; i < ENEMIES_TARGETED_LIMIT; i++) {
+  for (let i = real.length; i < capacity; i++) {
     const ph = document.createElement('div');
     ph.className = 'enemy-card enemy-card-placeholder';
     ph.dataset.key = `placeholder-${i - real.length}`;
