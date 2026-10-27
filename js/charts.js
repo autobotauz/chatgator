@@ -155,7 +155,19 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
     container.appendChild(div);
     return div;
   }
-  const allT = allPoints.map(p => p.t).concat(markers.map(m => m.t));
+  // Deliberately NOT concat(markers...) here. A marker (e.g. a checkpoint
+  // boundary) can sit well outside the real series data -- the clearest
+  // real case: an initial "Statistics for X this Session:" reset logged the
+  // moment the chat log opens, hours before the player's first actual
+  // action, versus a second checkpoint minutes before the dense play at the
+  // end. Letting that stray marker into the min/max calc used to stretch
+  // the whole chart back to cover it, so almost the entire plotted width
+  // was a flat dead stretch with every real series point crammed into a
+  // sliver at the far right -- see the "big gap in time" report. The
+  // x-domain is the actual series data's own range, full stop; a marker
+  // outside that range gets excluded when drawn (below) rather than pulling
+  // the domain out to include it.
+  const allT = allPoints.map(p => p.t);
   const minT = Math.min(...allT);
   const maxT = Math.max(...allT);
   const spanT = Math.max(1, maxT - minT);
@@ -268,8 +280,16 @@ export function timelineChart(container, { series, width = 1040, height = 220, s
   // lands at the same moment.
   const solidMarkers = markers.filter(m => m.solid);
   const dashedMarkers = markers.filter(m => !m.solid);
+  // A marker from outside the plotted range (e.g. a checkpoint logged
+  // seconds before the first real action the chart actually spans) is
+  // still worth a line -- it just has nothing to line up against inside
+  // the plot, so it's pinned to whichever edge it's closest to instead of
+  // either being dropped (losing it entirely) or rendered past the axis
+  // (the svg's overflow is visible, so an un-clamped x would draw off the
+  // left/right edge of the chart box).
   [...solidMarkers, ...dashedMarkers].forEach((m) => {
-    const mx = x(m.t);
+    const clampedT = Math.min(maxT, Math.max(minT, m.t));
+    const mx = x(clampedT);
     const rule = document.createElementNS(svgNS, 'line');
     rule.setAttribute('x1', mx); rule.setAttribute('x2', mx);
     rule.setAttribute('y1', pad.top); rule.setAttribute('y2', pad.top + innerH);

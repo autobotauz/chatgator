@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-27',
+    title: 'Fixed: Overview chart could show hours of dead space',
+    bullets: [
+      'A /stats checkpoint logged well before your real first action (like the all-zero reset the moment the log file opens) used to stretch the whole chart back to cover it, squeezing all your actual activity into a sliver at the edge',
+      'The chart now sizes itself to your actual activity; a stray early/late checkpoint still shows as a line, just pinned to the edge instead of dragging the whole timeline out to meet it',
+    ],
+  },
+  {
+    date: '2026-10-27',
     title: 'Overview chart: death and checkpoint markers',
     bullets: [
       'Added a red dashed line for each of your own deaths, right alongside the existing deathblow marker',
