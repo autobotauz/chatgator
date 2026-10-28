@@ -809,16 +809,23 @@ export function renderSpells(container, stats, ctx) {
   const castOnlyNames = stats.spellsCast.filter(n => !coveredNames.has(n) && !isAbilityGhost(n, inferredClass));
 
   const castCountByName = stats.castCountByName || {};
+  const castFailedByName = stats.castFailedByName || {};
   const noDamageRows = [
+    // `landed` (aggregate.js) also counts casts that went off with no resist
+    // -- many debuffs never log a landing line at all; ccLanded is only the
+    // landings the game explicitly confirmed.
     ...zeroRows.map(r => ({
       name: r.name, role: r.role,
-      ccLanded: r.ccLanded || 0, resists: r.resists || 0, resistRate: r.resistRate || 0,
+      ccLanded: r.landed ?? r.ccLanded ?? 0, resists: r.resists || 0, resistRate: r.resistRate || 0,
       castCount: castCountByName[r.name] || 0,
+      failed: castFailedByName[r.name] || 0,
     })),
     ...castOnlyNames.map(n => ({
       name: n, role: 'Other',
-      ccLanded: 0, resists: 0, resistRate: 0,
+      // Never resisted: every cast that didn't fizzle went off.
+      ccLanded: Math.max(0, (castCountByName[n] || 0) - (castFailedByName[n] || 0)), resists: 0, resistRate: 0,
       castCount: castCountByName[n] || 0,
+      failed: castFailedByName[n] || 0,
     })),
   ].sort((a, b) => (b.castCount - a.castCount) || (b.ccLanded - a.ccLanded) || (b.resists - a.resists));
 
@@ -853,7 +860,7 @@ export function renderSpells(container, stats, ctx) {
     h3(s2, 'No damage/heal logged (buffs, debuffs, cures, CC, pet summons…)');
     const p2 = document.createElement('p');
     p2.className = 'sub';
-    p2.textContent = 'Everything else cast in this view — the rest of the kit a damage/heal number alone would hide. Shows how many times each one lands, gets resisted, or (for a pure buff with no trackable result at all) was simply cast.';
+    p2.textContent = 'Everything else cast in this view — the rest of the kit a damage/heal number alone would hide. Shows how many times each one lands, gets resisted, or (for a pure buff with no trackable result at all) was simply cast. Many debuffs print nothing when they land, so a cast that wasn\'t resisted and didn\'t fail counts as landed. Failed = the target already had the effect, or was out of range; those aren\'t counted toward Resist %.';
     s2.appendChild(p2);
     const c2 = card(s2);
     dataTable(c2, {
@@ -861,7 +868,8 @@ export function renderSpells(container, stats, ctx) {
         { key: 'name', label: 'Name', html: nameWithIcon },
         { key: 'info', label: 'Type' },
         { key: 'castCount', label: 'Times cast', num: true, fmt: v => v || '—' },
-        { key: 'ccLanded', label: 'Landed (CC)', num: true, fmt: v => v || 0 },
+        { key: 'failed', label: 'Failed', num: true, fmt: v => v || 0 },
+        { key: 'ccLanded', label: 'Landed', num: true, fmt: v => v || 0 },
         { key: 'resists', label: 'Resists', num: true, fmt: v => v || 0 },
         { key: 'resistRate', label: 'Resist %', num: true, fmt: v => (v || 0) + '%' },
       ],

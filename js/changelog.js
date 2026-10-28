@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-27',
+    title: 'Fixed: debuffs showing 100% resisted',
+    bullets: [
+      'Many debuffs (like Visions of the Elements) print nothing when they land -- only resists get a line -- so they always showed 100% resisted. Casts that weren\'t resisted now count as landed',
+      'New "Failed" column: casts that fizzled because the target already had the effect or was out of range. These no longer count against your resist %',
+      'Lines like "X seems weaker!" or "X begins moving more slowly!" show up for everyone\'s spells nearby. They\'re now only credited to your spell when it\'s that kind of spell, so your groupmates\' snares stop inflating your debuffs\' landed count',
+    ],
+  },
+  {
+    date: '2026-10-27',
     title: 'Enemies targeted: names colored by realm',
     bullets: [
       'Each enemy\'s name is now tinted by their realm -- red for Albion, blue for Midgard, green for Hibernia -- worked out from the race DAoC shows when you examine them',

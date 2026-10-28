@@ -17,7 +17,7 @@ import { ABILITY_DATABASE } from './ability-database.js';
 const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts the next
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
-  'ability_hit', 'ability_crit', 'cast', 'cast_begin',
+  'ability_hit', 'ability_crit', 'cast', 'cast_begin', 'cast_failed',
   'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
   'incoming_dmg', 'incoming_crit', 'incoming_extra',
   'heal_out', 'heal_out_crit', 'heal_in', 'power_transfer',
@@ -314,6 +314,12 @@ export function buildStats(events, playerNameHint) {
   for (const e of events) if (e.type === 'cast') {
     castNames.add(e.name);
     castCountByName[e.name] = (castCountByName[e.name] || 0) + 1;
+  }
+  // Completed casts that then fizzled ("Your target already has that
+  // effect!", "That target is too far away!") -- see parser.js 'cast_failed'.
+  const castFailedByName = {};
+  for (const e of events) if (e.type === 'cast_failed' && e.spellName) {
+    castFailedByName[e.spellName] = (castFailedByName[e.spellName] || 0) + 1;
   }
 
   // Class-inference signal: spell casts plus melee style names. A style
@@ -787,8 +793,20 @@ export function buildStats(events, playerNameHint) {
     if (!dmgOutBySourceFinal[key]) dmgOutBySourceFinal[key] = { ...emptySourceStat(), totalHits: 0, avg: 0, critRate: 0 };
     dmgOutBySourceFinal[key].ccLanded = count;
   }
-  for (const entry of Object.values(dmgOutBySourceFinal)) {
-    const attempts = entry.totalHits + (entry.ccLanded || 0) + (entry.resists || 0);
+  // Resist %. Many debuffs (e.g. Sorcerer's "Visions of the Elements")
+  // print NOTHING when they land -- only a resist or a failure is ever
+  // logged -- so counting attempts as landed + resisted made every such
+  // spell show 100% resisted. For no-damage spells the attempts are instead
+  // the casts that actually went off (casts minus fizzles), or the logged
+  // landed + resisted count if that's higher (an AoE mez/root reports one
+  // line per target hit). `landed` is then everything not resisted.
+  for (const [key, entry] of Object.entries(dmgOutBySourceFinal)) {
+    const logged = entry.totalHits + (entry.ccLanded || 0) + (entry.resists || 0);
+    let attempts = logged;
+    if (!entry.totalHits && castCountByName[key]) {
+      attempts = Math.max(logged, castCountByName[key] - (castFailedByName[key] || 0));
+      entry.landed = attempts - (entry.resists || 0);
+    }
     entry.resistRate = attempts ? +(100 * (entry.resists || 0) / attempts).toFixed(1) : 0;
   }
 
@@ -878,6 +896,7 @@ export function buildStats(events, playerNameHint) {
     kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal, deathLog },
     spellsCast: Array.from(castNames),
     castCountByName,
+    castFailedByName,
     bgBroadcasts,
   };
 }

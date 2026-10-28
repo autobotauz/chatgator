@@ -422,6 +422,14 @@ const RULES = [
   ['flavor', /^You (draw your weapons and interrupt your spell cast|enter combat mode but have no target)!$/, () => ({})],
   ['flavor', /^Your spell is cancelled!$/, () => ({})],
   ['flavor', /^You must (wait \d+ (seconds?|minutes? \d+ seconds?) to (cast a spell|use this spell)|have a target for your next attack style|select a target for this spell)!$/, () => ({})],
+  // A completed cast ("You cast a X spell!") that then fizzles: the target
+  // already has that effect, or walked out of range during the cast. Turned
+  // into 'cast_failed' (attributed to that cast) in the main loop, or back
+  // into flavor when no cast just completed -- the out-of-range wording is
+  // also printed for melee. Counted so a resist % can be worked out against
+  // the casts that actually reached a target (see aggregate.js).
+  ['cast_failed', /^Your target already has that effect! Wait until it expires\. Spell failed\.$/, () => ({ reason: 'already has effect' })],
+  ['cast_failed', /^(?:Your target|That target) is too far away!$/, () => ({ reason: 'out of range' })],
   ['flavor', /^(Your target|That target|.+?) is too far away( \(max \d+\))?( to attack)?!?$/, () => ({})],
   ['flavor', /^(Your target is not (in view\. The spell fails|visible|in view)|You cannot move|You can't (attack a member of your realm|cast while (stunned|mesmerized))|You can't use that door)\.?!?$/, () => ({})],
   ['flavor', /^(Your|.+?'s) feet are frozen to the ground!$/, () => ({})],
@@ -436,7 +444,6 @@ const RULES = [
   ['flavor', /^The .+? runs in fear!$/, () => ({})],
   ['flavor', /^The .+?'s? calms? down\.?$/, () => ({})],
   ['flavor', /^.+? focuses on entrancing .+?$/, () => ({})],
-  ['flavor', /^Your target already has that effect! Wait until it expires\. Spell failed\.$/, () => ({})],
   ['flavor', /^This spell only works on dead members of your realm!$/, () => ({})],
   ['flavor', /^The forces of \w+ led by .+? have captured .+?!$/, () => ({})],
   ['flavor', /^.+? has lost control of .+?!$/, () => ({})],
@@ -832,6 +839,25 @@ function confirmedCannotHeal(name) {
 // and the last clock value seen (for a no-timestamp line arriving right at
 // the start of a new chunk, which would otherwise have no local event to
 // fall back on). See filewatch.js for the chunking side of this.
+// Which ability-database spell types each cc_landed effect line can come
+// from. A spell whose type is known but not listed for that effect is never
+// credited with the line; one with no known type keeps the old behavior.
+const LANDING_TYPES = {
+  immobilize: ['Root'],
+  rooted: ['Root'],
+  stunned: ['Stun', 'Style Stun'],
+  mesmerized: ['Mesmerize'],
+  mesmerize: ['Mesmerize'],
+  snare: ['Snare', 'Damage Speed Decrease', 'Unbreakable Speed Decrease'],
+  debuff: ['Strength Debuff', 'Strength Constitution Debuff', 'Strength Shear', 'Strength Constitution Shear'],
+};
+function landingLineFitsSpell(effect, spellName) {
+  const allowed = LANDING_TYPES[effect];
+  const type = (ABILITY_DATABASE[spellName] || CL_ABILITY_DATABASE[spellName])?.type;
+  if (!allowed || !type) return true;
+  return allowed.includes(type);
+}
+
 export function parseLogText(rawText, resume) {
   const lines = rawText.split(/\r?\n/);
 
@@ -860,6 +886,9 @@ export function parseLogText(rawText, resume) {
   const CAST_WINDOW_MS = 4000;
   let pendingStyleName = resume?.pendingStyleName ?? null, pendingStyleAt = resume?.pendingStyleAt ?? -Infinity;
   let pendingCastName = resume?.pendingCastName ?? null, pendingCastAt = resume?.pendingCastAt ?? -Infinity;
+  // The most recent completed cast, for pinning a 'cast_failed' line on it.
+  // Separate from pendingCastName, which damage/heal attribution clears.
+  let lastCastName = resume?.lastCastName ?? null, lastCastAt = resume?.lastCastAt ?? -Infinity;
   // A CC/debuff landing (cc_landed) or an unnamed resist (resist_generic) is
   // attributed to whichever cast — yours or your pet's — most recently
   // happened, and unlike pendingCastName above this one is deliberately NOT
@@ -1020,7 +1049,12 @@ export function parseLogText(rawText, resume) {
       if (PET_OWNERSHIP_TYPES.has(parsed.type)) {
         ownPetNames.add(parsed.payload.pet);
       }
+      if (parsed.type === 'cast_begin') {
+        lastCastName = null; // a failure from here on belongs to this new, not-yet-completed cast
+      }
       if (parsed.type === 'cast') {
+        lastCastName = parsed.payload.name;
+        lastCastAt = clockMs;
         pendingCastName = parsed.payload.name;
         pendingCastAt = clockMs;
         pendingEffectName = parsed.payload.name;
@@ -1117,6 +1151,13 @@ export function parseLogText(rawText, resume) {
           payload.spellName = activePowerName;
           activePowerAt = clockMs; // still resolving — extend the window
         }
+      } else if (type === 'cast_failed') {
+        if (lastCastName && clockMs - lastCastAt <= CAST_WINDOW_MS) {
+          payload.spellName = lastCastName;
+          lastCastName = null; // one failure per cast
+        } else {
+          type = 'flavor';
+        }
       } else if (type === 'cc_landed') {
         // A pending pet-cast ("The X casts a spell!") only tells us *that*
         // X cast something, not what it does or who it hit — so when the
@@ -1130,8 +1171,15 @@ export function parseLogText(rawText, resume) {
         // a phantom "Landed (CC): 2" row in the Spells table, as if its own
         // generic cast-flavor line were a named ability. ("The " is part of
         // cc_landed's target capture but not pet_cast's, hence the strip.)
+        // These landing lines ("X seems weaker!", "X begins moving more
+        // slowly!", "X cannot seem to move!") are shown for EVERYONE's spells
+        // nearby, not just yours -- so one is only credited to your last cast
+        // when it's the kind of line that spell type actually produces. A
+        // Dexterity debuff or an Amnesia spell was otherwise collecting your
+        // groupmates' snares and roots as its own "landed" count.
         if (!isSelfTargetingPetCast(payload.target, pendingEffectIsPet, pendingEffectName) &&
-            pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS) {
+            pendingEffectName && clockMs - pendingEffectAt <= EFFECT_WINDOW_MS &&
+            (pendingEffectIsPet || landingLineFitsSpell(payload.effect, pendingEffectName))) {
           payload.sourceName = pendingEffectName;
           payload.isPet = pendingEffectIsPet;
         }
@@ -1165,6 +1213,7 @@ export function parseLogText(rawText, resume) {
       lastClock: lastEventClock(events) ?? lastClock,
       pendingStyleName, pendingStyleAt,
       pendingCastName, pendingCastAt,
+      lastCastName, lastCastAt,
       pendingEffectName, pendingEffectAt, pendingEffectIsPet,
       activeDotName, activeDotTarget, activeDotAt,
       activeHealName, activeHealAt, lastHealTarget,
