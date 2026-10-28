@@ -18,6 +18,7 @@
 // as a pet-summon ability even though `type` itself is null for it.
 // `classes` lists every class with any version of this name at all (realm
 // ability or spec skill).
+// `damage` (charplan delve) and `isBolt` added by tools/add-ability-damage.py.
 export const ABILITY_DATABASE = 
 {
   "Abate Senses": {
@@ -33,6 +34,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 195.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51,6 +53,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 153.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -91,6 +94,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 121.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -100,6 +104,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -138,6 +143,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 81.9,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -147,6 +154,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 76.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -461,6 +469,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -650,6 +659,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -794,6 +804,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -887,6 +898,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 7.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1190,6 +1202,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1208,6 +1221,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 177.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1258,6 +1272,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 206.7,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1277,6 +1293,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1286,6 +1303,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1342,6 +1360,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 131.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1369,6 +1388,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 56.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1378,6 +1398,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 162.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1387,6 +1408,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 81.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1405,6 +1427,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1414,6 +1437,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 211.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1432,6 +1456,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 106.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1441,6 +1466,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 6.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1450,6 +1476,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 27.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1562,6 +1589,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1571,6 +1599,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1621,6 +1650,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1650,6 +1680,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 54.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1677,6 +1708,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1686,6 +1718,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1695,6 +1728,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1704,6 +1738,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 3.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1758,6 +1793,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1800,6 +1836,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 200.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1907,6 +1944,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -1925,6 +1963,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2010,6 +2049,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 1.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2286,6 +2326,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 0.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2315,6 +2356,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 4.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2373,6 +2415,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 1.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2393,6 +2436,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 15.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2402,6 +2446,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 27.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2442,6 +2487,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 0.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2487,6 +2533,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2506,6 +2553,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Berserker"
     ],
+    "damage": 95.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2517,6 +2565,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2526,6 +2575,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2756,6 +2806,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2810,6 +2861,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 123.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2882,6 +2934,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2920,6 +2973,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2938,6 +2992,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2956,6 +3011,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2974,6 +3030,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -2992,6 +3049,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3010,6 +3068,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3064,6 +3123,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3118,6 +3178,7 @@ export const ABILITY_DATABASE =
       "Minstrel",
       "Skald"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3127,6 +3188,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3136,6 +3198,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3176,6 +3239,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 3.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3209,6 +3273,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 1.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3218,6 +3283,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3245,6 +3311,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 143.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3263,6 +3330,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 160.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3272,6 +3340,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3281,6 +3350,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3290,6 +3360,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 2.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3299,6 +3370,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3308,6 +3380,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3439,6 +3512,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 163.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3490,6 +3564,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 167.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3499,6 +3574,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 75.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3508,6 +3584,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3517,6 +3594,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 133.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3535,6 +3613,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 14.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3544,6 +3623,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 135.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3615,6 +3695,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3624,6 +3705,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3633,6 +3715,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 30.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3642,6 +3725,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 63.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3651,6 +3735,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3660,6 +3745,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 106.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3669,6 +3755,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 148.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3678,6 +3765,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3687,6 +3775,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 191.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3696,6 +3785,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 212.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3751,6 +3841,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3796,6 +3887,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3932,6 +4024,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 20.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3941,6 +4034,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Champion"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3950,6 +4044,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Champion"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3959,6 +4054,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Champion"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3968,6 +4064,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Champion"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3977,6 +4074,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Champion"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3986,6 +4084,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Champion"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -3995,6 +4094,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 113.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4004,6 +4104,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Champion"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4013,6 +4114,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Champion"
     ],
+    "damage": 106.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4022,6 +4124,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 10.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4031,6 +4134,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 133.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4040,6 +4144,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 51.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4049,6 +4154,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 26.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4058,6 +4164,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 209.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4067,6 +4174,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 77.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4076,6 +4184,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 102.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4085,6 +4194,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 163.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4094,6 +4204,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 41.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4103,6 +4214,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4112,6 +4224,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 44.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4121,6 +4234,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4130,6 +4244,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4139,6 +4254,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4148,6 +4264,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 86.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4166,6 +4283,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 19.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4175,6 +4293,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 72.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4184,6 +4303,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 58.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4193,6 +4313,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 71.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4221,6 +4342,7 @@ export const ABILITY_DATABASE =
       "Heretic",
       "Reaver"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4251,6 +4373,7 @@ export const ABILITY_DATABASE =
       "Vampiir",
       "Warrior"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4263,6 +4386,7 @@ export const ABILITY_DATABASE =
       "Infiltrator",
       "Mercenary"
     ],
+    "damage": 14.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4295,6 +4419,7 @@ export const ABILITY_DATABASE =
       "Warden",
       "Warrior"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4325,6 +4450,7 @@ export const ABILITY_DATABASE =
       "Warden",
       "Warrior"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4350,6 +4476,7 @@ export const ABILITY_DATABASE =
       "Valkyrie",
       "Vampiir"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4360,6 +4487,7 @@ export const ABILITY_DATABASE =
       "Infiltrator",
       "Mercenary"
     ],
+    "damage": 26.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4385,6 +4513,7 @@ export const ABILITY_DATABASE =
       "Warden",
       "Warrior"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4394,6 +4523,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Armsman"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4409,6 +4539,7 @@ export const ABILITY_DATABASE =
       "Reaver",
       "Scout"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4623,6 +4754,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 2.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4659,6 +4791,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 43.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4668,6 +4801,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4677,6 +4811,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 3.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4686,6 +4821,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4704,6 +4840,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4912,6 +5049,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 95.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4962,6 +5100,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -4980,6 +5119,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5007,6 +5147,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 142.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5016,6 +5157,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 36.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5180,6 +5322,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 243.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5189,6 +5333,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 136.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5198,6 +5344,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5207,6 +5354,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 15.6,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5216,6 +5365,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 29.9,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5225,6 +5376,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5234,6 +5386,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5243,6 +5396,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 312.2,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5279,6 +5434,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 11.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5317,6 +5473,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5326,6 +5483,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5353,6 +5511,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 7.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5362,6 +5521,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 4.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5371,6 +5531,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5380,6 +5541,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 9.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5389,6 +5551,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 3.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5398,6 +5561,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5407,6 +5571,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5416,6 +5581,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 5.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5435,6 +5601,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 1.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5453,6 +5620,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5516,6 +5684,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5525,6 +5694,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 22.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5534,6 +5704,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5543,6 +5714,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5552,6 +5724,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5570,6 +5743,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 65.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5579,6 +5753,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5617,6 +5792,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 3.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5662,6 +5838,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5707,6 +5884,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 31.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5716,6 +5894,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5725,6 +5904,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5734,6 +5914,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5743,6 +5924,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 189.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5752,6 +5934,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 112.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5761,6 +5944,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 54.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5770,6 +5954,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 151.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5779,6 +5964,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 131.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5815,6 +6001,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 18.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5853,6 +6040,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 102.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5862,6 +6050,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5871,6 +6060,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 46.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5880,6 +6070,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 183.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5889,6 +6080,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 62.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5898,6 +6090,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 81.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5907,6 +6100,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 137.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5916,6 +6110,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 16.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5925,6 +6120,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 31.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5934,6 +6130,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 225.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5943,6 +6140,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 0.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -5952,6 +6150,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 7.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6013,6 +6212,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 7.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6022,6 +6222,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 44.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6088,6 +6289,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 112.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6221,6 +6423,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6230,6 +6433,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 114.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6240,6 +6444,7 @@ export const ABILITY_DATABASE =
       "Mauler",
       "Wizard"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6250,6 +6455,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 85.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6259,6 +6465,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 1.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6268,6 +6475,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 74.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6277,6 +6485,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 52.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6286,6 +6495,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6340,6 +6550,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 93.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6349,6 +6560,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6385,6 +6597,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6592,6 +6805,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6682,6 +6896,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6774,6 +6989,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6902,6 +7118,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6911,6 +7128,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 144.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6929,6 +7147,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 31.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6938,6 +7157,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 24.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -6947,6 +7167,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 158.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7053,6 +7274,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 300.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7152,6 +7374,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 10.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7161,6 +7384,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7170,6 +7394,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 20.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7179,6 +7404,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 27.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7189,6 +7415,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 52.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7208,6 +7435,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 305.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7218,6 +7446,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 176.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7228,6 +7457,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 104.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7256,6 +7486,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 240.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7265,6 +7496,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7352,6 +7584,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 4.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7361,6 +7594,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 1.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7370,6 +7604,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 3.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7379,6 +7614,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 2.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7388,6 +7624,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 5.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7397,6 +7634,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 7.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7430,6 +7668,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7439,6 +7678,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7484,6 +7724,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7493,6 +7734,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 128.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7511,6 +7753,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 18.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7637,6 +7880,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7646,6 +7890,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7655,6 +7900,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 51.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7673,6 +7919,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 72.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7682,6 +7929,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 99.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7700,6 +7948,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 151.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7709,6 +7958,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 178.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7718,6 +7968,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 123.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7727,6 +7978,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 119.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7736,6 +7988,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7763,6 +8016,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 114.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7799,6 +8053,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 1.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -7999,6 +8254,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 47.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8008,6 +8264,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 69.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8017,6 +8274,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8026,6 +8284,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 59.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8053,6 +8312,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 36.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8071,6 +8331,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8080,6 +8341,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 22.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8089,6 +8351,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8098,6 +8361,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 14.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8173,6 +8437,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 130.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8182,6 +8447,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 130.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8205,6 +8471,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8223,6 +8490,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8271,6 +8539,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8289,6 +8558,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 31.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8317,6 +8587,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 163.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8384,6 +8655,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 21.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8420,6 +8692,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8429,6 +8702,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8465,6 +8739,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8483,6 +8758,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 87.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8510,6 +8786,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8519,6 +8796,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 9.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8599,6 +8877,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8608,6 +8887,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 87.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8617,6 +8897,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 67.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8626,6 +8907,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8635,6 +8917,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 143.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8644,6 +8927,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 61.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8653,6 +8937,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8662,6 +8947,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 111.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8671,6 +8957,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 160.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8680,6 +8967,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 82.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8689,6 +8977,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 26.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8698,6 +8987,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 64.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8717,6 +9007,7 @@ export const ABILITY_DATABASE =
       "Valewalker",
       "Wizard"
     ],
+    "damage": 150.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8919,6 +9210,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 143.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8928,6 +9220,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 88.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8965,6 +9258,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8984,6 +9278,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -8993,6 +9288,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9002,6 +9298,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9082,6 +9379,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9092,6 +9390,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9102,6 +9401,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9111,6 +9411,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 167.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9129,6 +9430,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9138,6 +9440,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 209.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9229,6 +9532,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9296,6 +9600,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9370,6 +9675,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 12.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9381,6 +9687,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 38.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9392,6 +9699,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 79.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9403,6 +9711,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 106.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9414,6 +9723,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 132.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9425,6 +9735,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 185.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9436,6 +9747,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 212.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9447,6 +9759,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 239.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9458,6 +9771,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 265.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9514,6 +9828,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 7.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9523,6 +9838,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 46.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9532,6 +9848,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 58.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9622,6 +9939,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 27.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9659,6 +9977,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 13.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9686,6 +10005,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 155.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9695,6 +10015,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 37.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9704,6 +10025,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9713,6 +10035,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9732,6 +10055,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9862,6 +10186,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 219.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9871,6 +10196,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 62.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9880,6 +10206,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 127.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9889,6 +10216,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 164.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9898,6 +10226,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 16.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9925,6 +10254,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 39.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9934,6 +10264,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 109.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9943,6 +10274,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 90.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9970,6 +10302,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 239.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9979,6 +10313,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 24.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9988,6 +10324,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 98.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -9997,6 +10335,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 36.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10006,6 +10346,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 149.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10015,6 +10357,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 188.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10024,6 +10368,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10033,6 +10378,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 55.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10042,6 +10389,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 75.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10051,6 +10400,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 116.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10060,6 +10411,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10069,6 +10421,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10078,6 +10431,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10087,6 +10441,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10096,6 +10451,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10105,6 +10461,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10116,6 +10473,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 2.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10126,6 +10484,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 164.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10136,6 +10495,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 128.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10145,6 +10505,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10163,6 +10524,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10172,6 +10534,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10200,6 +10563,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10307,6 +10671,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10443,6 +10808,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10485,6 +10851,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 7.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10521,6 +10888,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 140.0,
     "isDamage": false,
     "isHeal": false,
     "isPetSummon": false,
@@ -10640,6 +11008,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 160.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10649,6 +11018,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 296.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10658,6 +11029,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 174.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10712,6 +11084,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 250.9,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10723,6 +11097,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10769,6 +11144,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10778,6 +11154,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10823,6 +11200,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 41.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10832,6 +11210,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10851,6 +11230,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 102.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10860,6 +11240,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 29.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10881,6 +11262,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 106.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10890,6 +11272,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10908,6 +11291,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -10917,6 +11301,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 87.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11137,6 +11522,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11164,6 +11550,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 12.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11173,6 +11560,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 26.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11299,6 +11687,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11323,6 +11712,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 19.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11332,6 +11722,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11359,6 +11750,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 150.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11368,6 +11760,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 51.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11377,6 +11770,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 115.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11386,6 +11780,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 26.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11395,6 +11790,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 95.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11440,6 +11836,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11476,6 +11873,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11512,6 +11910,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 160.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11574,6 +11973,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 1.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11622,6 +12022,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11728,6 +12129,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 37.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11832,6 +12234,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 2.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11841,6 +12244,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 3.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11850,6 +12254,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 4.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11859,6 +12264,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 3.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11868,6 +12274,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 2.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11877,6 +12284,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 1.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11886,6 +12294,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 4.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11895,6 +12304,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 1.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -11994,6 +12404,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12186,6 +12597,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 139.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12195,6 +12607,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12204,6 +12617,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 115.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12213,6 +12627,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 26.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12222,6 +12637,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 58.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12267,6 +12683,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 2.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12276,6 +12693,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 214.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12285,6 +12703,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 74.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12294,6 +12713,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 133.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12303,6 +12723,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 325.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12321,6 +12742,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 97.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12331,6 +12753,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12341,6 +12764,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12350,6 +12774,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12360,6 +12785,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12378,6 +12804,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12397,6 +12824,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 86.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12443,6 +12871,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12481,6 +12910,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 36.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12565,6 +12995,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12583,6 +13014,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12593,6 +13025,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12603,6 +13036,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12612,6 +13046,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 55.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12622,6 +13057,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12632,6 +13068,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 37.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12813,6 +13250,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12822,6 +13260,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 48.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12831,6 +13270,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 82.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12840,6 +13280,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 82.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12870,6 +13311,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 157.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -12980,6 +13422,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 41.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13041,6 +13484,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 150.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13050,6 +13494,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 150.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13059,6 +13504,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13068,6 +13514,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13095,6 +13542,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 65.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13104,6 +13552,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 26.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13131,6 +13580,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13210,6 +13660,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 56.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13221,6 +13672,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 9.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13230,6 +13682,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 10.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13275,6 +13728,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 206.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13302,6 +13757,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13321,6 +13777,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 13.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13330,6 +13787,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 124.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13339,6 +13797,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 92.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13366,6 +13825,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 155.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13376,6 +13836,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13386,6 +13847,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 7.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13396,6 +13858,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 2.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13406,6 +13869,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 7.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13416,6 +13880,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 3.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13443,6 +13908,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 158.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13452,6 +13918,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 115.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13481,6 +13948,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 7.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13499,6 +13967,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13508,6 +13977,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13616,6 +14086,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13625,6 +14096,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 52.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13634,6 +14106,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 76.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13643,6 +14116,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 102.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13652,6 +14126,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 145.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13661,6 +14136,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 183.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13843,6 +14319,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -13861,6 +14338,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14040,6 +14518,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14049,6 +14528,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14167,6 +14647,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14203,6 +14684,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 28.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14212,6 +14694,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14239,6 +14722,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14318,6 +14802,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14358,6 +14843,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14367,6 +14853,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14422,6 +14909,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 2.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14489,6 +14977,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 21.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14498,6 +14987,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14507,6 +14997,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14516,6 +15007,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 64.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14525,6 +15017,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 49.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14534,6 +15027,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14543,6 +15037,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14552,6 +15047,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 88.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14561,6 +15057,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14579,6 +15076,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14588,6 +15086,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14651,6 +15150,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 37.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14660,6 +15160,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14669,6 +15170,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14678,6 +15180,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14687,6 +15190,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14696,6 +15200,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14705,6 +15210,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 30.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14714,6 +15220,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 63.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14723,6 +15230,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14732,6 +15240,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 106.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14741,6 +15250,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 148.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14750,6 +15260,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14759,6 +15270,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 191.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14768,6 +15280,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 212.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14777,6 +15290,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14815,6 +15329,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 24.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14833,6 +15348,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 107.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14842,6 +15358,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 156.2,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14852,6 +15370,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 59.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14862,6 +15381,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14871,6 +15391,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14929,6 +15450,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14981,6 +15503,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 13.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14990,6 +15513,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 49.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -14999,6 +15523,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 136.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15008,6 +15533,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15162,6 +15688,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15171,6 +15698,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15180,6 +15708,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15189,6 +15718,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 1.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15198,6 +15728,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 3.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15251,6 +15782,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 8.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15279,6 +15811,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 4.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15288,6 +15821,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 11.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15297,6 +15831,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 4.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15315,6 +15850,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Friar"
     ],
+    "damage": 75.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15405,6 +15941,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 44.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15468,6 +16005,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 11.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15477,6 +16015,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15486,6 +16025,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15495,6 +16035,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 44.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15504,6 +16045,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 28.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15513,6 +16055,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 153.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15522,6 +16066,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 195.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15531,6 +16077,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 117.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15540,6 +16088,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 3.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15577,6 +16126,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 195.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15653,6 +16203,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15745,6 +16296,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15902,6 +16454,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15911,6 +16464,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15931,6 +16485,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 56.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15967,6 +16522,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 130.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15976,6 +16532,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -15994,6 +16551,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 40.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16012,6 +16570,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 78.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16030,6 +16589,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 22.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16048,6 +16608,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 102.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16075,6 +16636,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 24.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16084,6 +16647,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16147,6 +16711,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 136.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16156,6 +16721,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16165,6 +16731,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 108.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16174,6 +16741,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 37.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16264,6 +16832,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 317.2,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16273,6 +16843,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 1.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16327,6 +16898,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 13.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16336,6 +16909,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 64.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16345,6 +16919,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16354,6 +16929,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 49.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16363,6 +16939,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 59.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16372,6 +16950,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 21.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16381,6 +16960,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 36.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16480,6 +17061,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 331.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16489,6 +17072,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 133.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16498,6 +17083,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16507,6 +17093,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 149.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16516,6 +17104,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 188.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16525,6 +17115,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 239.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16534,6 +17126,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 115.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16562,6 +17156,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16572,6 +17167,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 15.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16618,6 +17214,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 1.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16627,6 +17224,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 18.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16654,6 +17252,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 28.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16673,6 +17272,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16710,6 +17310,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 95.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16719,6 +17320,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 50.9,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16777,6 +17380,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 41.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16827,6 +17431,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 104.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16865,6 +17470,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 3.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16896,6 +17502,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 150.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -16992,6 +17599,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 21.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17001,6 +17609,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 87.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17019,6 +17628,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 163.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17028,6 +17638,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 46.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17037,6 +17648,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 51.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17046,6 +17658,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17064,6 +17677,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 37.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17073,6 +17687,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 61.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17082,6 +17697,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 104.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17091,6 +17707,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 155.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17109,6 +17726,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 204.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17119,6 +17737,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 2.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17137,6 +17756,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 112.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17146,6 +17766,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 26.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17155,6 +17776,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 128.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17164,6 +17786,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 76.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -17182,6 +17805,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 135.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17292,6 +17916,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 51.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17310,6 +17935,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17319,6 +17945,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17337,6 +17964,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 7.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17355,6 +17983,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 112.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17364,6 +17993,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17373,6 +18003,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 43.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17400,6 +18031,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17580,6 +18212,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 37.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17589,6 +18222,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 51.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17598,6 +18232,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 27.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17607,6 +18242,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 168.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17616,6 +18252,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 209.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17645,6 +18282,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17693,6 +18331,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 114.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17730,6 +18369,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 36.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17766,6 +18406,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17775,6 +18416,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 201.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17784,6 +18427,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17793,6 +18437,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 87.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17802,6 +18447,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 63.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17811,6 +18458,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 26.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17820,6 +18469,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 1.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17829,6 +18479,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 2.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17847,6 +18498,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17856,6 +18508,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17865,6 +18518,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 7.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17874,6 +18528,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17883,6 +18538,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17892,6 +18548,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 27.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17901,6 +18558,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17910,6 +18568,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17919,6 +18578,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 17.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17928,6 +18588,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 4.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17937,6 +18598,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 108.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17946,6 +18608,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17955,6 +18618,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17964,6 +18628,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17973,6 +18638,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 169.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17982,6 +18649,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 73.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -17991,6 +18659,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 7.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18000,6 +18670,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 1.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18045,6 +18716,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 128.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18054,6 +18726,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 3.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18063,6 +18736,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 57.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18072,6 +18746,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 92.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18081,6 +18756,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 40.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18090,6 +18766,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 19.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18099,6 +18776,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 279.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18108,6 +18787,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 45.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18117,6 +18798,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 232.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18126,6 +18809,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 89.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18135,6 +18820,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 114.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18144,6 +18831,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 145.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18162,6 +18851,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 2.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18210,6 +18900,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 141.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18259,6 +18950,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18268,6 +18960,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18416,6 +19109,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 1.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18469,6 +19163,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 13.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18480,6 +19175,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18491,6 +19187,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 9.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18500,6 +19197,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 56.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18566,6 +19264,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 90.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18575,6 +19274,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 6.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18585,6 +19285,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 49.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18595,6 +19296,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 37.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18605,6 +19307,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 64.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18614,6 +19317,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 102.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18623,6 +19327,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18645,6 +19350,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 45.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18708,6 +19414,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 2.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18717,6 +19424,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18914,6 +19622,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 6.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18964,6 +19673,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 4.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -18986,6 +19696,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 1.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19006,6 +19717,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 20.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19015,6 +19727,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 33.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19037,6 +19750,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 1.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19066,6 +19780,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 2.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19075,6 +19790,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 6.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19084,6 +19800,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 3.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19093,6 +19810,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Paladin"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19102,6 +19820,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 190.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19111,6 +19830,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 94.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19120,6 +19840,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19139,6 +19860,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 324.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19148,6 +19871,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 162.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19157,6 +19882,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 96.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19166,6 +19893,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 29.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19184,6 +19913,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 86.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19193,6 +19923,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19211,6 +19942,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 46.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19220,6 +19952,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 173.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19268,6 +20001,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19306,6 +20040,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 21.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19334,6 +20069,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19344,6 +20080,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 3.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19354,6 +20091,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19384,6 +20122,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 19.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19402,6 +20141,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 37.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19411,6 +20151,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 64.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19430,6 +20171,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19467,6 +20209,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19518,6 +20261,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 57.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19527,6 +20271,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 98.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19536,6 +20281,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 41.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19545,6 +20291,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 201.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19554,6 +20301,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 77.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19563,6 +20311,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 129.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19594,6 +20343,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19612,6 +20362,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19633,6 +20384,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 36.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19644,6 +20396,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 65.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19684,6 +20437,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19695,6 +20449,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 118.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19706,6 +20461,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 61.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19734,6 +20490,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19743,6 +20500,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19752,6 +20510,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 41.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19761,6 +20520,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -19772,6 +20532,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 96.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20005,6 +20766,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 7.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20014,6 +20776,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 16.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20023,6 +20786,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20032,6 +20796,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 81.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20041,6 +20806,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 137.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20050,6 +20816,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 46.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20059,6 +20826,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 219.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20068,6 +20836,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 115.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20077,6 +20847,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20097,6 +20868,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 155.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20106,6 +20878,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20115,6 +20888,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 87.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20124,6 +20898,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 3.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20151,6 +20926,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 1.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20171,6 +20947,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20218,6 +20995,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 66.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20227,6 +21005,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20236,6 +21015,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 114.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20245,6 +21025,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 24.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20264,6 +21045,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 18.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20284,6 +21066,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20293,6 +21076,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20302,6 +21086,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 146.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20311,6 +21096,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20479,6 +21265,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 80.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -20489,6 +21276,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 1.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20508,6 +21296,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 9.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -20517,6 +21306,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 164.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -20546,6 +21336,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 40.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -20555,6 +21346,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 64.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -20564,6 +21356,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 131.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -20583,6 +21376,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 25.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -20592,6 +21386,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 108.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": true,
@@ -20874,6 +21669,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20892,6 +21688,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 75.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20901,6 +21698,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20920,6 +21718,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -20992,6 +21791,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 2.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21001,6 +21801,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 1.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21010,6 +21811,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 3.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21019,6 +21821,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 9.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21028,6 +21831,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 4.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21037,6 +21841,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 5.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21046,6 +21851,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 7.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21055,6 +21861,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 1.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21064,6 +21871,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 11.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21773,6 +22581,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21782,6 +22591,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 43.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21791,6 +22601,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21872,6 +22683,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 49.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21912,6 +22724,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21921,6 +22734,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21970,6 +22784,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 71.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21979,6 +22794,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 105.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -21988,6 +22804,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22006,6 +22823,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 140.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22069,6 +22887,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 36.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22124,6 +22943,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 76.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22133,6 +22953,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22142,6 +22963,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22151,6 +22973,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22169,6 +22992,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 45.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22250,6 +23074,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22423,6 +23248,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 26.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22472,6 +23298,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 163.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22523,6 +23350,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 56.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22561,6 +23389,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 219.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22570,6 +23399,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 98.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22608,6 +23438,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 10.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22660,6 +23491,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 36.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22750,6 +23582,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 80.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22959,6 +23793,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 158.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -22986,6 +23821,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 121.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23052,6 +23888,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23062,6 +23899,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 88.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23072,6 +23910,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23118,6 +23957,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 9.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23128,6 +23968,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 13.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23138,6 +23979,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23148,6 +23990,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 25.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23176,6 +24019,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23185,6 +24029,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 102.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23220,6 +24065,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23229,6 +24075,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 55.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23238,6 +24085,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 4.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23247,6 +24095,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 161.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23360,6 +24209,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 5.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23369,6 +24219,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23378,6 +24229,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23387,6 +24239,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23405,6 +24258,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23414,6 +24268,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23423,6 +24278,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 19.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23432,6 +24288,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23441,6 +24298,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23450,6 +24308,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23459,6 +24318,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23468,6 +24328,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23477,6 +24338,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 87.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23486,6 +24348,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23495,6 +24358,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 77.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23504,6 +24368,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 27.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23513,6 +24378,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23522,6 +24388,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23631,6 +24498,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 6.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23649,6 +24517,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 57.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23689,6 +24558,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23856,6 +24726,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 221.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23875,6 +24747,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23886,6 +24759,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 1.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23950,6 +24824,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 1.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23960,6 +24835,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 110.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23979,6 +24855,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -23988,6 +24865,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24006,6 +24884,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24015,6 +24894,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24024,6 +24904,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24033,6 +24914,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24042,6 +24924,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24107,6 +24990,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24116,6 +25000,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24125,6 +25010,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 2.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24134,6 +25020,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 2.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24143,6 +25030,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 54.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24152,6 +25040,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24161,6 +25050,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24170,6 +25060,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 4.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24179,6 +25070,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 74.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24188,6 +25080,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24197,6 +25090,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 34.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24206,6 +25100,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 9.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24215,6 +25110,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24224,6 +25120,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 7.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24234,6 +25131,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 102.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24390,6 +25288,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24399,6 +25298,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24444,6 +25344,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 8.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24453,6 +25354,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24538,6 +25440,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 72.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24547,6 +25450,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 209.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24565,6 +25469,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 68.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24611,6 +25516,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24710,6 +25616,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 241.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24719,6 +25626,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24728,6 +25636,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24737,6 +25646,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 123.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24802,6 +25712,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24858,6 +25769,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -24903,6 +25815,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 124.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25061,6 +25974,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 72.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25070,6 +25984,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 40.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25079,6 +25994,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 124.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25107,6 +26023,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25117,6 +26034,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 11.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25135,6 +26053,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25157,6 +26076,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25166,6 +26086,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25194,6 +26115,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25239,6 +26161,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25248,6 +26171,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25257,6 +26181,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 36.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25266,6 +26191,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 31.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25275,6 +26201,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 11.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25284,6 +26211,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 118.3,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25293,6 +26222,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 162.5,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25302,6 +26233,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25320,6 +26252,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25329,6 +26262,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 206.7,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25338,6 +26273,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 258.7,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25347,6 +26284,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 52.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25356,6 +26295,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 81.9,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25365,6 +26306,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 16.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25374,6 +26316,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 309.4,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25478,6 +26422,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25507,6 +26452,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 128.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25516,6 +26462,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 51.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25525,6 +26472,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25544,6 +26492,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 189.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25553,6 +26503,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 117.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25562,6 +26514,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 63.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25571,6 +26525,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25580,6 +26535,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25589,6 +26545,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25598,6 +26555,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 14.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25607,6 +26566,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25616,6 +26576,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25625,6 +26586,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25634,6 +26596,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25643,6 +26606,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25652,6 +26616,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25670,6 +26635,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25679,6 +26645,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25688,6 +26655,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 16.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25697,6 +26665,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 108.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25706,6 +26675,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 112.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25715,6 +26685,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 64.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25724,6 +26695,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25754,6 +26726,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25763,6 +26736,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25772,6 +26746,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25781,6 +26756,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25808,6 +26784,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25817,6 +26794,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25835,6 +26813,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 176.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25844,6 +26823,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 52.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25853,6 +26833,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 111.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25862,6 +26843,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 265.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25871,6 +26853,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25880,6 +26863,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 7.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25918,6 +26902,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25927,6 +26912,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25936,6 +26922,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 21.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25946,6 +26933,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25965,6 +26953,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 2.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -25992,6 +26981,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 24.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26001,6 +26991,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26010,6 +27001,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 69.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26050,6 +27042,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26059,6 +27052,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 97.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26068,6 +27062,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 56.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26077,6 +27072,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 28.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26086,6 +27082,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 96.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26097,6 +27094,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26108,6 +27106,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26128,6 +27127,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 137.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26139,6 +27139,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26150,6 +27151,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26159,6 +27161,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 15.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26177,6 +27180,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 58.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26196,6 +27200,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 41.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26205,6 +27210,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 19.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26214,6 +27220,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26223,6 +27230,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26232,6 +27240,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26241,6 +27250,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 77.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26250,6 +27260,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 133.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26286,6 +27297,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 39.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26295,6 +27307,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 67.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26304,6 +27317,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 12.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26313,6 +27327,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 32.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26322,6 +27337,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 115.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26331,6 +27347,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26386,6 +27403,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26451,6 +27469,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26460,6 +27479,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 53.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26469,6 +27490,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 19.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26487,6 +27509,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 89.7,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26496,6 +27520,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 156.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26505,6 +27531,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 45.5,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26514,6 +27542,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 7.8,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26523,6 +27553,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 250.9,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26532,6 +27564,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 28.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26541,6 +27574,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26587,6 +27621,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 49.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26596,6 +27631,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 13.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26605,6 +27641,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26634,6 +27671,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26643,6 +27681,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26663,6 +27702,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 70.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26672,6 +27712,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 116.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26683,6 +27724,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 22.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26702,6 +27744,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 125.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26711,6 +27754,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 125.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26720,6 +27764,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26729,6 +27774,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 133.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26740,6 +27786,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26749,6 +27796,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 17.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26758,6 +27806,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 92.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26899,6 +27948,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26908,6 +27958,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 51.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26944,6 +27995,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26953,6 +28005,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 30.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26962,6 +28015,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 63.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26971,6 +28025,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26980,6 +28035,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 106.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26989,6 +28045,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 148.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -26998,6 +28055,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27007,6 +28065,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 191.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27016,6 +28075,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 212.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27043,6 +28103,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 7.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27052,6 +28113,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27061,6 +28123,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27070,6 +28133,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27079,6 +28143,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 69.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27090,6 +28155,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 5.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27101,6 +28167,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 15.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27112,6 +28179,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 31.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27123,6 +28191,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 42.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27134,6 +28203,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 53.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27145,6 +28215,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 74.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27156,6 +28227,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27167,6 +28239,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 95.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27343,6 +28416,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 15.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27370,6 +28444,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27379,6 +28454,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27461,6 +28537,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 179.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27602,6 +28679,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 143.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27611,6 +28689,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 62.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27620,6 +28699,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 219.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27629,6 +28709,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27647,6 +28728,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27677,6 +28759,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27713,6 +28796,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 96.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27724,6 +28808,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 13.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27746,6 +28831,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27756,6 +28842,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27765,6 +28852,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 37.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27774,6 +28862,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 21.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27783,6 +28872,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 64.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27792,6 +28882,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27801,6 +28892,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 108.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27829,6 +28921,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 3.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27878,6 +28971,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27889,6 +28983,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -27900,6 +28995,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 58.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28173,6 +29269,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 92.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28202,6 +29300,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28313,6 +29412,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28371,6 +29471,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 154.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28380,6 +29481,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 214.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28391,6 +29493,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 102.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28411,6 +29514,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 74.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28420,6 +29524,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 325.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28429,6 +29534,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 176.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28438,6 +29544,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 52.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28447,6 +29554,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 104.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28456,6 +29564,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 265.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28504,6 +29613,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 52.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28513,6 +29623,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 128.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28522,6 +29633,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 96.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28549,6 +29661,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 73.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28558,6 +29671,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 155.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28928,6 +30042,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28937,6 +30052,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -28957,6 +30073,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29087,6 +30204,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 73.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29167,6 +30285,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 7.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29176,6 +30295,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29185,6 +30305,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 56.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29194,6 +30315,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 27.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29203,6 +30325,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29212,6 +30335,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 209.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29230,6 +30354,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 20.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29239,6 +30364,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29248,6 +30374,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 102.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29257,6 +30384,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 163.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29295,6 +30423,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29353,6 +30482,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29362,6 +30492,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29371,6 +30502,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29380,6 +30512,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 81.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29389,6 +30522,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29409,6 +30543,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29445,6 +30580,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 57.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29473,6 +30609,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 3.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29483,6 +30620,7 @@ export const ABILITY_DATABASE =
       "Theurgist",
       "Wizard"
     ],
+    "damage": 1.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29505,6 +30643,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29514,6 +30653,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29524,6 +30664,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29543,6 +30684,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 29.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29552,6 +30695,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 273.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29561,6 +30706,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 96.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29579,6 +30726,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 1.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29608,6 +30756,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 33.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29648,6 +30797,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 170.3,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29659,6 +30810,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29668,6 +30820,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 77.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29679,6 +30832,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29690,6 +30844,7 @@ export const ABILITY_DATABASE =
       "Nightshade",
       "Shadowblade"
     ],
+    "damage": 43.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -29748,6 +30903,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30055,6 +31211,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 41.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30064,6 +31222,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 1.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30073,6 +31232,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 0.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30082,6 +31242,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30110,6 +31271,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30157,6 +31319,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30179,6 +31342,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30228,6 +31392,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30237,6 +31402,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30246,6 +31412,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30255,6 +31422,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 19.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30291,6 +31459,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30311,6 +31480,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30329,6 +31499,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 102.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30338,6 +31509,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 134.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30347,6 +31519,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 81.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30356,6 +31529,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 56.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30374,6 +31548,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 11.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30385,6 +31560,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 49.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30396,6 +31572,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 25.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30407,6 +31584,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 37.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30533,6 +31711,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 13.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30551,6 +31730,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 43.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30562,6 +31742,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 73.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30607,6 +31788,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 39.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30723,6 +31905,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 41.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30732,6 +31915,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 95.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30750,6 +31934,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 1.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30760,6 +31945,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30778,6 +31964,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30814,6 +32001,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 14.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30850,6 +32038,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30904,6 +32093,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warden"
     ],
+    "damage": 7.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30932,6 +32122,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 4.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30941,6 +32132,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30968,6 +32160,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30977,6 +32170,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -30986,6 +32180,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warden"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31006,6 +32201,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warden"
     ],
+    "damage": 5.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31015,6 +32211,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warden"
     ],
+    "damage": 1.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31024,6 +32221,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 7.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31106,6 +32304,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31124,6 +32323,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warden"
     ],
+    "damage": 2.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31133,6 +32333,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warden"
     ],
+    "damage": 3.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31142,6 +32343,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31241,6 +32443,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31297,6 +32500,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 52.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31420,6 +32625,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 7.8,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31454,6 +32661,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 48.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31479,6 +32687,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 40.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31508,6 +32717,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 118.3,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31517,6 +32728,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 91.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31526,6 +32738,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 20.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31535,6 +32748,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 48.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31555,6 +32769,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 158.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31641,6 +32856,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 72.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31738,6 +32954,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31766,6 +32983,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 258.7,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31793,6 +33012,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 162.5,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31850,6 +33071,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31877,6 +33099,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31895,6 +33118,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 28.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31922,6 +33146,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31940,6 +33165,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -31994,6 +33220,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32003,6 +33230,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 67.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32021,6 +33249,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32057,6 +33286,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32066,6 +33296,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 44.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32093,6 +33324,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 26.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32102,6 +33334,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32120,6 +33353,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 145.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32129,6 +33363,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 33.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32138,6 +33373,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32147,6 +33383,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 158.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32156,6 +33393,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32165,6 +33403,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32174,6 +33413,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 65.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32183,6 +33423,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32201,6 +33442,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32210,6 +33452,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32237,6 +33480,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 43.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32264,6 +33508,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32273,6 +33518,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 7.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32291,6 +33537,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 44.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32300,6 +33547,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 114.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32363,6 +33611,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32372,6 +33621,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32381,6 +33631,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 115.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32390,6 +33641,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32401,6 +33653,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Valkyrie"
     ],
+    "damage": 87.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32454,6 +33707,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 161.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32463,6 +33717,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32481,6 +33736,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 90.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32490,6 +33746,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 90.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32590,6 +33847,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 48.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32869,6 +34127,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 7.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32958,6 +34217,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 9.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32967,6 +34227,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32976,6 +34237,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -32985,6 +34247,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33015,6 +34278,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 43.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33098,6 +34362,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33145,6 +34410,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 24.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33181,6 +34447,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33199,6 +34466,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33235,6 +34503,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 14.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33244,6 +34513,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33253,6 +34523,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 2.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33262,6 +34533,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 37.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33316,6 +34588,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 31.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33325,6 +34598,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 81.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33334,6 +34608,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 219.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33343,6 +34618,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 137.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33352,6 +34628,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 62.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33361,6 +34638,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 46.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33370,6 +34648,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 108.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33379,6 +34658,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 173.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33388,6 +34668,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 1.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33451,6 +34732,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33514,6 +34796,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 117.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33532,6 +34815,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 100.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33568,6 +34852,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 80.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33586,6 +34871,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 38.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33595,6 +34881,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 5.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33604,6 +34891,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33622,6 +34910,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33649,6 +34938,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 8.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33676,6 +34966,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 7.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33694,6 +34985,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33730,6 +35022,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 15.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33748,6 +35041,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33865,6 +35159,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33883,6 +35178,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33919,6 +35215,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33964,6 +35261,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 11.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33973,6 +35271,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -33982,6 +35281,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 92.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34063,6 +35363,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 48.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34090,6 +35391,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 26.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34099,6 +35401,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34108,6 +35411,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34117,6 +35421,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34126,6 +35431,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34135,6 +35441,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34144,6 +35451,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34153,6 +35461,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34162,6 +35471,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34180,6 +35490,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34189,6 +35500,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 3.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34261,6 +35573,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 98.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34297,6 +35610,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 82.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34369,6 +35683,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34396,6 +35711,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 64.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34405,6 +35721,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 66.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34414,6 +35731,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34423,6 +35741,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 21.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34432,6 +35751,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 159.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34441,6 +35761,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 52.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34459,6 +35780,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 33.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34486,6 +35808,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34504,6 +35827,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 75.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34531,6 +35855,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 124.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34558,6 +35883,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34576,6 +35902,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 143.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34585,6 +35912,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 179.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34594,6 +35922,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 92.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34603,6 +35932,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 116.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34612,6 +35942,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34621,6 +35952,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34630,6 +35962,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34648,6 +35981,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34657,6 +35991,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34711,6 +36046,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34801,6 +36137,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 116.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34846,6 +36183,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34855,6 +36193,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34864,6 +36203,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 163.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34873,6 +36213,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 114.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34882,6 +36223,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 144.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34891,6 +36233,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 89.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34900,6 +36243,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34909,6 +36253,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 15.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34918,6 +36263,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 31.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34927,6 +36273,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 209.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34936,6 +36283,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 180.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -34954,6 +36302,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 145.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35009,6 +36358,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 9.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35032,6 +36382,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 248.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35041,6 +36393,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 114.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35050,6 +36403,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 57.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35059,6 +36413,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 136.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35070,6 +36425,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 1.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35097,6 +36453,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 31.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35151,6 +36508,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 6.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35160,6 +36518,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 4.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35214,6 +36573,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 148.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35223,6 +36583,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 34.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35232,6 +36593,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35241,6 +36603,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35250,6 +36613,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 122.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35259,6 +36623,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 68.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35278,6 +36643,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Minstrel"
     ],
+    "damage": 152.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35303,6 +36669,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 10.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35314,6 +36681,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 30.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35325,6 +36693,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 63.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35336,6 +36705,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35347,6 +36717,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 106.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35358,6 +36729,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 148.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35369,6 +36741,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35380,6 +36753,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 191.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35398,6 +36772,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35549,6 +36924,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 136.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35611,6 +36987,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 136.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35620,6 +36997,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35647,6 +37025,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35665,6 +37044,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 77.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35674,6 +37054,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 55.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35683,6 +37064,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 23.4,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35701,6 +37084,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 5.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35710,6 +37094,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 25.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35775,6 +37160,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 12.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35786,6 +37172,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 38.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35797,6 +37184,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 79.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35808,6 +37196,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 106.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35819,6 +37208,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 132.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35830,6 +37220,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 185.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35841,6 +37232,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 212.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35852,6 +37244,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 239.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35861,6 +37254,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 35.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35880,6 +37274,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -35996,6 +37391,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36017,6 +37413,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 1.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36374,6 +37771,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 135.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36383,6 +37781,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36392,6 +37791,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36445,6 +37845,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 123.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36454,6 +37855,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 63.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36489,6 +37891,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 33.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36754,6 +38157,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 194.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36763,6 +38167,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36772,6 +38177,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 30.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36781,6 +38187,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 63.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36790,6 +38197,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36799,6 +38207,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 106.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36808,6 +38217,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 148.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36817,6 +38227,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36826,6 +38237,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 191.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36835,6 +38247,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Ranger"
     ],
+    "damage": 212.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36984,6 +38397,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -36993,6 +38407,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 133.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37132,6 +38547,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 3.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37143,6 +38559,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37154,6 +38571,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 15.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37165,6 +38583,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 21.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37176,6 +38595,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 26.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37187,6 +38607,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 37.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37198,6 +38619,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 42.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37209,6 +38631,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 47.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37218,6 +38641,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 67.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37261,6 +38685,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 112.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37270,6 +38695,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 28.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37279,6 +38705,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37288,6 +38715,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 56.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37297,6 +38725,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 90.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37306,6 +38735,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 140.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37315,6 +38745,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 72.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37407,6 +38838,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 45.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37650,6 +39082,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 0.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37659,6 +39092,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 3.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37668,6 +39102,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 4.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37677,6 +39112,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 6.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37699,6 +39135,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 33.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37925,6 +39362,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 75.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37934,6 +39373,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 98.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -37943,6 +39384,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 53.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38088,6 +39531,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38097,6 +39541,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38117,6 +39562,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38126,6 +39572,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38216,6 +39663,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38234,6 +39682,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 42.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38270,6 +39719,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38371,6 +39821,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38380,6 +39831,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 157.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38389,6 +39841,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 110.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38398,6 +39851,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38416,6 +39870,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 27.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38621,6 +40076,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 307.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38805,6 +40261,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38841,6 +40298,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 61.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38905,6 +40363,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 71.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38949,6 +40408,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 38.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38958,6 +40418,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 167.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38985,6 +40446,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -38994,6 +40456,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39003,6 +40466,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 32.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39021,6 +40485,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 17.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39048,6 +40513,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39123,6 +40589,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 7.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39132,6 +40599,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39141,6 +40609,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 1.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39150,6 +40619,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39159,6 +40629,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 4.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39168,6 +40639,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 3.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39177,6 +40649,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39186,6 +40659,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39204,6 +40678,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 62.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39213,6 +40688,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 108.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39222,6 +40698,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 5.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39231,6 +40708,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 31.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39240,6 +40718,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 173.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39249,6 +40728,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 11.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39276,6 +40756,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 70.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39355,6 +40837,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 72.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39512,6 +40995,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 34.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39632,6 +41116,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 77.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39641,6 +41126,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39673,6 +41159,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39691,6 +41178,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39700,6 +41188,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39709,6 +41198,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39718,6 +41208,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 98.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39727,6 +41218,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 106.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39736,6 +41229,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 139.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39745,6 +41239,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39754,6 +41249,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 108.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39763,6 +41259,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 79.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39772,6 +41269,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bard"
     ],
+    "damage": 54.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39792,6 +41290,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39810,6 +41309,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39819,6 +41319,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39828,6 +41329,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 48.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39837,6 +41339,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39855,6 +41358,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 108.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39873,6 +41377,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 179.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39882,6 +41387,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 136.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39891,6 +41397,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 77.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39900,6 +41407,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 61.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39909,6 +41417,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 136.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39918,6 +41427,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 97.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39927,6 +41437,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 44.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39936,6 +41447,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 25.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -39945,6 +41457,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40026,6 +41539,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 117.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40186,6 +41700,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40343,6 +41858,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 26.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40352,6 +41868,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40361,6 +41878,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 41.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40370,6 +41888,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 102.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40379,6 +41898,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 163.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40388,6 +41908,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 209.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40397,6 +41918,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 133.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40406,6 +41928,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 56.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40415,6 +41938,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 77.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40424,6 +41948,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 37.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40433,6 +41958,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40442,6 +41968,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 3.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40473,6 +42000,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 4.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40501,6 +42029,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 35.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40510,6 +42039,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 154.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40519,6 +42050,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 223.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40528,6 +42060,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40537,6 +42070,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40546,6 +42080,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 2.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40657,6 +42192,7 @@ export const ABILITY_DATABASE =
       "Minstrel",
       "Skald"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40801,6 +42337,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 3.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40825,6 +42362,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 41.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40834,6 +42372,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 3.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40888,6 +42427,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 82.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40897,6 +42437,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 29.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40906,6 +42448,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40915,6 +42458,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 46.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40942,6 +42486,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40962,6 +42507,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40980,6 +42526,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -40989,6 +42536,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41025,6 +42573,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 31.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41183,6 +42732,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 2.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41194,6 +42744,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 7.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41205,6 +42756,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 15.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41216,6 +42768,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 21.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41227,6 +42780,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 26.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41238,6 +42792,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 37.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41249,6 +42804,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 42.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41260,6 +42816,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 47.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41294,6 +42851,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 118.3,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41303,6 +42862,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 198.9,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41312,6 +42873,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 67.6,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41321,6 +42884,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 23.4,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41330,6 +42895,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 317.2,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41348,6 +42915,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 140.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41357,6 +42925,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 95.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41366,6 +42935,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 25.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41375,6 +42945,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 24.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41402,6 +42974,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 58.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41411,6 +42984,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41507,6 +43081,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 113.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41576,6 +43151,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 102.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41598,6 +43174,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41851,6 +43428,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41860,6 +43438,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41869,6 +43448,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 3.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41878,6 +43458,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 51.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41887,6 +43468,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 27.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41923,6 +43505,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41932,6 +43515,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 22.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41941,6 +43525,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41981,6 +43566,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 2.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -41990,6 +43576,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42111,6 +43698,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 49.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42210,6 +43798,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42219,6 +43808,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 30.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42228,6 +43818,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 63.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42237,6 +43828,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42246,6 +43838,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 106.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42255,6 +43848,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 148.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42264,6 +43858,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42273,6 +43868,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 191.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42282,6 +43878,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Scout"
     ],
+    "damage": 212.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42441,6 +44038,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 343.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42478,6 +44076,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 64.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42496,6 +44095,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 331.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42505,6 +44105,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 92.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42514,6 +44115,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 228.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42523,6 +44125,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 133.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42532,6 +44135,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 56.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42570,6 +44174,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 58.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42581,6 +44186,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 125.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42592,6 +44198,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 77.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42610,6 +44217,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 273.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42628,6 +44236,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 96.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42637,6 +44246,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 59.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42646,6 +44256,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42655,6 +44266,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 176.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42666,6 +44278,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 99.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42675,6 +44288,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42702,6 +44316,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 160.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42720,6 +44335,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 21.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42729,6 +44345,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 48.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42738,6 +44355,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 159.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42747,6 +44365,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42783,6 +44402,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 239.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42803,6 +44424,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 26.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42812,6 +44434,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42902,6 +44525,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 178.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42911,6 +44535,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 111.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -42920,6 +44545,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 38.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43082,6 +44708,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 325.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43091,6 +44718,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 273.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43100,6 +44728,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 222.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43118,6 +44747,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 124.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43127,6 +44757,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 61.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43136,6 +44767,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43145,6 +44777,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 155.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43154,6 +44787,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 4.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43183,6 +44817,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43194,6 +44829,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 44.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43214,6 +44850,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43223,6 +44860,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43233,6 +44871,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 33.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43287,6 +44926,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43307,6 +44947,7 @@ export const ABILITY_DATABASE =
       "Runemaster",
       "Spiritmaster"
     ],
+    "damage": 33.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43325,6 +44966,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 28.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43343,6 +44985,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 104.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43361,6 +45004,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 124.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43379,6 +45023,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 8.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43388,6 +45033,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 41.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43397,6 +45043,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43469,6 +45116,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 56.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43478,6 +45126,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 137.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43496,6 +45145,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 225.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43505,6 +45155,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 16.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43532,6 +45183,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 31.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43541,6 +45193,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 77.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43604,6 +45257,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 183.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43622,6 +45276,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 102.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43658,6 +45313,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43667,6 +45323,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 33.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43676,6 +45333,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 15.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43685,6 +45343,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 15.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43694,6 +45353,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 6.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43703,6 +45363,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 20.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43712,6 +45373,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 1.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43721,6 +45383,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 10.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43730,6 +45393,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 4.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43739,6 +45403,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 27.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43793,6 +45458,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43839,6 +45505,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 41.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43857,6 +45524,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 31.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43893,6 +45561,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 53.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43929,6 +45598,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 65.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43947,6 +45617,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -43992,6 +45663,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44001,6 +45673,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 2.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44110,6 +45783,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 33.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44121,6 +45795,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 7.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44132,6 +45807,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 23.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44143,6 +45819,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 47.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44154,6 +45831,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 63.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44165,6 +45843,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 79.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44176,6 +45855,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 111.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44187,6 +45867,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 127.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44198,6 +45879,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 143.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44209,6 +45891,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 159.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44291,6 +45974,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 95.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44300,6 +45984,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 133.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44309,6 +45994,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 176.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44318,6 +46004,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 104.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44327,6 +46014,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 265.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44336,6 +46024,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 325.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44345,6 +46034,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 214.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44366,6 +46056,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 37.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44375,6 +46066,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 54.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44384,6 +46076,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 42.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44417,6 +46110,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 8.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44499,6 +46193,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44592,6 +46287,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -44759,6 +46455,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Healer"
     ],
+    "damage": 3.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -45341,6 +47038,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -45845,6 +47543,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 13.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -45899,6 +47598,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 127.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -45982,6 +47682,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -45993,6 +47694,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 64.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46004,6 +47706,7 @@ export const ABILITY_DATABASE =
       "Enchanter",
       "Mentalist"
     ],
+    "damage": 88.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46032,6 +47735,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 70.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46071,6 +47775,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 82.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46137,6 +47842,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 140.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46165,6 +47871,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 6.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46240,6 +47947,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 149.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46318,6 +48027,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Spiritmaster"
     ],
+    "damage": 72.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46416,6 +48126,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 9.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46425,6 +48136,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cleric"
     ],
+    "damage": 179.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46446,6 +48158,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 188.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46464,6 +48178,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46473,6 +48188,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 4.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46482,6 +48198,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 2.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46491,6 +48208,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 8.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46500,6 +48218,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 5.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46509,6 +48228,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 10.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46518,6 +48238,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 12.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46537,6 +48258,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 33.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46556,6 +48278,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 56.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46565,6 +48288,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 102.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46574,6 +48298,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 68.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46617,6 +48342,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46665,6 +48391,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 2.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46719,6 +48446,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 64.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46858,6 +48586,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46877,6 +48606,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 3.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46958,6 +48688,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 132.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46967,6 +48698,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46976,6 +48708,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 30.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46985,6 +48718,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 63.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -46994,6 +48728,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47003,6 +48738,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 106.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47012,6 +48748,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 148.8,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47021,6 +48758,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 170.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47030,6 +48768,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 191.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47039,6 +48778,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 212.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47129,6 +48869,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47156,6 +48897,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 90.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47165,6 +48907,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 55.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47174,6 +48917,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47183,6 +48927,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47192,6 +48937,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 75.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47201,6 +48947,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47210,6 +48957,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 65.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47228,6 +48976,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 125.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47237,6 +48986,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 150.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47246,6 +48996,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 175.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47255,6 +49006,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47264,6 +49016,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47273,6 +49026,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47282,6 +49036,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 75.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47356,6 +49111,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 179.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47366,6 +49122,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 92.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47375,6 +49132,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 116.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47428,6 +49186,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 3.7,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47463,6 +49222,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 26.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47481,6 +49241,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 184.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47490,6 +49251,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 37.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47499,6 +49261,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 146.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47521,6 +49284,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 14.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47530,6 +49294,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47539,6 +49304,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 112.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47548,6 +49314,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 52.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47566,6 +49333,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47575,6 +49343,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 67.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47629,6 +49398,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 6.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47639,6 +49409,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 1.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47682,6 +49453,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47728,6 +49500,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 136.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47770,6 +49543,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 49.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47779,6 +49553,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 27.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47788,6 +49563,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47797,6 +49573,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47806,6 +49583,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 1.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47815,6 +49593,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 8.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47824,6 +49603,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 5.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47833,6 +49613,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 3.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47842,6 +49623,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 3.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47851,6 +49633,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 10.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47860,6 +49643,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 6.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47869,6 +49653,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 263.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47878,6 +49664,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 299.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47887,6 +49675,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 224.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -47998,6 +49788,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Runemaster"
     ],
+    "damage": 25.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48025,6 +49816,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48034,6 +49826,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48043,6 +49836,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 83.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48052,6 +49846,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 143.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48061,6 +49856,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 35.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48070,6 +49866,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 19.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48079,6 +49876,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 61.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48088,6 +49886,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Thane"
     ],
+    "damage": 111.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48106,6 +49905,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48144,6 +49944,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 65.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48153,6 +49954,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 120.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48162,6 +49964,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Wizard"
     ],
+    "damage": 111.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48459,6 +50262,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48477,6 +50281,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Nightshade"
     ],
+    "damage": 18.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48517,6 +50322,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 1.6,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48526,6 +50332,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mentalist"
     ],
+    "damage": 5.4,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48535,6 +50342,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48606,6 +50414,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Shaman"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48725,6 +50534,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Enchanter"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48743,6 +50553,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 12.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48761,6 +50572,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 66.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48771,6 +50583,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48782,6 +50595,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 7.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48791,6 +50605,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48905,6 +50720,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 7.2,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48914,6 +50730,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Hunter"
     ],
+    "damage": 90.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48966,6 +50783,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48975,6 +50793,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48984,6 +50803,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -48993,6 +50813,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49002,6 +50823,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49029,6 +50851,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49047,6 +50870,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49056,6 +50880,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49128,6 +50953,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49241,6 +51067,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 80.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49259,6 +51086,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 90.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49268,6 +51096,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49277,6 +51106,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 60.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49286,6 +51116,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49295,6 +51126,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 40.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49304,6 +51136,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49313,6 +51146,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49322,6 +51156,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 70.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49340,6 +51175,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 20.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49662,6 +51498,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49671,6 +51508,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Necromancer"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49940,6 +51778,7 @@ export const ABILITY_DATABASE =
       "Cabalist",
       "Sorcerer"
     ],
+    "damage": 11.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49949,6 +51788,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 64.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -49959,6 +51799,7 @@ export const ABILITY_DATABASE =
       "Necromancer",
       "Occultist"
     ],
+    "damage": 73.5,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50042,6 +51883,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 239.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50051,6 +51894,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 29.9,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50060,6 +51905,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 36.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50069,6 +51916,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 188.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50078,6 +51927,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 53.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50087,6 +51938,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 115.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50096,6 +51949,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 24.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50105,6 +51960,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 149.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50114,6 +51971,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 75.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50123,6 +51982,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 98.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50132,6 +51993,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 13.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50177,6 +52040,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 6.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50188,6 +52052,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 18.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50199,6 +52064,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 75.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50210,6 +52076,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50221,6 +52088,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 125.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50232,6 +52100,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 175.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50243,6 +52112,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 200.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50254,6 +52124,7 @@ export const ABILITY_DATABASE =
       "Ranger",
       "Scout"
     ],
+    "damage": 225.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50337,6 +52208,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 56.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50346,6 +52219,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 195.3,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50419,6 +52293,7 @@ export const ABILITY_DATABASE =
       "Minstrel",
       "Skald"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50446,6 +52321,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 139.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50464,6 +52340,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 111.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50473,6 +52350,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 9.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50550,6 +52428,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 26.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50559,6 +52438,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 45.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50568,6 +52448,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 36.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50577,6 +52458,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 87.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50586,6 +52468,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bonedancer"
     ],
+    "damage": 72.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50631,6 +52514,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 199.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50640,6 +52524,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Skald"
     ],
+    "damage": 61.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50672,6 +52557,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Mauler"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50740,6 +52626,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Cabalist"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50776,6 +52663,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 89.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50812,6 +52700,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Eldritch"
     ],
+    "damage": 85.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50882,6 +52771,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Heretic"
     ],
+    "damage": 104.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -50910,6 +52800,8 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 43.0,
+    "isBolt": true,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51071,6 +52963,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 95.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51089,6 +52982,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valkyrie"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51098,6 +52992,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Theurgist"
     ],
+    "damage": 88.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51125,6 +53020,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 73.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51134,6 +53030,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 37.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51143,6 +53040,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 57.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51152,6 +53050,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51161,6 +53060,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 13.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51170,6 +53070,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51179,6 +53080,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 171.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51188,6 +53090,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 124.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51197,6 +53100,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Animist"
     ],
+    "damage": 29.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51206,6 +53110,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Druid"
     ],
+    "damage": 27.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51215,6 +53120,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Vampiir"
     ],
+    "damage": 10.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51233,6 +53139,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Valewalker"
     ],
+    "damage": 15.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51285,6 +53192,7 @@ export const ABILITY_DATABASE =
       "Animist",
       "Valewalker"
     ],
+    "damage": 1.9,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51358,6 +53266,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Reaver"
     ],
+    "damage": 6.1,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51367,6 +53276,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51376,6 +53286,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51385,6 +53296,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Bainshee"
     ],
+    "damage": 30.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51453,6 +53365,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Warlock"
     ],
+    "damage": 145.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51462,6 +53375,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Sorcerer"
     ],
+    "damage": 100.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51471,6 +53385,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Occultist"
     ],
+    "damage": 5.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,
@@ -51536,6 +53451,7 @@ export const ABILITY_DATABASE =
     "classes": [
       "Enchanter"
     ],
+    "damage": 50.0,
     "isDamage": true,
     "isHeal": false,
     "isPetSummon": false,

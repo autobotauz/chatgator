@@ -41,6 +41,10 @@ function sortableValue(v, isNum) {
 const nameWithIcon = (row) => `${iconHtml(row.name)}${row.name}`;
 
 function dataTable(parent, { columns, rows, filterable = true }) {
+  // A column marked hideIfEmpty is left out entirely when no row has a value
+  // for it (e.g. Weapon for a pure caster, the cast columns for pure melee),
+  // so wide tables only spend width on columns that say something.
+  columns = columns.filter(c => !c.hideIfEmpty || rows.some(r => r[c.key] != null && r[c.key] !== ''));
   const wrap = document.createElement('div');
   wrap.className = 'data-table-wrap';
 
@@ -61,7 +65,7 @@ function dataTable(parent, { columns, rows, filterable = true }) {
     const th = document.createElement('th');
     th.className = (c.num ? 'num ' : '') + 'sortable';
     th.textContent = c.label;
-    th.title = 'Click to sort';
+    th.title = c.title ? `${c.title} — click to sort` : 'Click to sort';
     headRow.appendChild(th);
   });
   thead.appendChild(headRow);
@@ -722,10 +726,10 @@ function combineRole(existing, added) {
 // weapon swing -- nothing is ever "cast") shows as "—".
 const castFmt = v => (v == null ? '—' : v);
 const CAST_COLUMNS = [
-  { key: 'attempted', label: 'Attempted', num: true, fmt: castFmt },
-  { key: 'casted', label: 'Casted', num: true, fmt: castFmt },
-  { key: 'interrupted', label: 'Interrupted', num: true, fmt: castFmt },
-  { key: 'failed', label: 'Failed', num: true, fmt: castFmt },
+  { key: 'attempted', label: 'Attempted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Started casting it ("You begin casting"), plus instant casts' },
+  { key: 'casted', label: 'Casted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'The cast went off ("You cast")' },
+  { key: 'interrupted', label: 'Interrupted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Cut off by moving or being hit' },
+  { key: 'failed', label: 'Failed', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Went off, but the target already had the effect or was out of range' },
 ];
 
 export function renderSpells(container, stats, ctx) {
@@ -857,7 +861,7 @@ export function renderSpells(container, stats, ctx) {
   dataTable(c, {
     columns: [
       { key: 'name', label: 'Name', html: nameWithIcon },
-      { key: 'weapon', label: 'Weapon', fmt: v => v || '—' },
+      { key: 'weapon', label: 'Weapon', fmt: v => v || '—', hideIfEmpty: true },
       { key: 'info', label: 'Type' },
       ...CAST_COLUMNS,
       { key: 'totalHits', label: 'Hits', num: true },
@@ -866,7 +870,7 @@ export function renderSpells(container, stats, ctx) {
       { key: 'ccLanded', label: 'Landed', num: true, fmt: v => v || 0 },
       { key: 'resists', label: 'Resists', num: true, fmt: v => v || 0 },
       { key: 'resistRate', label: 'Resist %', num: true, fmt: v => (v || 0) + '%' },
-      { key: 'dmg', label: 'Total dmg/heal', num: true, fmt: fmtExact },
+      { key: 'dmg', label: 'Total', num: true, fmt: fmtExact, title: 'Total damage or healing' },
       { key: 'avg', label: 'Avg', num: true },
     ],
     rows: rows.map(r => ({

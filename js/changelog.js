@@ -11,6 +11,22 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-10-28',
+    title: 'Bolt damage credited to the right spell',
+    bullets: [
+      'A bolt has to travel, so a spell you cast after it often lands first -- e.g. Final Blast into Theft of Liveliness. Bolt hits were landing on whatever you\'d cast last, leaving bolts showing 0 damage',
+      'When more than one recent spell could have caused a hit, we now compare the hit to each spell\'s base damage from the character planner and pick the best match',
+      'Debuffs and other non-damage spells cast in between never take a bolt\'s damage',
+    ],
+  },
+  {
+    date: '2026-10-28',
+    title: 'Spells & Styles table fits without scrolling',
+    bullets: [
+      'Columns with nothing in them for your character are hidden (Weapon for casters, the cast columns for pure melee), and "Total dmg/heal" is now just "Total"',
+    ],
+  },
+  {
     date: '2026-10-27',
     title: 'Spells & Styles: Attempted, Casted and Interrupted columns',
     bullets: [

@@ -119,7 +119,7 @@ def clean_name(name):
 
 
 # name -> accumulated info while walking the export
-by_name = defaultdict(lambda: {"types": set(), "has_damage_attr": False, "classes": set(), "has_spec_data": False})
+by_name = defaultdict(lambda: {"types": set(), "has_damage_attr": False, "classes": set(), "has_spec_data": False, "damages": []})
 
 
 def walk_skill(sk, class_name):
@@ -134,6 +134,10 @@ def walk_skill(sk, class_name):
             info["types"].add(t)
         if "Damage" in a:
             info["has_damage_attr"] = True
+            try:
+                info["damages"].append(float(a["Damage"]))
+            except (TypeError, ValueError):
+                pass
     for sub in (sk.get("subSkills") or []):
         walk_skill(sub, class_name)
 
@@ -184,6 +188,20 @@ for name, info in by_name.items():
         "isHeal": is_heal,
         "classes": sorted(info["classes"]),
     }
+    # `damage`: the charplan delve (base damage before stats/spec/variance).
+    # parser.js compares it against a hit's size to decide WHICH of several
+    # recently cast damage spells a "You hit X for N damage!" line belongs
+    # to -- e.g. a bolt still in flight vs. the lifetap cast after it. Only
+    # written when every version of the name agrees to within 10% (Theft of
+    # Liveliness is 179.2 on Occultist, 179.3 as a Necromancer pet spell);
+    # otherwise we can't know which one the player has, so it's left out.
+    dmgs = sorted(info["damages"])
+    if dmgs and dmgs[0] > 0 and dmgs[-1] <= dmgs[0] * 1.10:
+        result[name]["damage"] = dmgs[len(dmgs) // 2]
+    # `isBolt`: travels to the target, so its hit can land a second or more
+    # after spells cast later than it.
+    if "Bolt" in types:
+        result[name]["isBolt"] = True
 
 with open("ability_database.json", "w", encoding="utf-8") as f:
     json.dump(result, f, indent=2, sort_keys=True, ensure_ascii=False)
@@ -198,7 +216,7 @@ js_lines = []
 js_lines.append("// ability-database.js — GENERATED FILE, do not hand-edit.")
 js_lines.append("// Produced by tools/build-ability-database.py from a charplan export (same")
 js_lines.append("// source as ability-cooldowns.js). Flat map of ability name ->")
-js_lines.append("// { type, isDamage, isHeal, classes }.")
+js_lines.append("// { type, isDamage, isHeal, classes, damage?, isBolt? }.")
 js_lines.append("//")
 js_lines.append("// isDamage/isHeal answer \"can this ability positively be ruled OUT as the")
 js_lines.append("// source of a damage/heal result line\" — see build-ability-database.py's")
@@ -207,7 +225,8 @@ js_lines.append("// anything not confidently known is permissive (don't block), 
 js_lines.append("// reverse. `type` is the ability's raw charplan Type string (e.g.")
 js_lines.append("// \"Direct Damage\", \"Heal\", \"Nearsight\", \"Stun\") when every class trains an")
 js_lines.append("// identical version of it, else null. `classes` lists every class with any")
-js_lines.append("// version of this name at all (realm ability or spec skill).")
+js_lines.append("// version of this name at all (realm ability or spec skill). `damage` is the")
+js_lines.append("// charplan delve when every version agrees; `isBolt` marks travelling bolts.")
 js_lines.append("export const ABILITY_DATABASE = ")
 js_lines.append(json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False))
 js_lines.append(";")

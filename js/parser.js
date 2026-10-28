@@ -831,6 +831,57 @@ function confirmedCannotDamage(name) {
   const entries = [ABILITY_DATABASE[name], CL_ABILITY_DATABASE[name]].filter(Boolean);
   return entries.length > 0 && entries.every(info => info.isDamage === false);
 }
+// Charplan delve ("Damage" attribute) and bolt flag for a spell, from
+// ABILITY_DATABASE (see tools/add-ability-damage.py). null when unknown.
+function spellDelve(name) {
+  return ABILITY_DATABASE[name]?.damage ?? CL_ABILITY_DATABASE[name]?.damage ?? null;
+}
+function isBoltSpell(name) {
+  return !!(ABILITY_DATABASE[name]?.isBolt || CL_ABILITY_DATABASE[name]?.isBolt);
+}
+
+// How long after "You cast X" a damage line can still belong to X. A bolt
+// has to travel, so in a real log a Final Blast cast at :23 landed at :25,
+// AFTER the Theft of Liveliness cast at :24 had already hit.
+const DAMAGE_CAST_WINDOW_MS = 4000;
+const BOLT_CAST_WINDOW_MS = 6000;
+// Starting guess for how much bigger a real hit is than its charplan delve
+// (stats + spec + variance) until this log teaches us the player's own
+// ratio from hits with only one possible source. 1.4 sits between the
+// ~1.6 measured on a level-50 Occultist and lower-geared characters.
+const DEFAULT_DAMAGE_RATIO = 1.4;
+
+// Picks which spell a bare "You hit <target> for N damage!" line came from.
+//   candidates: damage-capable casts still within their window (oldest
+//     first), plus — when another hit was attributed in this exact same
+//     second — that spell again, as an AoE landing on several targets.
+//   One candidate: it. Several: the one whose delve × the player's ratio is
+//     closest to the hit (log scale). If fewer than two candidates have a
+//     delve, falls back to whichever was started most recently — the old
+//     "most recent cast" behaviour.
+// Returns { name, queued } (queued = came from the damageCasts list, so the
+// caller removes it) or null.
+function pickDamageSource(dmg, clockMs, damageCasts, aoe, ratio) {
+  const live = damageCasts.filter(c =>
+    clockMs - c.at <= (isBoltSpell(c.name) ? BOLT_CAST_WINDOW_MS : DAMAGE_CAST_WINDOW_MS));
+  const candidates = live.map(c => ({ name: c.name, at: c.at, queued: true }));
+  if (aoe) candidates.push({ name: aoe.name, at: aoe.at, queued: false });
+  if (!candidates.length) return null;
+  if (candidates.length === 1) return candidates[0];
+  const scored = candidates
+    .map(c => ({ c, delve: spellDelve(c.name) }))
+    .filter(x => x.delve);
+  if (scored.length >= 2 && dmg > 0) {
+    let best = null, bestScore = Infinity;
+    for (const { c, delve } of scored) {
+      const score = Math.abs(Math.log(dmg / (delve * ratio)));
+      if (score < bestScore) { bestScore = score; best = c; }
+    }
+    return best;
+  }
+  return candidates.reduce((a, b) => (b.at >= a.at ? b : a));
+}
+
 function confirmedCannotHeal(name) {
   const entries = [ABILITY_DATABASE[name], CL_ABILITY_DATABASE[name]].filter(Boolean);
   return entries.length > 0 && entries.every(info => info.isHeal === false);
@@ -900,6 +951,20 @@ export function parseLogText(rawText, resume) {
   // X" not yet) -- what an interrupt line belongs to, and how a "You cast"
   // line with no begin of its own is recognised as an instant cast.
   let castingName = resume?.castingName ?? null;
+  // Damage-capable casts that haven't produced their damage line yet — see
+  // pickDamageSource(). A list, not one "last cast", because a bolt cast
+  // first can land after a spell cast later than it.
+  let damageCasts = resume?.damageCasts ? resume.damageCasts.slice() : [];
+  // This player's typical hit / delve, learned from unambiguous hits.
+  let damageRatio = resume?.damageRatio ?? null;
+  // Targets already hit by activeDotName in its current second — an AoE
+  // hits each target once, so a second same-second hit on the SAME target
+  // is something else (e.g. the spell cast right after a bolt landed).
+  let aoeHitTargets = new Set(resume?.aoeHitTargets || []);
+  const dropDamageCast = (name) => {
+    const i = damageCasts.findIndex(c => c.name === name);
+    if (i >= 0) damageCasts.splice(i, 1);
+  };
   // A CC/debuff landing (cc_landed) or an unnamed resist (resist_generic) is
   // attributed to whichever cast — yours or your pet's — most recently
   // happened, and unlike pendingCastName above this one is deliberately NOT
@@ -1067,6 +1132,12 @@ export function parseLogText(rawText, resume) {
       if (parsed.type === 'cast') {
         lastCastName = parsed.payload.name;
         lastCastAt = clockMs;
+        // Non-damage casts (debuffs, buffs, CC) never enter the list, so a
+        // debuff cast while a bolt is in flight can't steal the bolt's hit.
+        damageCasts = damageCasts.filter(c => clockMs - c.at <= BOLT_CAST_WINDOW_MS);
+        if (!confirmedCannotDamage(parsed.payload.name)) {
+          damageCasts.push({ name: parsed.payload.name, at: clockMs });
+        }
         pendingCastName = parsed.payload.name;
         pendingCastAt = clockMs;
         pendingEffectName = parsed.payload.name;
@@ -1104,12 +1175,31 @@ export function parseLogText(rawText, resume) {
         // Falling through here (rather than attributing wrongly) still
         // lets the activeDotName branches below correctly pick up a REAL
         // damage DoT/AE already in progress instead — see ABILITY_DATABASE.
-        if (pendingCastName && !confirmedCannotDamage(pendingCastName) && clockMs - pendingCastAt <= CAST_WINDOW_MS) {
-          payload.spellName = pendingCastName;
-          activeDotName = pendingCastName;
+        //
+        // Which cast: see pickDamageSource() — a bolt still travelling and a
+        // spell cast after it are both candidates, decided by delve.
+        const aoe = activeDotName && clockMs === activeDotAt && !aoeHitTargets.has(payload.target)
+          ? { name: activeDotName, at: activeDotAt } : null;
+        const src = pickDamageSource(payload.dmg, clockMs, damageCasts, aoe, damageRatio ?? DEFAULT_DAMAGE_RATIO);
+        if (src && src.queued) {
+          payload.spellName = src.name;
+          dropDamageCast(src.name);
+          if (pendingCastName === src.name) pendingCastName = null;
+          // Learn the player's hit/delve ratio, only from hits that had a
+          // single possible source (no guess involved).
+          const delve = spellDelve(src.name);
+          if (delve && !aoe && damageCasts.every(c => clockMs - c.at > (isBoltSpell(c.name) ? BOLT_CAST_WINDOW_MS : DAMAGE_CAST_WINDOW_MS))) {
+            const r = Math.min(4, Math.max(0.5, payload.dmg / delve));
+            damageRatio = damageRatio == null ? r : damageRatio * 0.8 + r * 0.2;
+          }
+          activeDotName = src.name;
           activeDotTarget = payload.target;
           activeDotAt = clockMs;
-          pendingCastName = null;
+          aoeHitTargets = new Set([payload.target]);
+        } else if (src) {
+          // Same-second AoE continuation onto another target.
+          payload.spellName = src.name;
+          aoeHitTargets.add(payload.target);
         } else if (activeDotName && clockMs === activeDotAt) {
           // Another bare "You hit <target> for N damage!" in the EXACT same
           // logged second as the hit just attributed above (or as a
@@ -1181,6 +1271,7 @@ export function parseLogText(rawText, resume) {
       } else if (type === 'cast_failed') {
         if (lastCastName && clockMs - lastCastAt <= CAST_WINDOW_MS) {
           payload.spellName = lastCastName;
+          dropDamageCast(lastCastName); // fizzled — it won't produce a hit
           lastCastName = null; // one failure per cast
         } else {
           type = 'flavor';
@@ -1241,6 +1332,7 @@ export function parseLogText(rawText, resume) {
       pendingStyleName, pendingStyleAt,
       pendingCastName, pendingCastAt,
       lastCastName, lastCastAt, castingName,
+      damageCasts, damageRatio, aoeHitTargets: [...aoeHitTargets],
       pendingEffectName, pendingEffectAt, pendingEffectIsPet,
       activeDotName, activeDotTarget, activeDotAt,
       activeHealName, activeHealAt, lastHealTarget,
