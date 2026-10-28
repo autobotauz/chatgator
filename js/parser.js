@@ -376,7 +376,6 @@ const RULES = [
   ['flavor', /^You can't (attack yourself|enter melee combat mode with a fired weapon)!\s*$/, () => ({})],
   ['flavor', /^You must wait \d+ seconds? (to use this spell|before you can cast a spell again)!$/, () => ({})],
   ['flavor', /^You don't have enough power to cast that!$/, () => ({})],
-  ['flavor', /^You move and interrupt your spellcast\.$/, () => ({})],
   ['flavor', /^You gather energy from your surroundings\.(?:\s*\(Siphon Chance:\s*[\d.]+%\))?$/, () => ({})],
   ['flavor', /^\[Reset\] to try again$/, () => ({})],
   ['cc_landed', /^(.+?) seems to be moving more slowly\.?$/, m => ({ target: m[1], effect: 'snare' })],
@@ -415,11 +414,20 @@ const RULES = [
   ['flavor', /^You feel more (dextrous|agile)!$/, () => ({})],
   ['flavor', /^(.+? is|You are) fully healed\.$/, () => ({})],
   ['flavor', /^.+? seems (calm and healthy|weaker|vulnerable to [\w\s]+?)!?\.?$/, () => ({})],
-  ['flavor', /^Your ablative absorbs \d+ damage!$/, () => ({})],
-  ['flavor', /^The (blow|arrow) was absorbed by a magical barrier!$/, () => ({})],
+  // Your own absorb buffs. "ablative"/"barrier" is an ablative (absorbs a
+  // fixed pool of damage); "The blow was absorbed by a magical barrier!" is
+  // a bladeturn eating an incoming hit outright (the very next line in a
+  // real log is always that same attacker's 100%-miss line against you).
+  ['ablative', /^Your (?:ablative|barrier|Spirit Form) (?:absorbs|blocks) (\d+) damage!$/, m => ({ amount: +m[1] })],
+  ['bladeturn', /^The (?:blow|arrow) was absorbed by a magical barrier!$/, () => ({})],
+  // Your spell being interrupted -- attributed in the main loop to whichever
+  // spell you'd begun casting, or dropped as flavor if nothing was.
+  ['cast_interrupted', /^You move and interrupt your (?:spellcast|focus)[.!]$/, () => ({ reason: 'moved' })],
+  ['cast_interrupted', /^(.+?) attacks you and your spell is interrupted!$/, m => ({ reason: 'attacked', by: m[1] })],
+  ['cast_interrupted', /^You draw your weapons and interrupt your spell cast!$/, () => ({ reason: 'weapons drawn' })],
   ['flavor', /^You resist the effect! \(Resist Chance:\s*[\d.]+%\)$/, () => ({})],
-  ['flavor', /^.+? attacks you and (misses! \(Miss Chance:\s*[\d.]+%\)|your spell is interrupted!)$/, () => ({})],
-  ['flavor', /^You (draw your weapons and interrupt your spell cast|enter combat mode but have no target)!$/, () => ({})],
+  ['flavor', /^.+? attacks you and misses! \(Miss Chance:\s*[\d.]+%\)$/, () => ({})],
+  ['flavor', /^You enter combat mode but have no target!$/, () => ({})],
   ['flavor', /^Your spell is cancelled!$/, () => ({})],
   ['flavor', /^You must (wait \d+ (seconds?|minutes? \d+ seconds?) to (cast a spell|use this spell)|have a target for your next attack style|select a target for this spell)!$/, () => ({})],
   // A completed cast ("You cast a X spell!") that then fizzles: the target
@@ -522,7 +530,6 @@ const RULES = [
   ['flavor', /^.+?'s weapon begins channeling the strength of the earth\.$/, () => ({})],
   ['flavor', /^.+? trains in various specializations\.$/, () => ({})],
   ['flavor', /^Your Spirit Form blocks \d+ damage!$/, () => ({})],
-  ['flavor', /^You move and interrupt your (spellcast|focus)!$/, () => ({})],
   ['flavor', /^You cannot absorb any more (life|power)\.$/, () => ({})],
   ['flavor', /^You received .+? and place it in your backpack!$/, () => ({})],
   ['flavor', /^You regain \d+ (power|endurance|hits|health) from resting by the campfire\.?$/, () => ({})],
@@ -889,6 +896,10 @@ export function parseLogText(rawText, resume) {
   // The most recent completed cast, for pinning a 'cast_failed' line on it.
   // Separate from pendingCastName, which damage/heal attribution clears.
   let lastCastName = resume?.lastCastName ?? null, lastCastAt = resume?.lastCastAt ?? -Infinity;
+  // The spell currently being cast ("You begin casting X" seen, its "You cast
+  // X" not yet) -- what an interrupt line belongs to, and how a "You cast"
+  // line with no begin of its own is recognised as an instant cast.
+  let castingName = resume?.castingName ?? null;
   // A CC/debuff landing (cc_landed) or an unnamed resist (resist_generic) is
   // attributed to whichever cast — yours or your pet's — most recently
   // happened, and unlike pendingCastName above this one is deliberately NOT
@@ -1051,6 +1062,7 @@ export function parseLogText(rawText, resume) {
       }
       if (parsed.type === 'cast_begin') {
         lastCastName = null; // a failure from here on belongs to this new, not-yet-completed cast
+        castingName = parsed.payload.name;
       }
       if (parsed.type === 'cast') {
         lastCastName = parsed.payload.name;
@@ -1151,6 +1163,21 @@ export function parseLogText(rawText, resume) {
           payload.spellName = activePowerName;
           activePowerAt = clockMs; // still resolving — extend the window
         }
+      } else if (type === 'cast') {
+        // Instant spells never print "You begin casting" -- flagged so the
+        // Attempted count (begins + instants) still includes them.
+        // An instant cast can go off while another spell is still being
+        // cast (seen in a real log: Banish Confidence landing mid-Veil of
+        // Senility), so it leaves that in-progress spell alone.
+        if (castingName === payload.name) castingName = null;
+        else payload.instant = true;
+      } else if (type === 'cast_interrupted') {
+        if (castingName) {
+          payload.spellName = castingName;
+          castingName = null;
+        } else {
+          type = 'flavor';
+        }
       } else if (type === 'cast_failed') {
         if (lastCastName && clockMs - lastCastAt <= CAST_WINDOW_MS) {
           payload.spellName = lastCastName;
@@ -1213,7 +1240,7 @@ export function parseLogText(rawText, resume) {
       lastClock: lastEventClock(events) ?? lastClock,
       pendingStyleName, pendingStyleAt,
       pendingCastName, pendingCastAt,
-      lastCastName, lastCastAt,
+      lastCastName, lastCastAt, castingName,
       pendingEffectName, pendingEffectAt, pendingEffectIsPet,
       activeDotName, activeDotTarget, activeDotAt,
       activeHealName, activeHealAt, lastHealTarget,

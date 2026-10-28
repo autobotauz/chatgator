@@ -17,7 +17,7 @@ import { ABILITY_DATABASE } from './ability-database.js';
 const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts the next
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
-  'ability_hit', 'ability_crit', 'cast', 'cast_begin', 'cast_failed',
+  'ability_hit', 'ability_crit', 'cast', 'cast_begin', 'cast_failed', 'cast_interrupted', 'ablative', 'bladeturn',
   'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
   'incoming_dmg', 'incoming_crit', 'incoming_extra',
   'heal_out', 'heal_out_crit', 'heal_in', 'power_transfer',
@@ -321,6 +321,17 @@ export function buildStats(events, playerNameHint) {
   for (const e of events) if (e.type === 'cast_failed' && e.spellName) {
     castFailedByName[e.spellName] = (castFailedByName[e.spellName] || 0) + 1;
   }
+  // Attempted = every "You begin casting X" plus every instant cast (no
+  // begin line of its own). Interrupted = attempts cut off by moving or
+  // being hit -- see parser.js 'cast_interrupted'.
+  const castAttemptedByName = {};
+  const castInterruptedByName = {};
+  const bump1 = (m, k) => { m[k] = (m[k] || 0) + 1; };
+  for (const e of events) {
+    if (e.type === 'cast_begin') bump1(castAttemptedByName, e.name);
+    else if (e.type === 'cast' && e.instant) bump1(castAttemptedByName, e.name);
+    else if (e.type === 'cast_interrupted' && e.spellName) bump1(castInterruptedByName, e.spellName);
+  }
 
   // Class-inference signal: spell casts plus melee style names. A style
   // name only ever reaches an event as e.styleName tacked onto its
@@ -612,6 +623,7 @@ export function buildStats(events, playerNameHint) {
   let blocks = 0, youParries = 0, youEvades = 0, enemyParriedYou = 0, enemyEvadedYou = 0, enemyBlockedYou = 0;
   let resistCount = 0;
   const resistBySource = {};
+  let ablativeHits = 0, ablativeAbsorbed = 0, bladeturns = 0;
   // A CC/debuff application (e.g. a pet's root, or your own mez) with no
   // damage number of its own — tracked separately from resistBySource so a
   // spell's "landed vs resisted" rate reflects real attempts even when it
@@ -624,6 +636,8 @@ export function buildStats(events, playerNameHint) {
     else if (e.type === 'parry_in') enemyParriedYou++;
     else if (e.type === 'evade_in') enemyEvadedYou++;
     else if (e.type === 'block_in') enemyBlockedYou++;
+    else if (e.type === 'ablative') { ablativeHits++; ablativeAbsorbed += e.amount; }
+    else if (e.type === 'bladeturn') bladeturns++;
     else if (e.type === 'resist_generic' || e.type === 'resist_named') {
       resistCount++;
       const key = e.source || 'Unknown';
@@ -633,7 +647,9 @@ export function buildStats(events, playerNameHint) {
     }
   }
   const incomingHitsLanded = Object.values(dmgInBySource).reduce((a, s) => a + s.hits + s.crits, 0);
-  const totalIncomingAttackAttempts = blocks + youParries + youEvades + incomingHitsLanded;
+  // A bladeturned blow is an attack that would otherwise have landed, so it
+  // counts as an attempt (and as mitigated) alongside blocks/parries/evades.
+  const totalIncomingAttackAttempts = blocks + youParries + youEvades + bladeturns + incomingHitsLanded;
 
   // ---- realm points --------------------------------------------------------------
   // The game logs a realm-rank bonus as its OWN line ("You get an additional N
@@ -875,6 +891,8 @@ export function buildStats(events, playerNameHint) {
     },
     defense: {
       blocks, youParries, youEvades, enemyParriedYou, enemyEvadedYou, enemyBlockedYou, resistCount,
+      ablativeHits, ablativeAbsorbed, bladeturns,
+      bladeturnRate: pct(bladeturns, totalIncomingAttackAttempts),
       resistBySource,
       totalIncomingAttackAttempts,
       blockRate: pct(blocks, totalIncomingAttackAttempts),
@@ -897,6 +915,8 @@ export function buildStats(events, playerNameHint) {
     spellsCast: Array.from(castNames),
     castCountByName,
     castFailedByName,
+    castAttemptedByName,
+    castInterruptedByName,
     bgBroadcasts,
   };
 }

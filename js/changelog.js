@@ -12,6 +12,23 @@
 export const CHANGELOG = [
   {
     date: '2026-10-27',
+    title: 'Spells & Styles: Attempted, Casted and Interrupted columns',
+    bullets: [
+      'Both spell tables now show Attempted (you started casting it), Casted (the cast went off), Interrupted (you moved or got hit) and Failed (target already had the effect, or was out of range)',
+      '"Landed (CC)" is now just "Landed"',
+      'Removed the "Detected class" note -- your class is already shown next to your name',
+    ],
+  },
+  {
+    date: '2026-10-27',
+    title: 'Defense tab: ablatives and bladeturns',
+    bullets: [
+      'New tiles for how much damage your ablative absorbed and how many hits a bladeturn stopped; bladeturns also count toward Attacks mitigated',
+      'Removed the "Resists by spell / effect" chart -- the same numbers are on the Spells & Styles tab, per spell',
+    ],
+  },
+  {
+    date: '2026-10-27',
     title: 'Fixed: debuffs showing 100% resisted',
     bullets: [
       'Many debuffs (like Visions of the Elements) print nothing when they land -- only resists get a line -- so they always showed 100% resisted. Casts that weren\'t resisted now count as landed',

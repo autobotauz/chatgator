@@ -369,7 +369,7 @@ a { color: var(--series-1); }
 .viz-tooltip .tt-row { display:flex; gap:8px; justify-content: space-between; }
 
 /* ---------- table ---------- */
-.data-table-wrap { width: 100%; }
+.data-table-wrap { width: 100%; overflow-x: auto; } /* wide tables (Spells & Styles has 14 columns) scroll sideways instead of widening the page */
 .table-filter {
   display: block; width: 100%; max-width: 260px; margin: 0 0 8px auto;
   padding: 6px 10px; font-size: 12.5px; font-family: var(--font);

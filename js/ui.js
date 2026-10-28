@@ -417,7 +417,7 @@ export function renderPets(container, stats, ctx) {
       spellSub.innerHTML = `
         <div class="grid cols-4" style="gap:10px">
           ${tile('Spells cast', fmtExact(p.spellsCast))}
-          ${tile('Landed (CC/debuff)', fmtExact(p.ccLanded || 0))}
+          ${tile('Landed', fmtExact(p.ccLanded || 0))}
           ${tile('Resisted', fmtExact(p.resists || 0))}
           ${tile('Resist %', (p.resistRate || 0) + '%')}
         </div>`;
@@ -445,19 +445,19 @@ export function renderDefense(container, stats, ctx) {
   statTile(g, { label: 'Block rate', value: d.blockRate + '%', sub: `${d.blocks} blocks` });
   statTile(g, { label: 'Parry rate', value: d.parryRate + '%', sub: `${d.youParries} parries` });
   statTile(g, { label: 'Evade rate', value: d.evadeRate + '%', sub: `${d.youEvades} evades` });
-  statTile(g, { label: 'Attacks mitigated', value: `${d.blocks + d.youParries + d.youEvades} / ${d.totalIncomingAttackAttempts}` });
+  statTile(g, { label: 'Attacks mitigated', value: `${d.blocks + d.youParries + d.youEvades + d.bladeturns} / ${d.totalIncomingAttackAttempts}` });
 
+  // Your absorb buffs: an ablative soaks part of a hit; a bladeturn stops one
+  // outright. (Your spells resisted by enemies used to be charted here too --
+  // that's on the Spells & Styles tab already, per spell.)
   const g2 = grid(section(container), 4);
-  statTile(g2, { label: 'Your attacks blocked by enemy', value: fmtExact(d.enemyBlockedYou) });
-  statTile(g2, { label: 'Your attacks parried by enemy', value: fmtExact(d.enemyParriedYou) });
-  statTile(g2, { label: 'Your attacks evaded by enemy', value: fmtExact(d.enemyEvadedYou) });
-  statTile(g2, { label: 'Spell/effect resists landed on enemies', value: fmtExact(d.resistCount) });
+  statTile(g2, { label: 'Ablative absorbed', value: fmtExact(d.ablativeAbsorbed), sub: `${fmtExact(d.ablativeHits)} hits soaked` });
+  statTile(g2, { label: 'Bladeturns', value: fmtExact(d.bladeturns), sub: `${d.bladeturnRate}% of attacks` });
 
-  const resSec = section(container);
-  h3(resSec, 'Resists by spell / effect (enemy resisted you)');
-  const resCard = card(resSec);
-  const items = Object.entries(d.resistBySource).map(([label, value]) => ({ label, value }));
-  barChart(resCard, { items, unit: ' resists', colorFn: () => 'var(--series-5)' });
+  const g3 = grid(section(container), 4);
+  statTile(g3, { label: 'Your attacks blocked by enemy', value: fmtExact(d.enemyBlockedYou) });
+  statTile(g3, { label: 'Your attacks parried by enemy', value: fmtExact(d.enemyParriedYou) });
+  statTile(g3, { label: 'Your attacks evaded by enemy', value: fmtExact(d.enemyEvadedYou) });
 }
 
 // ===========================================================================
@@ -718,6 +718,16 @@ function combineRole(existing, added) {
   return parts.includes(added) ? existing : [...parts, added].join(' + ');
 }
 
+// Shared by both Spells & Styles tables. A null value (a style or plain
+// weapon swing -- nothing is ever "cast") shows as "—".
+const castFmt = v => (v == null ? '—' : v);
+const CAST_COLUMNS = [
+  { key: 'attempted', label: 'Attempted', num: true, fmt: castFmt },
+  { key: 'casted', label: 'Casted', num: true, fmt: castFmt },
+  { key: 'interrupted', label: 'Interrupted', num: true, fmt: castFmt },
+  { key: 'failed', label: 'Failed', num: true, fmt: castFmt },
+];
+
 export function renderSpells(container, stats, ctx) {
   clear(container);
   const skillMap = ctx && ctx.skillMap || {};
@@ -810,6 +820,20 @@ export function renderSpells(container, stats, ctx) {
 
   const castCountByName = stats.castCountByName || {};
   const castFailedByName = stats.castFailedByName || {};
+  // Attempted ("You begin casting X", plus instant casts), Casted ("You cast
+  // X"), Interrupted and Failed for one name -- shared by both tables below.
+  // Styles/melee have no cast lines, so they get null ("—") rather than 0.
+  const castCounts = (name) => {
+    const casted = castCountByName[name] || 0;
+    const attempted = (stats.castAttemptedByName || {})[name] || 0;
+    if (!casted && !attempted) return { attempted: null, casted: null, interrupted: null, failed: null };
+    return {
+      attempted: Math.max(attempted, casted),
+      casted,
+      interrupted: (stats.castInterruptedByName || {})[name] || 0,
+      failed: castFailedByName[name] || 0,
+    };
+  };
   const noDamageRows = [
     // `landed` (aggregate.js) also counts casts that went off with no resist
     // -- many debuffs never log a landing line at all; ccLanded is only the
@@ -817,42 +841,39 @@ export function renderSpells(container, stats, ctx) {
     ...zeroRows.map(r => ({
       name: r.name, role: r.role,
       ccLanded: r.landed ?? r.ccLanded ?? 0, resists: r.resists || 0, resistRate: r.resistRate || 0,
-      castCount: castCountByName[r.name] || 0,
-      failed: castFailedByName[r.name] || 0,
+      ...castCounts(r.name),
     })),
     ...castOnlyNames.map(n => ({
       name: n, role: 'Other',
       // Never resisted: every cast that didn't fizzle went off.
       ccLanded: Math.max(0, (castCountByName[n] || 0) - (castFailedByName[n] || 0)), resists: 0, resistRate: 0,
-      castCount: castCountByName[n] || 0,
-      failed: castFailedByName[n] || 0,
+      ...castCounts(n),
     })),
-  ].sort((a, b) => (b.castCount - a.castCount) || (b.ccLanded - a.ccLanded) || (b.resists - a.resists));
+  ].sort((a, b) => ((b.casted || 0) - (a.casted || 0)) || (b.ccLanded - a.ccLanded) || (b.resists - a.resists));
 
   const s = section(container);
   h3(s, 'Spells, styles & abilities used');
-  if (inferredClass) {
-    const p = document.createElement('p');
-    p.className = 'sub';
-    p.textContent = `Detected class: ${inferredClass.name} (from the abilities cast in this view) — used above to hide rows that can only belong to some other class.`;
-    s.appendChild(p);
-  }
   const c = card(s);
   dataTable(c, {
     columns: [
       { key: 'name', label: 'Name', html: nameWithIcon },
       { key: 'weapon', label: 'Weapon', fmt: v => v || '—' },
       { key: 'info', label: 'Type' },
+      ...CAST_COLUMNS,
       { key: 'totalHits', label: 'Hits', num: true },
       { key: 'crits', label: 'Crits', num: true },
       { key: 'critRate', label: 'Crit %', num: true, fmt: v => v + '%' },
-      { key: 'ccLanded', label: 'Landed (CC)', num: true, fmt: v => v || 0 },
+      { key: 'ccLanded', label: 'Landed', num: true, fmt: v => v || 0 },
       { key: 'resists', label: 'Resists', num: true, fmt: v => v || 0 },
       { key: 'resistRate', label: 'Resist %', num: true, fmt: v => (v || 0) + '%' },
       { key: 'dmg', label: 'Total dmg/heal', num: true, fmt: fmtExact },
       { key: 'avg', label: 'Avg', num: true },
     ],
-    rows: rows.map(r => ({ ...r, info: roleOrType(r.name, r.role, skillMap) })),
+    rows: rows.map(r => ({
+      ...r, ...castCounts(r.name),
+      ccLanded: r.landed ?? r.ccLanded ?? 0,
+      info: roleOrType(r.name, r.role, skillMap),
+    })),
   });
 
   if (noDamageRows.length) {
@@ -860,15 +881,14 @@ export function renderSpells(container, stats, ctx) {
     h3(s2, 'No damage/heal logged (buffs, debuffs, cures, CC, pet summons…)');
     const p2 = document.createElement('p');
     p2.className = 'sub';
-    p2.textContent = 'Everything else cast in this view — the rest of the kit a damage/heal number alone would hide. Shows how many times each one lands, gets resisted, or (for a pure buff with no trackable result at all) was simply cast. Many debuffs print nothing when they land, so a cast that wasn\'t resisted and didn\'t fail counts as landed. Failed = the target already had the effect, or was out of range; those aren\'t counted toward Resist %.';
+    p2.textContent = 'Everything else cast in this view — the rest of the kit a damage/heal number alone would hide. Shows how many times each one lands, gets resisted, or (for a pure buff with no trackable result at all) was simply cast. Attempted = started casting (plus instant casts); Casted = the cast went off; Interrupted = cut off by moving or being hit; Failed = went off but the target already had the effect or was out of range (not counted toward Resist %). Many debuffs print nothing when they land, so a cast that wasn\'t resisted and didn\'t fail counts as landed.';
     s2.appendChild(p2);
     const c2 = card(s2);
     dataTable(c2, {
       columns: [
         { key: 'name', label: 'Name', html: nameWithIcon },
         { key: 'info', label: 'Type' },
-        { key: 'castCount', label: 'Times cast', num: true, fmt: v => v || '—' },
-        { key: 'failed', label: 'Failed', num: true, fmt: v => v || 0 },
+        ...CAST_COLUMNS,
         { key: 'ccLanded', label: 'Landed', num: true, fmt: v => v || 0 },
         { key: 'resists', label: 'Resists', num: true, fmt: v => v || 0 },
         { key: 'resistRate', label: 'Resist %', num: true, fmt: v => (v || 0) + '%' },
