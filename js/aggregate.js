@@ -15,6 +15,9 @@
 import { ABILITY_DATABASE } from './ability-database.js';
 
 const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts the next
+// A stretch this long with no encounter at all is "idle" -- the time-series
+// charts can squeeze these down (see charts.js timelineChart's hideIdle).
+export const IDLE_GAP_MS = 60 * 60 * 1000;
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
   'ability_hit', 'ability_crit', 'cast', 'cast_begin', 'cast_failed', 'cast_interrupted', 'ablative', 'bladeturn',
@@ -783,6 +786,14 @@ export function buildStats(events, playerNameHint) {
   const durationMs = (startClock != null && endClock != null) ? Math.max(1000, endClock - startClock) : 1000;
   const durationSec = durationMs / 1000;
 
+  // Idle gaps: the space between two encounters when it's IDLE_GAP_MS or
+  // longer -- you logged off, went AFK, etc. Charts can collapse these.
+  const idleGaps = [];
+  const encs = segmentEncounters(events);
+  for (let i = 1; i < encs.length; i++) {
+    if (encs[i].start - encs[i - 1].end >= IDLE_GAP_MS) idleGaps.push({ start: encs[i - 1].end, end: encs[i].start });
+  }
+
   const totalDmgOut = sumVals(dmgOutBySource) + sumPetDmg(petStats);
   const totalDmgIn = sumVals(dmgInBySource);
 
@@ -845,7 +856,7 @@ export function buildStats(events, playerNameHint) {
 
   return {
     meta: {
-      playerName, startClock, endClock, durationMs,
+      playerName, startClock, endClock, durationMs, idleGaps,
       statsSnapshots, latestSnapshot, checkpointStarts,
       petNames: Array.from(petNames),
       inferredClass,
@@ -858,12 +869,14 @@ export function buildStats(events, playerNameHint) {
       melee: { hits: totalMeleeHits, crits: totalMeleeCrits, misses: totalMeleeMisses, dmg: totalMeleeDmg,
         critRate: (totalMeleeHits + totalMeleeCrits) ? +(100 * totalMeleeCrits / (totalMeleeHits + totalMeleeCrits)).toFixed(1) : 0 },
       timeline: bucketTimeline(dmgOutPoints, startClock, endClock),
+      points: dmgOutPoints, // raw { clock, amount }, for the zoomable charts
     },
     damageIn: {
       total: totalDmgIn,
       bySource: finalizeSourceMap(dmgInBySource),
       dtps: durationSec ? +(totalDmgIn / durationSec).toFixed(1) : 0,
       timeline: bucketTimeline(dmgInPoints, startClock, endClock),
+      points: dmgInPoints,
     },
     healOut: {
       total: healOutTotal,
@@ -873,6 +886,7 @@ export function buildStats(events, playerNameHint) {
       bySpell: finalizeSourceMap(healOutBySpell),
       hps: durationSec ? +(healOutTotal / durationSec).toFixed(1) : 0,
       timeline: bucketTimeline(healOutPoints, startClock, endClock),
+      points: healOutPoints,
     },
     healIn: {
       total: healInTotal,
@@ -903,6 +917,8 @@ export function buildStats(events, playerNameHint) {
       total: rpTotal, bonusTotal: rpBonusTotal, byReason: rpByReason, bonusByReason: rpBonusByReason,
       perHour: durationSec ? +(rpTotal / (durationSec / 3600)).toFixed(0) : 0,
       timeline: bucketTimeline(rpPoints, startClock, endClock),
+      points: rpPoints,
+      pointsByReason: rpPointsByReason,
       // Same bucketing (same startClock/endClock/bucket count) as `timeline`
       // above, just split out per reason -- so each reason's series lines up
       // on the same x-axis buckets as every other, which a stacked chart

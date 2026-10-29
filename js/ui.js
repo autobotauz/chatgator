@@ -183,11 +183,14 @@ export function renderOverview(container, stats, ctx) {
     { color: 'var(--text-primary)', label: 'Checkpoint' },
   ]);
   timelineChart(tlCard, {
+    id: 'overview-activity',
+    domain: [stats.meta.startClock, stats.meta.endClock],
+    idleGaps: stats.meta.idleGaps,
     series: [
-      { name: 'Damage done', color: 'var(--series-1)', points: stats.damageOut.timeline.map(p => ({ t: p.t, v: p.v })) },
-      { name: 'Healing done', color: 'var(--series-3)', points: stats.healOut.timeline.map(p => ({ t: p.t, v: p.v })) },
-      { name: 'Damage taken', color: 'var(--series-8)', points: stats.damageIn.timeline.map(p => ({ t: p.t, v: p.v })) },
-      { name: 'Realm points', color: 'var(--series-4)', points: stats.realmPoints.timeline.map(p => ({ t: p.t, v: p.v })) },
+      { name: 'Damage done', color: 'var(--series-1)', raw: stats.damageOut.points },
+      { name: 'Healing done', color: 'var(--series-3)', raw: stats.healOut.points },
+      { name: 'Damage taken', color: 'var(--series-8)', raw: stats.damageIn.points },
+      { name: 'Realm points', color: 'var(--series-4)', raw: stats.realmPoints.points },
     ],
     // Deathblows and your own deaths are both discrete "it happened"
     // moments, not a quantity worth their own line — plotted as markers so
@@ -485,11 +488,14 @@ export function renderRealm(container, stats, ctx) {
   const tlCard = card(tlSec);
   legend(tlCard, reasonEntries.map(([label]) => ({ color: colorForReason.get(label), label })));
   timelineChart(tlCard, {
+    id: 'rp-by-source',
     stacked: true,
+    domain: [stats.meta.startClock, stats.meta.endClock],
+    idleGaps: stats.meta.idleGaps,
     series: reasonEntries.map(([label]) => ({
       name: label,
       color: colorForReason.get(label),
-      points: (rp.timelineByReason[label] || []).map(p => ({ t: p.t, v: p.v })),
+      raw: rp.pointsByReason[label] || [],
     })),
   });
 

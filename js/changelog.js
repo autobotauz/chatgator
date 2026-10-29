@@ -11,6 +11,15 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-10-29',
+    title: 'Zoom into the time charts, and hide idle time',
+    bullets: [
+      'Click and drag across the Overview or Realm Points chart to zoom into that window -- the chart redraws in finer detail for just that stretch. Double-click or "Reset zoom" to go back',
+      'Your zoom stays put while watching a live log, instead of resetting every time new lines come in',
+      'New "Hide idle time" option: any stretch of an hour or more with no fights is squeezed down to a thin shaded band labelled with how long it was, so a long break doesn\'t leave the chart mostly empty. On by default; untick it to see real time spacing',
+    ],
+  },
+  {
     date: '2026-10-28',
     title: 'Bolt damage credited to the right spell',
     bullets: [
