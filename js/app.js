@@ -328,6 +328,7 @@ function startNewSession() {
   el('enemiesTargetedList').innerHTML = '';
   lastRenderedNewestSeq = null;
   lastRenderedRealCount = 0;
+  lastEnemyRowSignature = null;
   el('cooldownTracker').hidden = true;
   el('lastUpdated').hidden = true;
   state.rawEvents = []; state.unmatched = [];
@@ -934,6 +935,7 @@ const ENEMY_CARD_GAP = 8;
 const ENEMIES_TARGETED_FALLBACK = 5;
 const ENEMY_CARD_ANIM_MS = 260;
 let lastRenderedNewestSeq = null;
+let lastEnemyRowSignature = null; // capacity + entries last painted -- see renderEnemiesTargeted
 let lastRenderedRealCount = 0;
 let lastEnemyRowPlayerName = null;
 let enemyRowResizeObserver = null;
@@ -981,6 +983,7 @@ function renderEnemiesTargeted(playerName) {
     list.innerHTML = '';
     lastRenderedNewestSeq = null;
     lastRenderedRealCount = 0;
+    lastEnemyRowSignature = null;
     return;
   }
   row.hidden = false;
@@ -988,6 +991,14 @@ function renderEnemiesTargeted(playerName) {
 
   const capacity = computeEnemyCapacity(list);
   const real = getEnemiesTargeted(state.rawEvents, capacity, playerName).slice().reverse(); // newest-first for display
+
+  // Nothing changed (the usual case: switching tabs, or a poll that didn't
+  // examine anyone new) -- leave the row's DOM alone. Rebuilding it anyway
+  // tore down and recreated every card on each tab switch, which read as
+  // the whole row "refreshing" and dropped any hover on a name.
+  const signature = capacity + '|' + real.map(e => `${e.seq}:${e.name}:${e.race || ''}:${e.killed ? 1 : 0}`).join(',');
+  if (signature === lastEnemyRowSignature && list.children.length) return;
+  lastEnemyRowSignature = signature;
 
   const newestSeq = real[0].seq;
   const isFreshEntry = lastRenderedNewestSeq !== null && newestSeq !== lastRenderedNewestSeq;

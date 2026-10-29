@@ -66,6 +66,11 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+/* Always reserve the scrollbar's space, so switching between a short tab
+   (no scrollbar) and a long one doesn't change the page width -- that
+   width jump resized the enemies row (adding/removing a card) and the
+   charts on every tab switch. */
+html { scrollbar-gutter: stable; }
 body {
   font-family: var(--font);
   background: var(--surface-0);

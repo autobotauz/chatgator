@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-29',
+    title: 'Fixed: enemies row refreshing when switching tabs',
+    bullets: [
+      'The Enemies targeted row no longer redraws every time you change tabs -- it only updates when someone new is examined or the window is resized',
+      'The page no longer shifts width between short and long tabs, which was also nudging the row and charts',
+    ],
+  },
+  {
+    date: '2026-10-29',
     title: 'New: abilities & styles over time',
     bullets: [
       'Spells & Styles now opens with a timeline: one row per ability or style, one dot each time it landed -- a hit, a heal, a confirmed CC, or a silent debuff/buff cast that wasn\'t resisted (shown faded). Crits are ringed',
