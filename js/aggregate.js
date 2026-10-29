@@ -594,6 +594,88 @@ export function buildStats(events, playerNameHint) {
       healOutPoints.push({ clock: e.clock, amount: e.amount });
     }
   }
+  // ---- ability timeline (Spells & Styles dot chart) ----------------------
+  // One entry per thing an ability or style actually DID: a damage hit, a
+  // style hit, a heal, a confirmed CC/debuff landing -- each with the target
+  // the log names. Attribution is the same as the tables above (parser.js's
+  // spellName/styleName/sourceName), so the dots and the table agree.
+  // Crit / "extra damage" follow-up lines are folded into the hit they
+  // follow rather than drawn as dots of their own. Plain unstyled weapon
+  // swings aren't an ability, so they're left out.
+  const abilityTimeline = [];
+  {
+    let last = null; // most recent dot, for crit/extra follow-ups
+    const add = (d) => { abilityTimeline.push(d); last = d; };
+    for (const e of events) {
+      if (e.clock == null) continue;
+      switch (e.type) {
+        case 'melee_weapon':
+          last = null;
+          if (e.styleName) add({ clock: e.clock, name: e.styleName, target: e.target || null, amount: e.dmg, kind: 'style', weapon: e.weapon });
+          break;
+        case 'melee_plain':
+          last = null;
+          if (e.spellName) add({ clock: e.clock, name: e.spellName, target: e.target || null, amount: e.dmg, kind: 'damage' });
+          break;
+        case 'ability_hit':
+          last = null;
+          if (!petNames.has(e.name)) add({ clock: e.clock, name: e.name, target: e.target || null, amount: e.dmg, kind: 'damage' });
+          break;
+        case 'melee_extra':
+          if (last && last.amount != null) last.amount += e.dmg;
+          break;
+        case 'melee_crit_named':
+        case 'melee_crit_generic':
+          if (last && last.kind !== 'heal') last.crit = (last.crit || 0) + e.dmg;
+          break;
+        case 'ability_crit':
+          if (last && last.name === e.name) last.crit = (last.crit || 0) + e.dmg;
+          break;
+        case 'heal_out':
+          add({ clock: e.clock, name: e.spellName || 'Heal (spell not identified)', target: e.target ? healTargetKey(e.target) : null, amount: e.amount, kind: 'heal' });
+          break;
+        case 'heal_out_crit':
+          if (last && last.kind === 'heal') last.crit = (last.crit || 0) + e.amount;
+          break;
+        case 'cc_landed':
+          if (e.sourceName && !e.isPet) add({ clock: e.clock, name: e.sourceName, target: e.target || null, kind: 'effect', effect: e.effect });
+          break;
+        default: break;
+      }
+    }
+
+    // Spells that land silently (many debuffs, most buffs) leave no line of
+    // their own -- for those, a completed cast that wasn't resisted and
+    // didn't fizzle counts as landed, same rule as the Landed column. The
+    // log doesn't say who it landed on, so no target.
+    const dotsByName = new Map();
+    for (const d of abilityTimeline) (dotsByName.get(d.name) || dotsByName.set(d.name, []).get(d.name)).push(d.clock);
+    const missByName = new Map(); // resist / fizzle clocks per spell
+    for (const e of events) {
+      const name = ((e.type === 'resist_generic' || e.type === 'resist_named') && !e.isPet) ? e.source
+        : e.type === 'cast_failed' ? e.spellName : null;
+      if (name && e.clock != null) (missByName.get(name) || missByName.set(name, []).get(name)).push(e.clock);
+    }
+    const casts = events.filter(e => e.type === 'cast' && e.clock != null);
+    const nextSame = new Array(casts.length).fill(null);
+    const seen = new Map();
+    for (let i = casts.length - 1; i >= 0; i--) { nextSame[i] = seen.get(casts[i].name) || null; seen.set(casts[i].name, casts[i]); }
+    casts.forEach((e, i) => {
+      // A cast's results arrive before the next cast of the same spell (or
+      // within 4s / 6s for a travelling bolt, whichever is sooner). Any
+      // resist or fizzle in that window means it didn't land -- an AoE mez
+      // can log several resists for one cast, so they're not "used up" one
+      // per cast.
+      const next = nextSame[i];
+      const end = Math.min(e.clock + (ABILITY_DATABASE[e.name]?.isBolt ? 6000 : 4000), next ? next.clock - 1 : Infinity);
+      const inWin = (t) => t >= e.clock && t <= end;
+      if ((dotsByName.get(e.name) || []).some(inWin)) return;
+      if ((missByName.get(e.name) || []).some(inWin)) return;
+      abilityTimeline.push({ clock: e.clock, name: e.name, target: null, kind: 'cast' });
+    });
+    abilityTimeline.sort((a, b) => a.clock - b.clock);
+  }
+
   const healInBySource = {};
   const healInPoints = [];
   let healInTotal = 0;
@@ -929,6 +1011,7 @@ export function buildStats(events, playerNameHint) {
     },
     kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal, deathLog },
     spellsCast: Array.from(castNames),
+    abilityTimeline,
     castCountByName,
     castFailedByName,
     castAttemptedByName,

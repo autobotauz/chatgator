@@ -138,18 +138,14 @@ export function legend(container, entries) {
 }
 
 // ---------------------------------------------------------------------------
-// Time-series chart with drag-to-zoom and collapsible idle time.
+// Time-axis charts with drag-to-zoom and collapsible idle time.
 //
-// Takes RAW points ({ clock, amount }) rather than pre-bucketed ones, and
-// buckets them itself for whatever window is on screen -- that's what makes
-// zooming useful: a 10-minute window of a 6-hour session gets its own ~60
-// buckets instead of the one or two it would get from the full-session
-// bucketing.
+// timeFrame() below is the shared machinery -- the x axis, zoom, drag
+// selection, "Hide idle time" squeezing and the controls row. Two charts
+// sit on it: timelineChart (bucketed lines/areas: Overview, Realm Points)
+// and dotTimelineChart (one dot per ability use: Spells & Styles).
 //
-//   series:   [{ name, color, raw: [{ clock, amount }] }]
-//   domain:   [startClock, endClock] -- the x range of the full view (raw
-//             points outside it are pinned to the nearest edge, so totals
-//             still add up, same as the old pre-bucketed timelines did)
+//   domain:   [startClock, endClock] -- the x range of the full view.
 //   idleGaps: [{ start, end }] -- stretches with no encounter for an hour+
 //             (aggregate.js meta.idleGaps). With "Hide idle time" on, each
 //             is squeezed into a narrow shaded band labelled with its
@@ -159,8 +155,8 @@ export function legend(container, entries) {
 //             would throw away the window you'd selected).
 //
 // Drag across the plot to zoom to that window; double-click or "Reset zoom"
-// to go back. The "Hide idle time" choice is one setting shared by every
-// chart (remembered in localStorage).
+// to go back. "Hide idle time" is one setting shared by every chart
+// (remembered in localStorage).
 // ---------------------------------------------------------------------------
 const zoomById = new Map();
 const HIDE_IDLE_KEY = 'chatgator:hideIdleTime';
@@ -171,6 +167,9 @@ function setHideIdle(on) {
   try { localStorage.setItem(HIDE_IDLE_KEY, on ? '1' : '0'); } catch { /* ignore */ }
 }
 const BUCKETS = 60;
+const svgNS = 'http://www.w3.org/2000/svg';
+const svgEl = (tag, attrs) => { const n = document.createElementNS(svgNS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
+const swatch = (color, round) => `<span class="swatch" style="display:inline-block;width:8px;height:8px;border-radius:${round ? '50%' : '2px'};background:${color};margin-right:5px;"></span>`;
 
 function fmtDuration(ms) {
   const m = Math.round(ms / 60000);
@@ -179,25 +178,16 @@ function fmtDuration(ms) {
   return h ? (mm ? `${h}h ${mm}m` : `${h}h`) : `${mm}m`;
 }
 
-export function timelineChart(container, { series, domain, idleGaps = [], id, width = 1040, height = 220, stacked = false, valueFmt = fmtNum, timeFmt, markers = [] }) {
+// Builds the frame and calls `render(frame)` to draw the chart's own
+// content each time the view changes (zoom, reset, idle toggle). `render`
+// returns { onHover(ev, sx, sy), onLeave() } for the tooltip. `pad.left`
+// can be widened by the caller (the dot chart needs room for row labels).
+function timeFrame(container, { domain, idleGaps = [], id, width, height, pad, timeFmt, render }) {
   const wrap = document.createElement('div');
   wrap.className = 'timeline-chart';
   container.appendChild(wrap);
-
-  const allRaw = series.flatMap(s => s.raw || []);
-  let [dataMin, dataMax] = domain && domain[0] != null ? domain : [null, null];
-  if (dataMin == null && allRaw.length) {
-    dataMin = Math.min(...allRaw.map(p => p.clock));
-    dataMax = Math.max(...allRaw.map(p => p.clock));
-  }
-  if (!allRaw.length || dataMin == null) {
-    const div = document.createElement('div');
-    div.className = 'empty-state';
-    div.textContent = 'No activity in this window.';
-    wrap.appendChild(div);
-    return wrap;
-  }
-  dataMax = Math.max(dataMax, dataMin + 1000);
+  const [dataMin, rawMax] = domain;
+  const dataMax = Math.max(rawMax, dataMin + 1000);
   const gaps = idleGaps
     .filter(g => g.end > dataMin && g.start < dataMax)
     .map(g => ({ start: Math.max(g.start, dataMin), end: Math.min(g.end, dataMax) }))
@@ -205,6 +195,7 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
 
   const draw = () => {
     wrap.innerHTML = '';
+    hideTooltip();
     const hideIdle = getHideIdle() && gaps.length > 0;
 
     // Compressed time: each collapsed gap keeps only `keep` ms of width.
@@ -264,61 +255,25 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
     }
     wrap.appendChild(controls);
 
-    // ---- bucket raw points for this window ----
-    const size = Math.max(1000, cSpan / BUCKETS);
-    const nB = Math.max(1, Math.ceil(cSpan / size));
-    const bucketed = series.map(s => {
-      const vals = new Array(nB).fill(0);
-      for (const p of (s.raw || [])) {
-        const t = Math.min(dataMax, Math.max(dataMin, p.clock));
-        if (t < lo || t > hi) continue;
-        const idx = Math.min(nB - 1, Math.floor((c(t) - cLo) / size));
-        if (idx >= 0) vals[idx] += p.amount;
-      }
-      return vals;
-    });
-    const centers = Array.from({ length: nB }, (_, i) => cLo + Math.min(cSpan, (i + 0.5) * size));
-
-    let maxV = 1;
-    for (let i = 0; i < nB; i++) {
-      if (stacked) { const sum = bucketed.reduce((a, v) => a + v[i], 0); if (sum > maxV) maxV = sum; }
-      else for (const v of bucketed) if (v[i] > maxV) maxV = v[i];
-    }
-    maxV = niceMax(maxV);
-
-    const pad = { top: 18, right: 16, bottom: 26, left: 48 };
     const innerW = width - pad.left - pad.right;
     const innerH = height - pad.top - pad.bottom;
-    const X = (cv) => pad.left + ((cv - cLo) / cSpan) * innerW;
-    const Y = (v) => pad.top + innerH - (v / maxV) * innerH;
-
-    const svgNS = 'http://www.w3.org/2000/svg';
-    const el = (tag, attrs) => { const n = document.createElementNS(svgNS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
-    const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, width: '100%' });
+    const X = (t) => pad.left + ((c(t) - cLo) / cSpan) * innerW; // real time -> px
+    const svg = svgEl('svg', { viewBox: `0 0 ${width} ${height}`, width: '100%' });
     svg.style.display = 'block';
     svg.style.overflow = 'visible';
     svg.style.touchAction = 'pan-y';
 
-    // gridlines + y ticks
-    for (let i = 0; i <= 4; i++) {
-      const v = (maxV / 4) * i, yy = Y(v);
-      svg.appendChild(el('line', { x1: pad.left, x2: width - pad.right, y1: yy, y2: yy, stroke: 'var(--grid)', 'stroke-width': 1 }));
-      const t = el('text', { x: pad.left - 8, y: yy + 4, 'text-anchor': 'end', 'font-size': 10.5, fill: 'var(--text-muted)' });
-      t.textContent = valueFmt(v);
-      svg.appendChild(t);
-    }
-
-    // idle-gap bands (only meaningful, and only labelled, when collapsed)
+    // idle-gap bands (only when squeezed)
     if (hideIdle) {
       for (const g of gaps) {
         if (g.end <= lo || g.start >= hi) continue;
-        const x1 = X(c(Math.max(g.start, lo))), x2 = X(c(Math.min(g.end, hi)));
-        const band = el('rect', { x: x1, y: pad.top, width: Math.max(2, x2 - x1), height: innerH, fill: 'var(--text-muted)', opacity: 0.12 });
-        const title = el('title', {});
+        const x1 = X(Math.max(g.start, lo)), x2 = X(Math.min(g.end, hi));
+        const band = svgEl('rect', { x: x1, y: pad.top, width: Math.max(2, x2 - x1), height: innerH, fill: 'var(--text-muted)', opacity: 0.12 });
+        const title = svgEl('title', {});
         title.textContent = `Idle ${fmtDuration(g.end - g.start)} (${fmtClock(g.start)} – ${fmtClock(g.end)}) — hidden`;
         band.appendChild(title);
         svg.appendChild(band);
-        const lab = el('text', { x: (x1 + x2) / 2, y: pad.top - 5, 'text-anchor': 'middle', 'font-size': 9.5, fill: 'var(--text-muted)' });
+        const lab = svgEl('text', { x: (x1 + x2) / 2, y: pad.top - 5, 'text-anchor': 'middle', 'font-size': 9.5, fill: 'var(--text-muted)' });
         lab.textContent = `⋯ ${fmtDuration(g.end - g.start)} idle`;
         svg.appendChild(lab);
       }
@@ -333,93 +288,51 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
       // A label inside a squeezed gap would name some arbitrary moment of
       // idle time -- the band's own "⋯ 2h 29m idle" label covers it.
       if (hideIdle && i > 0 && i < 4 && gaps.some(g => real > g.start && real < g.end)) continue;
-      const t = el('text', { x: X(cv), y: height - 6, 'text-anchor': i === 0 ? 'start' : i === 4 ? 'end' : 'middle', 'font-size': 10.5, fill: 'var(--text-muted)' });
+      const t = svgEl('text', { x: pad.left + (innerW * i) / 4, y: height - 6, 'text-anchor': i === 0 ? 'start' : i === 4 ? 'end' : 'middle', 'font-size': 10.5, fill: 'var(--text-muted)' });
       t.textContent = fmtT(real);
       svg.appendChild(t);
     }
 
-    // series
-    if (stacked) {
-      const cum = new Array(nB).fill(0);
-      series.forEach((s, si) => {
-        const bottom = cum.slice();
-        bucketed[si].forEach((v, i) => { cum[i] += v; });
-        let d = `M ${X(centers[0])} ${Y(bottom[0])}`;
-        for (let i = 0; i < nB; i++) d += ` L ${X(centers[i])} ${Y(cum[i])}`;
-        for (let i = nB - 1; i >= 0; i--) d += ` L ${X(centers[i])} ${Y(bottom[i])}`;
-        svg.appendChild(el('path', { d: d + ' Z', fill: s.color, 'fill-opacity': 0.75 }));
-      });
-    } else {
-      series.forEach((s, si) => {
-        let d = '';
-        bucketed[si].forEach((v, i) => { d += `${i ? ' L' : 'M'} ${X(centers[i])} ${Y(v)}`; });
-        svg.appendChild(el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
-      });
-    }
-    svg.appendChild(el('line', { x1: pad.left, x2: width - pad.right, y1: Y(0), y2: Y(0), stroke: 'var(--baseline)', 'stroke-width': 1 }));
+    const frame = { svg, el: svgEl, X, c, cinv, lo, hi, cLo, cHi, cSpan, zoomed: !!z, innerW, innerH, pad, width, height, fmtT };
+    const hooks = render(frame) || {};
 
-    // Markers: solid (checkpoint seams) under dashed (events). Outside the
-    // full view they're pinned to the nearest edge as before; outside a
-    // zoomed window they're simply not drawn.
-    const visibleMarkers = markers.filter(m => z ? (m.t >= lo && m.t <= hi) : true);
-    [...visibleMarkers.filter(m => m.solid), ...visibleMarkers.filter(m => !m.solid)].forEach((m) => {
-      const mx = X(c(Math.min(hi, Math.max(lo, m.t))));
-      const rule = el('line', { x1: mx, x2: mx, y1: pad.top, y2: pad.top + innerH, stroke: m.color || 'var(--series-7)' });
-      if (m.solid) { rule.setAttribute('stroke-width', '1'); rule.setAttribute('opacity', '0.35'); }
-      else { rule.setAttribute('stroke-width', '1.5'); rule.setAttribute('stroke-dasharray', '3,3'); rule.setAttribute('opacity', '0.75'); }
-      svg.appendChild(rule);
-    });
-
-    // ---- hover tooltip + drag-to-zoom ----
-    const crosshair = el('line', { y1: pad.top, y2: pad.top + innerH, stroke: 'var(--baseline)', 'stroke-width': 1 });
-    crosshair.style.display = 'none';
-    const sel = el('rect', { y: pad.top, height: innerH, fill: 'var(--series-1)', opacity: 0.15 });
+    // ---- drag-to-zoom + hover ----
+    const sel = svgEl('rect', { y: pad.top, height: innerH, fill: 'var(--series-1)', opacity: 0.15 });
     sel.style.display = 'none';
-    const overlay = el('rect', { x: pad.left, y: pad.top, width: innerW, height: innerH, fill: 'transparent' });
+    const overlay = svgEl('rect', { x: pad.left, y: pad.top, width: innerW, height: innerH, fill: 'transparent' });
     overlay.style.cursor = 'crosshair';
-    svg.append(crosshair, sel, overlay);
+    svg.append(sel, overlay);
 
-    const toSvgX = (ev) => {
+    const svgPoint = (ev) => {
       const rect = svg.getBoundingClientRect();
-      return Math.min(pad.left + innerW, Math.max(pad.left, (ev.clientX - rect.left) * (width / rect.width)));
+      const k = width / rect.width;
+      return {
+        sx: Math.min(pad.left + innerW, Math.max(pad.left, (ev.clientX - rect.left) * k)),
+        sy: (ev.clientY - rect.top) * k,
+      };
     };
     const fromSvgX = (sx) => cinv(cLo + ((sx - pad.left) / innerW) * cSpan);
     let dragFrom = null;
-
     overlay.addEventListener('pointerdown', (ev) => {
       if (ev.button !== 0) return;
-      dragFrom = toSvgX(ev);
+      dragFrom = svgPoint(ev).sx;
       overlay.setPointerCapture(ev.pointerId);
       hideTooltip();
-      crosshair.style.display = 'none';
+      if (hooks.onLeave) hooks.onLeave();
     });
     overlay.addEventListener('pointermove', (ev) => {
-      const sx = toSvgX(ev);
+      const { sx, sy } = svgPoint(ev);
       if (dragFrom != null) {
         sel.setAttribute('x', Math.min(dragFrom, sx));
         sel.setAttribute('width', Math.abs(sx - dragFrom));
         sel.style.display = 'block';
         return;
       }
-      const i = Math.min(nB - 1, Math.max(0, Math.floor(((sx - pad.left) / innerW) * nB)));
-      const px = X(centers[i]);
-      crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px);
-      crosshair.style.display = 'block';
-      const swatch = (color) => `<span class="swatch" style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${color};margin-right:5px;"></span>`;
-      const rows = series.map((s, si) => `<div class="tt-row"><span>${swatch(s.color)}${esc(s.name)}</span><span>${fmtExact(bucketed[si][i])}</span></div>`).join('');
-      const bStart = cinv(cLo + i * size), bEnd = cinv(Math.min(cHi, cLo + (i + 1) * size));
-      const counts = [];
-      for (const m of markers) {
-        if (m.excludeFromTooltip || m.t < bStart || m.t > bEnd) continue;
-        const r = counts.find(x => x.label === (m.label || 'Event'));
-        if (r) r.count++; else counts.push({ label: m.label || 'Event', color: m.color, count: 1 });
-      }
-      const markerHtml = counts.map(r => `<div class="tt-row"><span>${swatch(r.color || 'var(--series-7)')}${esc(r.label)}</span><span>${r.count}</span></div>`).join('');
-      showTooltip(ev.clientX, ev.clientY, `<div class="tt-title">${fmtT(bStart)} – ${fmtT(bEnd)}</div>${rows}${markerHtml}`);
+      if (hooks.onHover) hooks.onHover(ev, sx, sy);
     });
-    const endDrag = (ev) => {
+    overlay.addEventListener('pointerup', (ev) => {
       if (dragFrom == null) return;
-      const sx = toSvgX(ev);
+      const { sx } = svgPoint(ev);
       const a = Math.min(dragFrom, sx), b = Math.max(dragFrom, sx);
       dragFrom = null;
       sel.style.display = 'none';
@@ -427,19 +340,220 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
       const zLo = fromSvgX(a), zHi = fromSvgX(b);
       if (zHi - zLo < 5000) return; // don't zoom below ~5 seconds
       zoomById.set(id, { lo: zLo, hi: zHi });
-      hideTooltip();
       draw();
-    };
-    overlay.addEventListener('pointerup', endDrag);
+    });
     overlay.addEventListener('pointercancel', () => { dragFrom = null; sel.style.display = 'none'; });
     overlay.addEventListener('dblclick', () => { if (id && zoomById.has(id)) { zoomById.delete(id); draw(); } });
-    overlay.addEventListener('mouseleave', () => { if (dragFrom == null) { crosshair.style.display = 'none'; hideTooltip(); } });
+    overlay.addEventListener('mouseleave', () => { if (dragFrom == null) { hideTooltip(); if (hooks.onLeave) hooks.onLeave(); } });
 
     wrap.appendChild(svg);
   };
 
   draw();
   return wrap;
+}
+
+function emptyChart(container) {
+  const div = document.createElement('div');
+  div.className = 'empty-state';
+  div.textContent = 'No activity in this window.';
+  container.appendChild(div);
+  return div;
+}
+function rawDomain(domain, points) {
+  if (domain && domain[0] != null && domain[1] != null) return domain;
+  if (!points.length) return null;
+  return [Math.min(...points.map(p => p.clock)), Math.max(...points.map(p => p.clock))];
+}
+
+// ---------------------------------------------------------------------------
+// Bucketed line / stacked-area chart over time.
+//   series: [{ name, color, raw: [{ clock, amount }] }] -- RAW points,
+//   bucketed here (60 buckets) for whatever window is on screen, so zooming
+//   gives real detail. Raw points outside `domain` are pinned to the
+//   nearest edge so totals still add up.
+//   markers: [{ t, color, label, solid, excludeFromTooltip }] -- vertical
+//   rules (deathblows, deaths, checkpoint seams).
+// ---------------------------------------------------------------------------
+export function timelineChart(container, { series, domain, idleGaps = [], id, width = 1040, height = 220, stacked = false, valueFmt = fmtNum, timeFmt, markers = [] }) {
+  const allRaw = series.flatMap(s => s.raw || []);
+  const dom = rawDomain(domain, allRaw);
+  if (!allRaw.length || !dom) return emptyChart(container);
+  const [dataMin, dataMax] = dom;
+
+  return timeFrame(container, {
+    domain: dom, idleGaps, id, width, height, timeFmt,
+    pad: { top: 18, right: 16, bottom: 26, left: 48 },
+    render: ({ svg, el, X, c, cinv, lo, hi, cLo, cHi, cSpan, zoomed, innerW, innerH, pad, fmtT }) => {
+      const size = Math.max(1000, cSpan / BUCKETS);
+      const nB = Math.max(1, Math.ceil(cSpan / size));
+      const bucketed = series.map(s => {
+        const vals = new Array(nB).fill(0);
+        for (const p of (s.raw || [])) {
+          const t = Math.min(dataMax, Math.max(dataMin, p.clock));
+          if (t < lo || t > hi) continue;
+          const idx = Math.min(nB - 1, Math.floor((c(t) - cLo) / size));
+          if (idx >= 0) vals[idx] += p.amount;
+        }
+        return vals;
+      });
+      // bucket centres, in real time (X() takes real time)
+      const centers = Array.from({ length: nB }, (_, i) => cinv(cLo + Math.min(cSpan, (i + 0.5) * size)));
+
+      let maxV = 1;
+      for (let i = 0; i < nB; i++) {
+        if (stacked) { const sum = bucketed.reduce((a, v) => a + v[i], 0); if (sum > maxV) maxV = sum; }
+        else for (const v of bucketed) if (v[i] > maxV) maxV = v[i];
+      }
+      maxV = niceMax(maxV);
+      const Y = (v) => pad.top + innerH - (v / maxV) * innerH;
+
+      // gridlines + y ticks (inserted first so they sit under everything)
+      const grid = [];
+      for (let i = 0; i <= 4; i++) {
+        const v = (maxV / 4) * i, yy = Y(v);
+        grid.push(el('line', { x1: pad.left, x2: pad.left + innerW, y1: yy, y2: yy, stroke: 'var(--grid)', 'stroke-width': 1 }));
+        const t = el('text', { x: pad.left - 8, y: yy + 4, 'text-anchor': 'end', 'font-size': 10.5, fill: 'var(--text-muted)' });
+        t.textContent = valueFmt(v);
+        grid.push(t);
+      }
+      svg.prepend(...grid);
+
+      if (stacked) {
+        const cum = new Array(nB).fill(0);
+        series.forEach((s, si) => {
+          const bottom = cum.slice();
+          bucketed[si].forEach((v, i) => { cum[i] += v; });
+          let d = `M ${X(centers[0])} ${Y(bottom[0])}`;
+          for (let i = 0; i < nB; i++) d += ` L ${X(centers[i])} ${Y(cum[i])}`;
+          for (let i = nB - 1; i >= 0; i--) d += ` L ${X(centers[i])} ${Y(bottom[i])}`;
+          svg.appendChild(el('path', { d: d + ' Z', fill: s.color, 'fill-opacity': 0.75 }));
+        });
+      } else {
+        series.forEach((s, si) => {
+          let d = '';
+          bucketed[si].forEach((v, i) => { d += `${i ? ' L' : 'M'} ${X(centers[i])} ${Y(v)}`; });
+          svg.appendChild(el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+        });
+      }
+      svg.appendChild(el('line', { x1: pad.left, x2: pad.left + innerW, y1: Y(0), y2: Y(0), stroke: 'var(--baseline)', 'stroke-width': 1 }));
+
+      // Markers: solid (checkpoint seams) under dashed (events). Outside the
+      // full view they're pinned to the nearest edge; outside a zoomed
+      // window they're simply not drawn.
+      const visible = markers.filter(m => zoomed ? (m.t >= lo && m.t <= hi) : true);
+      [...visible.filter(m => m.solid), ...visible.filter(m => !m.solid)].forEach((m) => {
+        const mx = X(Math.min(hi, Math.max(lo, m.t)));
+        const rule = el('line', { x1: mx, x2: mx, y1: pad.top, y2: pad.top + innerH, stroke: m.color || 'var(--series-7)' });
+        if (m.solid) { rule.setAttribute('stroke-width', '1'); rule.setAttribute('opacity', '0.35'); }
+        else { rule.setAttribute('stroke-width', '1.5'); rule.setAttribute('stroke-dasharray', '3,3'); rule.setAttribute('opacity', '0.75'); }
+        svg.appendChild(rule);
+      });
+
+      const crosshair = el('line', { y1: pad.top, y2: pad.top + innerH, stroke: 'var(--baseline)', 'stroke-width': 1 });
+      crosshair.style.display = 'none';
+      svg.appendChild(crosshair);
+
+      return {
+        onLeave: () => { crosshair.style.display = 'none'; },
+        onHover: (ev, sx) => {
+          const i = Math.min(nB - 1, Math.max(0, Math.floor(((sx - pad.left) / innerW) * nB)));
+          const px = X(centers[i]);
+          crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px);
+          crosshair.style.display = 'block';
+          const rows = series.map((s, si) => `<div class="tt-row"><span>${swatch(s.color)}${esc(s.name)}</span><span>${fmtExact(bucketed[si][i])}</span></div>`).join('');
+          const bStart = cinv(cLo + i * size), bEnd = cinv(Math.min(cHi, cLo + (i + 1) * size));
+          const counts = [];
+          for (const m of markers) {
+            if (m.excludeFromTooltip || m.t < bStart || m.t > bEnd) continue;
+            const r = counts.find(x => x.label === (m.label || 'Event'));
+            if (r) r.count++; else counts.push({ label: m.label || 'Event', color: m.color, count: 1 });
+          }
+          const markerHtml = counts.map(r => `<div class="tt-row"><span>${swatch(r.color || 'var(--series-7)')}${esc(r.label)}</span><span>${r.count}</span></div>`).join('');
+          showTooltip(ev.clientX, ev.clientY, `<div class="tt-title">${fmtT(bStart)} – ${fmtT(bEnd)}</div>${rows}${markerHtml}`);
+        },
+      };
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Dot timeline: one row ("swim lane") per name, one dot per use.
+//   rows:  [{ name, color }] in display order
+//   dots:  [{ clock, name, ...anything }] -- `name` picks the row
+//   dotTooltip(dotsAtPoint) -> html for the dots under the pointer
+//   (several when they overlap, e.g. an AoE landing on 3 targets at once).
+// Dots in the same row that would overlap are stacked a few px apart
+// vertically (within the row) so simultaneous uses stay visible as more
+// than one dot.
+// ---------------------------------------------------------------------------
+export function dotTimelineChart(container, { rows, dots, domain, idleGaps = [], id, width = 1040, rowHeight = 20, labelWidth = 170, dotTooltip, timeFmt }) {
+  const dom = rawDomain(domain, dots);
+  if (!dots.length || !rows.length || !dom) return emptyChart(container);
+  const rowIndex = new Map(rows.map((r, i) => [r.name, i]));
+  const pad = { top: 18, right: 16, bottom: 26, left: labelWidth };
+  const height = pad.top + pad.bottom + rows.length * rowHeight;
+
+  return timeFrame(container, {
+    domain: dom, idleGaps, id, width, height, timeFmt, pad,
+    render: ({ svg, el, X, lo, hi, innerW, fmtT }) => {
+      const rowY = (i) => pad.top + i * rowHeight + rowHeight / 2;
+      // row stripes + labels
+      rows.forEach((r, i) => {
+        if (i % 2 === 1) svg.appendChild(el('rect', { x: pad.left, y: pad.top + i * rowHeight, width: innerW, height: rowHeight, fill: 'var(--surface-2)', opacity: 0.6 }));
+        const label = el('text', { x: pad.left - 8, y: rowY(i) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'var(--text-secondary)' });
+        label.textContent = r.name.length > 24 ? r.name.slice(0, 23) + '…' : r.name;
+        const title = el('title', {});
+        title.textContent = r.name;
+        label.appendChild(title);
+        svg.appendChild(label);
+      });
+      svg.appendChild(el('line', { x1: pad.left, x2: pad.left, y1: pad.top, y2: pad.top + rows.length * rowHeight, stroke: 'var(--baseline)', 'stroke-width': 1 }));
+
+      // place dots; stack ones that would overlap within a row
+      const R = 3.5;
+      const placed = [];
+      const lastInRow = new Map(); // row -> [{ px, n }]
+      for (const d of dots) {
+        if (d.clock < lo || d.clock > hi) continue;
+        const ri = rowIndex.get(d.name);
+        if (ri == null) continue;
+        const px = X(d.clock);
+        const prev = lastInRow.get(ri);
+        let n = 0;
+        if (prev && px - prev.px < R * 1.6) n = prev.n + 1; else lastInRow.set(ri, { px, n: 0 });
+        if (n) lastInRow.set(ri, { px: prev.px, n });
+        // 0, -1, +1, -2, +2 ... steps of 3px, clamped inside the row
+        const step = n === 0 ? 0 : (n % 2 ? -1 : 1) * Math.ceil(n / 2) * 3;
+        const py = rowY(ri) + Math.max(-(rowHeight / 2 - R), Math.min(rowHeight / 2 - R, step));
+        const color = rows[ri].color;
+        const circle = el('circle', { cx: px, cy: py, r: d.crit ? R + 1 : R, fill: color, 'fill-opacity': d.kind === 'cast' ? 0.45 : 0.9 });
+        if (d.crit) { circle.setAttribute('stroke', 'var(--text-primary)'); circle.setAttribute('stroke-width', '1'); }
+        svg.appendChild(circle);
+        placed.push({ d, px, py, ri });
+      }
+
+      const ring = el('circle', { r: R + 3, fill: 'none', stroke: 'var(--text-primary)', 'stroke-width': 1.5 });
+      ring.style.display = 'none';
+      svg.appendChild(ring);
+
+      return {
+        onLeave: () => { ring.style.display = 'none'; },
+        onHover: (ev, sx, sy) => {
+          const ri = Math.floor((sy - pad.top) / rowHeight);
+          if (ri < 0 || ri >= rows.length) { ring.style.display = 'none'; hideTooltip(); return; }
+          // every dot in this row within a few px of the pointer
+          const near = placed.filter(p => p.ri === ri && Math.abs(p.px - sx) <= 4.5);
+          if (!near.length) { ring.style.display = 'none'; hideTooltip(); return; }
+          near.sort((a, b) => Math.abs(a.px - sx) - Math.abs(b.px - sx));
+          ring.setAttribute('cx', near[0].px); ring.setAttribute('cy', near[0].py);
+          ring.style.display = 'block';
+          const list = near.map(p => p.d).sort((a, b) => a.clock - b.clock);
+          showTooltip(ev.clientX, ev.clientY, dotTooltip ? dotTooltip(list, fmtT) : `<div class="tt-title">${esc(list[0].name)}</div>`);
+        },
+      };
+    },
+  });
 }
 
 function niceMax(v) {

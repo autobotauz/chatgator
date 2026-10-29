@@ -447,7 +447,10 @@ const RULES = [
   ['flavor', /^.+? has joined the (group|battle group)\.$/, () => ({})],
   ['flavor', /^\(Autosplit\) .+? goes to .+?\.$/, () => ({})],
   ['flavor', /^.+? just died\. (Her|His|Its) corpse lies on the ground\.$/, () => ({})],
-  ['flavor', /^.+? (can't have that effect again yet|is enraged and cannot be mesmerized|is moving too fast and cannot be mesmerized|is immune to this effect)!$/, () => ({})],
+  // Your cast went off but the target was immune (recent-CC immunity,
+  // enraged, too fast, outright immune) -- a fizzle like "already has that
+  // effect", attributed to the cast in the main loop (or flavor if none).
+  ['cast_failed', /^.+? (?:can't have that effect again yet|is enraged and cannot be mesmerized|is moving too fast and cannot be mesmerized|is immune to this effect)!$/, () => ({ reason: 'immune' })],
   ['flavor', /^.+?'s protection from debilitation has faded\.$/, () => ({})],
   ['flavor', /^The .+? runs in fear!$/, () => ({})],
   ['flavor', /^The .+?'s? calms? down\.?$/, () => ({})],

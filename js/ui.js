@@ -3,7 +3,7 @@
 // Every render function clears its container first, so panels can be
 // re-rendered freely when the user switches encounters.
 
-import { statTile, barChart, legend, timelineChart, fmtNum, fmtExact, fmtClock, seriesColor } from './charts.js';
+import { statTile, barChart, legend, timelineChart, dotTimelineChart, fmtNum, fmtExact, fmtClock, seriesColor } from './charts.js';
 import { describeSkill } from './skills.js';
 import { ABILITY_DATABASE } from './ability-database.js';
 import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
@@ -735,8 +735,57 @@ const CAST_COLUMNS = [
   { key: 'attempted', label: 'Attempted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Started casting it ("You begin casting"), plus instant casts' },
   { key: 'casted', label: 'Casted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'The cast went off ("You cast")' },
   { key: 'interrupted', label: 'Interrupted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Cut off by moving or being hit' },
-  { key: 'failed', label: 'Failed', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Went off, but the target already had the effect or was out of range' },
+  { key: 'failed', label: 'Failed', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Went off, but the target already had the effect, was immune, or was out of range' },
 ];
+
+// "Abilities & styles over time": one row per ability/style, one dot per
+// time it landed (aggregate.js abilityTimeline). Rows ordered by how often
+// each was used; capped so a huge kit doesn't make the chart a wall.
+const ABILITY_TIMELINE_MAX_ROWS = 30;
+const EFFECT_WORDS = { immobilize: 'rooted', rooted: 'rooted', stunned: 'stunned', mesmerized: 'mezzed', mesmerize: 'mezzed', snare: 'snared', debuff: 'weakened' };
+function renderAbilityTimeline(container, stats, inferredClass) {
+  const all = (stats.abilityTimeline || []).filter(d => !isAbilityGhost(d.name, inferredClass));
+  if (!all.length) return;
+  const counts = new Map();
+  for (const d of all) counts.set(d.name, (counts.get(d.name) || 0) + 1);
+  const names = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a));
+  const shown = names.slice(0, ABILITY_TIMELINE_MAX_ROWS);
+  const rows = shown.map((name, i) => ({ name, color: seriesColor(i) }));
+  const shownSet = new Set(shown);
+
+  const s = section(container);
+  h3(s, 'Abilities & styles over time');
+  const p = document.createElement('p');
+  p.className = 'sub';
+  p.textContent = 'One dot each time an ability or style landed — a hit, a heal, a confirmed CC/debuff, or (for spells that land silently) a cast that wasn\'t resisted and didn\'t fail, shown faded. Ringed dots are crits. Hover a dot for the target, when the log names one.'
+    + (names.length > shown.length ? ` Showing your ${shown.length} most-used of ${names.length}.` : '');
+  s.appendChild(p);
+  const c = card(s);
+  dotTimelineChart(c, {
+    id: 'spells-ability-timeline',
+    rows,
+    dots: all.filter(d => shownSet.has(d.name)),
+    domain: [stats.meta.startClock, stats.meta.endClock],
+    idleGaps: stats.meta.idleGaps,
+    dotTooltip: (list) => {
+      const first = list[0];
+      const head = `<div class="tt-title">${escHtml(first.name)}</div>`;
+      const lines = list.slice(0, 8).map(d => {
+        let what;
+        if (d.kind === 'cast') what = 'landed';
+        else if (d.kind === 'effect') what = (d.target ? `on ${escHtml(d.target)} ` : '') + `(${EFFECT_WORDS[d.effect] || 'landed'})`;
+        else {
+          const amt = d.amount != null ? `${fmtExact(d.amount)}${d.crit ? ` +${fmtExact(d.crit)} crit` : ''}` : '';
+          const verb = d.kind === 'heal' ? 'healed' : 'hit';
+          what = `${verb}${d.target ? ` ${escHtml(d.target)}` : ''}${amt ? ` for ${amt}` : ''}${d.weapon ? ` <span style="opacity:.7">(${escHtml(d.weapon)})</span>` : ''}`;
+        }
+        return `<div class="tt-row"><span>${fmtClock(d.clock, true)}</span><span>${what}</span></div>`;
+      }).join('');
+      const more = list.length > 8 ? `<div class="tt-row"><span></span><span>+${list.length - 8} more</span></div>` : '';
+      return head + lines + more;
+    },
+  });
+}
 
 export function renderSpells(container, stats, ctx) {
   clear(container);
@@ -751,6 +800,8 @@ export function renderSpells(container, stats, ctx) {
   statTile(g, { label: 'Total damage done', value: fmtNum(stats.damageOut.total) });
   statTile(g, { label: 'DPS (this view)', value: fmtNum(stats.damageOut.dps) });
   statTile(g, { label: 'Melee crit rate', value: stats.damageOut.melee.critRate + '%', sub: `${stats.damageOut.melee.crits} / ${stats.damageOut.melee.hits + stats.damageOut.melee.crits} swings` });
+
+  renderAbilityTimeline(container, stats, inferredClass);
 
   const byName = {};
   for (const [key, s] of Object.entries(stats.damageOut.bySource)) {
@@ -891,7 +942,7 @@ export function renderSpells(container, stats, ctx) {
     h3(s2, 'No damage/heal logged (buffs, debuffs, cures, CC, pet summons…)');
     const p2 = document.createElement('p');
     p2.className = 'sub';
-    p2.textContent = 'Everything else cast in this view — the rest of the kit a damage/heal number alone would hide. Shows how many times each one lands, gets resisted, or (for a pure buff with no trackable result at all) was simply cast. Attempted = started casting (plus instant casts); Casted = the cast went off; Interrupted = cut off by moving or being hit; Failed = went off but the target already had the effect or was out of range (not counted toward Resist %). Many debuffs print nothing when they land, so a cast that wasn\'t resisted and didn\'t fail counts as landed.';
+    p2.textContent = 'Everything else cast in this view — the rest of the kit a damage/heal number alone would hide. Shows how many times each one lands, gets resisted, or (for a pure buff with no trackable result at all) was simply cast. Attempted = started casting (plus instant casts); Casted = the cast went off; Interrupted = cut off by moving or being hit; Failed = went off but the target already had the effect, was immune, or was out of range (not counted toward Resist %). Many debuffs print nothing when they land, so a cast that wasn\'t resisted and didn\'t fail counts as landed.';
     s2.appendChild(p2);
     const c2 = card(s2);
     dataTable(c2, {

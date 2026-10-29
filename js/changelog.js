@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-29',
+    title: 'New: abilities & styles over time',
+    bullets: [
+      'Spells & Styles now opens with a timeline: one row per ability or style, one dot each time it landed -- a hit, a heal, a confirmed CC, or a silent debuff/buff cast that wasn\'t resisted (shown faded). Crits are ringed',
+      'Hover a dot to see when it landed, who it hit (when the log says), and for how much. Drag to zoom and hide idle time work the same as the Overview chart',
+      'Casts on a target that was immune ("can\'t have that effect again yet", enraged, etc.) now count as Failed instead of being ignored',
+    ],
+  },
+  {
+    date: '2026-10-29',
     title: 'Zoom into the time charts, and hide idle time',
     bullets: [
       'Click and drag across the Overview or Realm Points chart to zoom into that window -- the chart redraws in finer detail for just that stretch. Double-click or "Reset zoom" to go back',
