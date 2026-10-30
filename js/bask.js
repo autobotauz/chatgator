@@ -26,7 +26,9 @@ const ALL_COOLDOWNS = { ...CL_COOLDOWNS, ...ABILITY_COOLDOWNS };
 
 const SYNC_MS = 10000;          // upload + poll cadence
 const HEARTBEAT_MS = 60000;     // re-send totals this often even when idle
-const QUIET_MS = 90000;         // no update for this long = "quiet"
+const SLEEP_MS = 5 * 60000;     // no activity of their own for this long = 💤 sleeping
+const STOP_MS = 60 * 60000;     // ...this long = stop reading their log until they pick it again
+const PAGE_GONE_MS = 3 * 60000; // no write from their page (heartbeat is 1/min) = page closed
 const CURSOR_OVERLAP_MS = 15000;
 const SAVE_KEY = 'chatgator:bask';
 const RECENT_KEY = 'chatgator:bask-recent'; // baskets this browser joined or watched
@@ -61,6 +63,7 @@ const S = {
   banned: [],            // names the leader banned
   lastLeader: undefined,
   booted: false,
+  handle: null,          // the chat.log being read
   resume: null,          // { player, handle } while a refreshed page waits to resume sharing
   loopGen: 0,
 };
@@ -99,6 +102,8 @@ function cleanTotals(t) {
     deathblows: list(t.deathblows, (d) => ({ at: num(obj(d).at), victim: str(obj(d).victim), zone: obj(d).zone ? str(obj(d).zone) : null })),
     deaths: list(t.deaths, (d) => ({ at: num(obj(d).at), killer: obj(d).killer ? str(obj(d).killer) : null })),
     cooldowns,
+    lastActive: num(t.lastActive) || null,
+    paused: num(t.paused) || null,
     cls: t.cls && CLASS_REALM[t.cls.name] !== undefined ? String(t.cls.name) : null,
   };
 }
@@ -121,6 +126,7 @@ function mergeMembers(rows) {
       pushFeed(`join:${player}:${r.joined_at}`, Date.parse(r.joined_at), `🐊 <strong>${esc(player)}</strong> slid into the bask`);
     }
     const t = S.members.get(player).totals;
+    if (t.paused) pushFeed(`stop:${player}:${t.paused}`, t.paused, `⚠️ <strong>${esc(player)}</strong> was idle for an hour; their chat.log needs picking again`);
     for (const d of t.deathblows) pushFeed(`db:${player}:${d.at}:${d.victim}`, d.at, `⚔️ <strong>${esc(player)}</strong> took down ${heraldLink(d.victim)}`);
     for (const d of t.deaths) pushFeed(`dd:${player}:${d.at}`, d.at, `💀 <strong>${esc(player)}</strong> died${d.killer ? ` to ${heraldLink(d.killer)}` : ''}`);
     if (r.updated_at && (!S.memberCursor || r.updated_at > S.memberCursor)) S.memberCursor = r.updated_at;
@@ -281,6 +287,7 @@ async function startLive(handle, player) {
   try {
     const existing = await net.fetchMember(S.code, player);
     if (existing) summarizer.restore(existing.totals);
+    summarizer.markActive(); // picking the log = here now (also clears an hour-idle stop)
     await net.upsertMember(S.code, player, summarizer.snapshot(), memberKey);
   } catch (err) {
     watcher.stop();
@@ -290,6 +297,7 @@ async function startLive(handle, player) {
   S.parseState = r.state;
   S.summarizer = summarizer;
   S.watcher = watcher;
+  S.handle = handle;
   S.lastSent = Date.now(); summarizer.changed = false;
   S.resume = null; S.booted = false;
   save({ code: S.code, player, mode: 'live' });
@@ -298,9 +306,25 @@ async function startLive(handle, player) {
   enterBask();
 }
 
+// An hour with nothing of their own in the log: stop reading it. The player
+// stays in the bask (their page keeps checking in) and everyone sees their
+// card asking them to pick their chat.log again.
+function stopReadingIfIdle() {
+  const sum = S.summarizer;
+  if (!sum || !S.watcher || sum.paused) return;
+  if (Date.now() - (sum.lastActive || sum.since) < STOP_MS) return;
+  S.watcher.stop(); S.watcher = null;
+  sum.paused = Date.now();
+  sum.changed = true;
+  S.resume = { player: S.player, handle: S.handle };
+  showResume(`You've been idle for an hour, so Bask stopped reading your chat.log. Pick it again to keep sharing as <strong>${esc(S.player)}</strong>.`);
+  show('watchStatus', false);
+}
+
 async function upload() {
   const sum = S.summarizer;
   if (!sum) return;
+  stopReadingIfIdle();
   const ticks = sum.takeDirtyTicks();
   try {
     if (sum.changed || Date.now() - S.lastSent > HEARTBEAT_MS) {
@@ -516,6 +540,20 @@ async function openSavedFile(file) {
   enterBask();
 }
 
+// 'left' | 'stopped' (hour idle, log no longer read) | 'sleeping' (5 min idle,
+// or their page closed) | 'active'
+function memberStatus(p) {
+  const m = S.members.get(p);
+  if (!m) return 'active';
+  if (m.left_at) return 'left';
+  const t = m.totals;
+  if (t.paused) return 'stopped';
+  const at = now();
+  if (S.mode !== 'offline' && at - Date.parse(m.updated_at) > PAGE_GONE_MS) return 'sleeping';
+  const lastActive = t.lastActive || t.last || t.since || Date.parse(m.joined_at);
+  return at - lastActive > SLEEP_MS ? 'sleeping' : 'active';
+}
+
 const isLeader = () => S.mode === 'live' && !S.booted && !!S.player && S.session?.leader === S.player;
 const isActive = (p) => !S.members.get(p)?.left_at;
 
@@ -656,7 +694,9 @@ function renderBar() {
     return;
   }
   if (S.syncError) { me.innerHTML = `<span class="bask-error">⚠️ ${esc(S.syncError)}</span>`; return; }
-  if (S.mode === 'live') {
+  if (S.mode === 'live' && S.summarizer?.paused) {
+    me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}<span class="bask-warn">⚠️ Not reading your chat.log (idle an hour)</span>`;
+  } else if (S.mode === 'live') {
     me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)} · sent ${ago(S.lastSent)}`;
   } else if (S.mode === 'spectate') {
     me.textContent = `Just watching · updates every 10 seconds${S.session?.leader ? ` · 👑 ${S.session.leader} leads` : ''}`;
@@ -670,16 +710,23 @@ function renderRoster() {
   const leader = S.session?.leader;
   el('roster').innerHTML = S.order.map((p) => {
     const m = S.members.get(p);
-    const left = !!m.left_at;
-    const quiet = !left && S.mode !== 'offline' && Date.now() - Date.parse(m.updated_at) > QUIET_MS;
+    const st = memberStatus(p);
+    const left = st === 'left';
     const t = m.totals;
-    const title = left ? 'Left the bask. Their numbers so far stay in the group view.'
-      : quiet ? 'No update from this player for a while — not playing, or their log or browser tab is idle.' : 'Sharing live';
-    return `<li class="roster-chip${quiet || left ? ' quiet' : ''}" title="${title}">
+    const title = {
+      left: 'Left the bask. Their numbers so far stay in the group view.',
+      stopped: 'Idle for an hour, so their page stopped reading their chat.log. They need to pick it again to keep sharing.',
+      sleeping: 'Nothing new from this player for 5+ minutes: not playing, or their page is closed.',
+      active: 'Sharing live',
+    }[st];
+    return `<li class="roster-chip st-${st}" title="${title}">
       <span class="roster-dot" style="background:${playerColor(p)}"></span>
       <span class="roster-name">${p === leader && !left && S.mode !== 'offline' ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${classTag(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}</span>
       <span class="roster-stats">⚔ ${fmtNum(t.dmgOut.total)} · ✚ ${fmtNum(t.healOut.total)}</span>
-      ${left ? '<span class="roster-quiet">left</span>' : quiet ? '<span class="roster-quiet">quiet</span>' : ''}
+      ${{ left: '<span class="roster-quiet">left</span>',
+          sleeping: '<span class="roster-zzz" aria-label="sleeping">💤 Z<span>z</span>Z<span>z</span>Z<span>z</span></span>',
+          stopped: `<span class="roster-stopped">⚠️ ${p === S.player ? 'pick your chat.log again' : 'needs to reselect chat.log'}</span>`,
+          active: '' }[st]}
       ${isLeader() && p !== S.player ? `<span class="roster-actions">
         <button class="roster-act" data-boot="${esc(p)}" title="Boot ${esc(p)}: removes them and their numbers from the bask. They can join again.">🥾</button>
         <button class="roster-act" data-ban="${esc(p)}" title="Ban ${esc(p)}: removes them and keeps that name out of this bask.">⛔</button>

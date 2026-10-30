@@ -85,6 +85,19 @@ const capAmount = (b) => ({ total: b.total, hits: b.hits, crits: b.crits,
   by: capBy(b.by, v => v[0], (a, v) => [a[0] + v[0], a[1] + v[1], a[2] + v[2]]) });
 const capCount = (c) => ({ total: c.total, by: capBy(c.by, v => v, (a, v) => a + v) });
 
+// The player's own doings: what decides whether they're playing (sleeping
+// after 5 idle minutes, log reading stops after an hour). The realm-wide kill
+// feed and other background lines keep flowing while someone is AFK, so
+// they don't count -- only a kill feed line naming this player does.
+const ACTIVITY = new Set([
+  'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
+  'ability_hit', 'ability_crit', 'pet_melee', 'pet_hit', 'pet_melee_stray', 'pet_summon', 'pet_command', 'pet_lost',
+  'incoming_dmg', 'incoming_crit', 'incoming_extra', 'heal_out', 'heal_out_crit', 'heal_in', 'power_transfer',
+  'resist_named', 'resist_generic', 'cast', 'cast_begin', 'cast_failed', 'cast_interrupted', 'cc_landed',
+  'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in', 'ablative', 'bladeturn',
+  'you_died', 'target', 'item_use',
+]);
+
 const EMPTY_TICK = () => ({ do: 0, di: 0, ho: 0, hi: 0, pd: 0, rs: 0, ir: 0, db: 0, dd: 0 });
 
 export class GroupSummarizer {
@@ -124,7 +137,12 @@ export class GroupSummarizer {
     this._pendingDeathAt = null;
     this.abilityNames = new Set();       // for the class guess only; never sent
     this.cls = null;                     // { name, confidence } once confident
+    this.lastActive = null;              // epoch ms of this player's last own activity
+    this.paused = null;                  // epoch ms when the page stopped reading the log (idle 1h)
   }
+
+  // "The player is here now" (joining, resuming): resets the idle clock.
+  markActive(at = Date.now()) { this.lastActive = Math.max(this.lastActive || 0, at); this.changed = true; }
 
   // Events from BEFORE the session started: used only to learn which names
   // are this player's pets (a pet summoned earlier still fights now).
@@ -152,6 +170,9 @@ export class GroupSummarizer {
       if (at < this.countFrom - 5000) continue; // a backlog line from before we joined
       if (this.last == null || at > this.last) this.last = at;
       this._one(e, at);
+      if (ACTIVITY.has(e.type) || (e.type === 'kill_feed' && (norm(e.killer) === this.playerKey || norm(e.victim) === this.playerKey))) {
+        if (this.lastActive == null || at > this.lastActive) this.lastActive = at;
+      }
       this.changed = true;
     }
   }
@@ -306,6 +327,8 @@ export class GroupSummarizer {
       deathblows: this.deathblows.slice(),
       deaths: this.deaths.slice(),
       cls: this.cls ? { ...this.cls } : null,
+      lastActive: this.lastActive,
+      paused: this.paused,
       cooldowns: Object.fromEntries(Object.entries(this.cdUsed).map(([n, at]) => [n, [at, this.cooldowns[n]?.cooldownSeconds ?? null]])),
     };
   }
@@ -327,6 +350,8 @@ export class GroupSummarizer {
     this.deathblows = Array.isArray(snap.deathblows) ? snap.deathblows.slice(-MAX_LOG) : [];
     this.deaths = Array.isArray(snap.deaths) ? snap.deaths.slice(-MAX_LOG) : [];
     for (const [n, v] of Object.entries(snap.cooldowns || {})) if (Array.isArray(v)) this.cdUsed[n] = +v[0];
+    if (Number.isFinite(+snap.lastActive) && +snap.lastActive > 0) this.lastActive = +snap.lastActive;
+    // (snap.paused is deliberately not restored: picking the log again resumes.)
     if (snap.cls && typeof snap.cls.name === 'string') this.cls = { name: snap.cls.name, confidence: +snap.cls.confidence || 0 };
   }
 

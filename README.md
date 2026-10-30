@@ -116,6 +116,11 @@ joined from another browser. Refreshing the page puts you back in your bask;
 sharing resumes with one click (the chat.log file handle is kept in
 IndexedDB, `js/bask-store.js`).
 
+A player is **sleeping** after 5 minutes with nothing of their own in the
+log (the realm kill feed doesn't count), or when their page has closed.
+After an hour idle their page stops reading `chat.log`; their card pulses
+yellow for everyone until they pick the file again.
+
 Everything is ephemeral: a bask closes 12 hours after its last activity (a
 player joining or new combat numbers; an idle open page doesn't count), is
 hidden the moment it expires, and is deleted by an hourly `pg_cron` job.

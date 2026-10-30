@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Bask: sleeping and idle players',
+    bullets: [
+      'A player with nothing of their own in the log for 5 minutes (no hits, heals, casts, getting hit...) now shows as sleeping: greyed out with 💤 ZzZzZz. The realm kill feed scrolling by doesn\'t count as playing',
+      'After an hour idle, Bask stops reading that player\'s chat.log. Their card pulses yellow with "needs to reselect chat.log" for everyone, and they get a button to pick it again',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Bask: classes, recent baskets, 12-hour expiry',
     bullets: [
       'Each player now shows their class (in their realm color), worked out from the spells and styles they use, the same way the main page does',
