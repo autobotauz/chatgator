@@ -42,10 +42,12 @@ create table if not exists public.bask_members (
   totals      jsonb not null default '{}'::jsonb check (pg_column_size(totals) <= 65536),
   key_hash    text check (key_hash is null or key_hash ~ '^[0-9a-f]{64}$'),
   left_at     timestamptz,     -- set by bask_leave(); numbers stay, spot frees up
+  seen_at     timestamptz not null default now(),  -- any write (incl. bask_ping); updated_at = numbers changed
   primary key (code, player)
 );
 alter table public.bask_members add column if not exists key_hash text check (key_hash is null or key_hash ~ '^[0-9a-f]{64}$');
 alter table public.bask_members add column if not exists left_at timestamptz;
+alter table public.bask_members add column if not exists seen_at timestamptz not null default now();
 
 create table if not exists public.bask_ticks (
   code        text not null,
@@ -78,9 +80,23 @@ begin
   return new;
 end $$;
 
+-- Members: seen_at moves on every write; updated_at only when the numbers
+-- (or joined/left) change, so viewers polling "what changed since X" don't
+-- re-download a player whose page is merely checking in.
+create or replace function public.bask_member_touch() returns trigger
+language plpgsql as $$
+begin
+  new.seen_at := now();
+  if tg_op = 'INSERT' or new.totals is distinct from old.totals or new.left_at is distinct from old.left_at then
+    new.updated_at := now();
+  else
+    new.updated_at := old.updated_at;
+  end if;
+  return new;
+end $$;
 drop trigger if exists bask_members_touch on public.bask_members;
 create trigger bask_members_touch before insert or update on public.bask_members
-  for each row execute function public.bask_touch();
+  for each row execute function public.bask_member_touch();
 drop trigger if exists bask_ticks_touch on public.bask_ticks;
 create trigger bask_ticks_touch before insert or update on public.bask_ticks
   for each row execute function public.bask_touch();
@@ -104,7 +120,7 @@ begin
   end if;
   if tg_op = 'INSERT' and exists (select 1 from bask_members m where m.code = new.code
        and lower(m.player) = lower(new.player) and m.player <> new.player
-       and m.left_at is null and m.updated_at > now() - interval '5 minutes') then
+       and m.left_at is null and m.seen_at > now() - interval '5 minutes') then
     raise exception '% is already in this bask.', new.player using errcode = 'P0001';
   end if;
   rejoining := tg_op = 'UPDATE' and old.left_at is not null and new.left_at is null;
@@ -121,7 +137,7 @@ begin
     else
       new.joined_at := old.joined_at;
       if old.key_hash is not null and new.key_hash is distinct from old.key_hash
-         and old.updated_at > now() - interval '5 minutes' then
+         and old.seen_at > now() - interval '5 minutes' then
         raise exception '% is already in this bask.', new.player using errcode = 'P0001';
       end if;
       new.key_hash := coalesce(new.key_hash, old.key_hash);
@@ -144,11 +160,11 @@ declare c text := coalesce(new.code, old.code);
 begin
   update bask_sessions s set leader = (
       select m.player from bask_members m
-      where m.code = c and m.left_at is null and m.updated_at > now() - interval '5 minutes'
+      where m.code = c and m.left_at is null and m.seen_at > now() - interval '5 minutes'
       order by m.joined_at limit 1)
   where s.code = c and (s.leader is null or not exists (
       select 1 from bask_members m where m.code = c and m.player = s.leader
-        and m.left_at is null and m.updated_at > now() - interval '5 minutes'));
+        and m.left_at is null and m.seen_at > now() - interval '5 minutes'));
   return null;
 end $$;
 drop trigger if exists bask_members_leader on public.bask_members;
@@ -294,6 +310,66 @@ revoke all on function public.bask_leave(text, text, text) from public;
 grant execute on function public.bask_kick(text, text, text, text, boolean) to anon;
 grant execute on function public.bask_unban(text, text, text, text) to anon;
 grant execute on function public.bask_leave(text, text, text) to anon;
+
+-- ------------------------------------------------- polling, spectators --
+-- Spectators: one row per watching browser, refreshed by bask_poll.
+create table if not exists public.bask_viewers (
+  code     text not null references public.bask_sessions(code) on delete cascade,
+  viewer   text not null check (viewer ~ '^[0-9a-f]{16,64}$'),
+  seen_at  timestamptz not null default now(),
+  primary key (code, viewer)
+);
+alter table public.bask_viewers enable row level security;
+revoke all on public.bask_viewers from anon;
+
+-- "Still here" from a player whose numbers haven't changed (cheaper than
+-- re-sending them). False = their seat is gone (booted) or not theirs.
+create or replace function public.bask_ping(p_code text, p_me text, p_key text) returns boolean
+language plpgsql security definer set search_path = public as $$
+begin
+  if not bask_is_member(p_code, p_me, p_key) then return false; end if;
+  update bask_members m set seen_at = now() where m.code = p_code and m.player = p_me;
+  return true;
+end $$;
+
+-- Everything a page needs in one round trip, to keep data transfer (the
+-- free plan's tightest limit) down: the session, banned names, who's here,
+-- only the members and time buckets that changed since the caller's
+-- cursors, and how many are watching. p_viewer: a just-watching browser's
+-- id, which also counts it as a spectator.
+create or replace function public.bask_poll(p_code text, p_members_since timestamptz default null,
+    p_ticks_since timestamptz default null, p_viewer text default null) returns json
+language plpgsql security definer set search_path = public as $$
+declare s bask_sessions;
+begin
+  select * into s from bask_sessions where code = p_code and expires_at > now();
+  if not found then return json_build_object('session', null); end if;
+  if p_viewer ~ '^[0-9a-f]{16,64}$' then
+    if exists (select 1 from bask_viewers v where v.code = p_code and v.viewer = p_viewer)
+       or (select count(*) from bask_viewers v where v.code = p_code) < 200 then
+      insert into bask_viewers (code, viewer) values (p_code, p_viewer)
+        on conflict (code, viewer) do update set seen_at = now();
+    end if;
+  end if;
+  delete from bask_viewers v where v.code = p_code and v.seen_at < now() - interval '10 minutes';
+  return json_build_object(
+    'session', json_build_object('code', s.code, 'created_at', s.created_at, 'expires_at', s.expires_at, 'leader', s.leader),
+    'banned', coalesce((select json_agg(b.player order by b.banned_at) from bask_banned b where b.code = p_code), '[]'::json),
+    'presence', coalesce((select json_agg(json_build_object('player', m.player, 'seen_at', m.seen_at, 'left_at', m.left_at) order by m.joined_at)
+        from bask_members m where m.code = p_code), '[]'::json),
+    'members', coalesce((select json_agg(json_build_object('player', m.player, 'joined_at', m.joined_at, 'updated_at', m.updated_at,
+          'seen_at', m.seen_at, 'left_at', m.left_at, 'totals', m.totals))
+        from bask_members m where m.code = p_code and (p_members_since is null or m.updated_at > p_members_since)), '[]'::json),
+    'ticks', coalesce((select json_agg(json_build_object('player', k.player, 't', k.t, 'updated_at', k.updated_at, 'data', k.data) order by k.updated_at)
+        from (select * from bask_ticks k where k.code = p_code and (p_ticks_since is null or k.updated_at > p_ticks_since)
+              order by k.updated_at limit 3000) k), '[]'::json),
+    'watching', (select count(*) from bask_viewers v where v.code = p_code and v.seen_at > now() - interval '3 minutes'));
+end $$;
+
+revoke all on function public.bask_ping(text, text, text) from public;
+revoke all on function public.bask_poll(text, timestamptz, timestamptz, text) from public;
+grant execute on function public.bask_ping(text, text, text) to anon;
+grant execute on function public.bask_poll(text, timestamptz, timestamptz, text) to anon;
 
 -- Let the REST API see new functions right away.
 notify pgrst, 'reload schema';

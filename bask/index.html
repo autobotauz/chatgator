@@ -25,6 +25,13 @@
     </div>
   </header>
 
+  <div class="wip-banner" role="note">
+    <span class="wip-icon" aria-hidden="true">🚧</span>
+    <div>
+      <strong>Work in progress.</strong> Bask is brand new and still changing. Expect rough edges, numbers that may be off, and baskets that could reset while it's being worked on. Keep your own log or a downloaded bask if a session matters.
+    </div>
+  </div>
+
   <!-- ===================== lobby ===================== -->
   <section id="lobby">
     <div class="bask-hero">
@@ -110,6 +117,7 @@
       <div class="bask-bar-code">
         <span class="sub">Bask</span> <strong id="barCode">——————</strong>
         <button class="icon-btn" id="btnBarCopy" title="Copy invite link">🔗</button>
+        <span class="pill" id="barWatching" hidden title="Browsers watching this bask without sharing a log (including yours, if you're just watching)."></span>
         <span class="pill" id="barExpires"></span>
         <span class="pill" id="barOffline" hidden>📦 Saved bask</span>
       </div>

@@ -121,6 +121,12 @@ log (the realm kill feed doesn't count), or when their page has closed.
 After an hour idle their page stops reading `chat.log`; their card pulses
 yellow for everyone until they pick the file again.
 
+To stay inside the free plan's data-transfer allowance, every page refresh
+is one `bask_poll` call that returns only what changed since the page's
+cursors (plus presence, banned names and the spectator count). Players send
+totals at most every 30 seconds and only when they changed, with a tiny
+`bask_ping` otherwise; background tabs refresh once a minute.
+
 Everything is ephemeral: a bask closes 12 hours after its last activity (a
 player joining or new combat numbers; an idle open page doesn't count), is
 hidden the moment it expires, and is deleted by an hourly `pg_cron` job.

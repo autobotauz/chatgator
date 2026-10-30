@@ -12,6 +12,16 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Bask: lighter on data, and a watching count',
+    bullets: [
+      'Bask now downloads far less: one small request per refresh, players\' numbers only when they change, and once a minute when the Bask tab is in the background (it catches up as soon as you switch back)',
+      'Your own numbers update instantly in the group view; other players\' totals refresh every 30 seconds, charts every 10',
+      'New 👀 watching count at the top shows how many people are following the bask without sharing a log',
+      'Bask is now clearly marked as a work in progress',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Bask: sleeping and idle players',
     bullets: [
       'A player with nothing of their own in the log for 5 minutes (no hits, heals, casts, getting hit...) now shows as sleeping: greyed out with 💤 ZzZzZz. The realm kill feed scrolling by doesn\'t count as playing',

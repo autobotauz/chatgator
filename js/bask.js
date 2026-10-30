@@ -25,11 +25,18 @@ const CL_COOLDOWNS = Object.fromEntries(
 const ALL_COOLDOWNS = { ...CL_COOLDOWNS, ...ABILITY_COOLDOWNS };
 
 const SYNC_MS = 10000;          // upload + poll cadence
-const HEARTBEAT_MS = 60000;     // re-send totals this often even when idle
+// Data transfer is the free plan's tightest limit, so: totals (the big
+// part) go out at most every 30s and only when they changed; otherwise a
+// tiny "still here" ping once a minute. A tab nobody is looking at
+// refreshes once a minute instead of every 10s.
+const TOTALS_EVERY_MS = 30000;
+const PING_EVERY_MS = 60000;
+const HIDDEN_POLL_MS = 60000;
+const VIEWER_KEY = 'chatgator:bask-viewer'; // this browser's spectator id
 const SLEEP_MS = 5 * 60000;     // no activity of their own for this long = 💤 sleeping
 const STOP_MS = 60 * 60000;     // ...this long = stop reading their log until they pick it again
 const PAGE_GONE_MS = 3 * 60000; // no write from their page (heartbeat is 1/min) = page closed
-const CURSOR_OVERLAP_MS = 15000;
+const CURSOR_OVERLAP_MS = 5000;
 const SAVE_KEY = 'chatgator:bask';
 const RECENT_KEY = 'chatgator:bask-recent'; // baskets this browser joined or watched
 const KEYS_KEY = 'chatgator:bask-keys';  // `${code}|${player}` -> this browser's per-join secret
@@ -56,6 +63,7 @@ const S = {
   exportedAt: null,      // offline: the moment the file was saved
   feed: [], feedKeys: new Set(),
   summarizer: null, watcher: null, parseState: null,
+  lastTotalsSent: 0, lastSeenSent: 0, lastPoll: 0, watching: null,
   lastSent: 0, lastChecked: null, lastNewLines: null, syncError: null,
   syncTimer: null, clockTimer: null,
   tab: 'overview', metric: 'do',
@@ -118,7 +126,7 @@ function mergeMembers(rows) {
     if (!player) continue;
     const isNew = !S.members.has(player);
     const wasLeft = !isNew && !!S.members.get(player).left_at;
-    S.members.set(player, { player, joined_at: r.joined_at, updated_at: r.updated_at, left_at: r.left_at || null, totals: cleanTotals(r.totals) });
+    S.members.set(player, { player, joined_at: r.joined_at, updated_at: r.updated_at, seen_at: r.seen_at || r.updated_at, left_at: r.left_at || null, totals: cleanTotals(r.totals) });
     if (r.left_at && !wasLeft) pushFeed(`leftvol:${player}:${r.left_at}`, Date.parse(r.left_at), `👋 <strong>${esc(player)}</strong> left the bask`);
     if (isNew || (wasLeft && !r.left_at)) {
       if (isNew) S.order.push(player);
@@ -298,7 +306,7 @@ async function startLive(handle, player) {
   S.summarizer = summarizer;
   S.watcher = watcher;
   S.handle = handle;
-  S.lastSent = Date.now(); summarizer.changed = false;
+  S.lastSent = S.lastTotalsSent = S.lastSeenSent = Date.now(); summarizer.changed = false;
   S.resume = null; S.booted = false;
   save({ code: S.code, player, mode: 'live' });
   rememberRecent(S.code, { player });
@@ -327,12 +335,16 @@ async function upload() {
   stopReadingIfIdle();
   const ticks = sum.takeDirtyTicks();
   try {
-    if (sum.changed || Date.now() - S.lastSent > HEARTBEAT_MS) {
+    const t = Date.now();
+    if (sum.changed && t - S.lastTotalsSent >= TOTALS_EVERY_MS) {
       sum.changed = false;
       if (!(await net.updateMember(S.code, S.player, sum.snapshot()))) { sum.requeueTicks(ticks); onBooted(); return; }
+      S.lastTotalsSent = S.lastSeenSent = S.lastSent = t;
+    } else if (t - S.lastSeenSent >= PING_EVERY_MS) {
+      if (!(await net.ping(S.code, S.player, S.memberKey))) { sum.requeueTicks(ticks); onBooted(); return; }
+      S.lastSeenSent = t;
     }
-    await net.upsertTicks(S.code, S.player, ticks);
-    S.lastSent = Date.now();
+    if (ticks.length) { await net.upsertTicks(S.code, S.player, ticks); S.lastSent = t; }
     S.syncError = null;
   } catch (err) {
     sum.changed = true;
@@ -342,8 +354,8 @@ async function upload() {
 }
 
 // Someone booted (or banned) disappears from the server; drop them here too.
-// Names are fetched before the changed rows, so a player who joins in between
-// is never mistaken for one who left.
+// `names` comes from the same server snapshot as the changed rows, so a
+// player who joins in between is never mistaken for one who left.
 function pruneMembers(names, bannedName = null) {
   const present = new Set(names);
   for (const p of [...S.order]) {
@@ -357,26 +369,42 @@ function pruneMembers(names, bannedName = null) {
   }
 }
 
+function viewerId() {
+  try {
+    let id = localStorage.getItem(VIEWER_KEY);
+    if (!/^[0-9a-f]{32}$/.test(id || '')) { id = net.newMemberKey().slice(0, 32); localStorage.setItem(VIEWER_KEY, id); }
+    return id;
+  } catch { return null; }
+}
+
 async function poll() {
   try {
-    pruneMembers(await net.fetchMemberNames(S.code));
-    if (S.booted) return;
-    const [members, ticks] = await Promise.all([
-      net.fetchMembers(S.code, cursorMinus(S.memberCursor)),
-      net.fetchTicksSince(S.code, cursorMinus(S.tickCursor)),
-    ]);
-    mergeMembers(members);
-    mergeTicks(ticks);
-    const [s, banned] = await Promise.all([net.getSession(S.code), net.fetchBanned(S.code)]);
-    S.banned = banned;
-    if (!s) S.syncError = 'This bask has expired — download it now if you want to keep it.';
-    else {
-      S.session = s;
-      if (S.lastLeader !== undefined && s.leader && s.leader !== S.lastLeader) {
-        pushFeed(`leader:${s.leader}:${Date.now()}`, Date.now(), `👑 <strong>${esc(s.leader)}</strong> is now the bask leader`);
+    let res, rounds = 0;
+    do {
+      res = await net.poll(S.code, cursorMinus(S.memberCursor), cursorMinus(S.tickCursor), S.mode === 'spectate' && !S.resume ? viewerId() : null); // a player waiting to resume isn't a spectator
+      if (!res || !res.session) { S.syncError = 'This bask has expired — download it now if you want to keep it.'; return; }
+      mergeMembers(res.members);
+      mergeTicks(res.ticks);
+      if (rounds === 0) {
+        const presence = Array.isArray(res.presence) ? res.presence : [];
+        pruneMembers(presence.map((x) => x.player));
+        if (S.booted) return;
+        for (const x of presence) {
+          const m = S.members.get(x.player);
+          if (m) { m.seen_at = x.seen_at; m.left_at = x.left_at || null; }
+        }
+        S.banned = Array.isArray(res.banned) ? res.banned.map((n) => str(n, 40)) : [];
+        S.watching = Number.isFinite(+res.watching) ? +res.watching : null;
+        const s = res.session;
+        S.session = s;
+        if (S.lastLeader !== undefined && s.leader && s.leader !== S.lastLeader) {
+          pushFeed(`leader:${s.leader}:${Date.now()}`, Date.now(), `👑 <strong>${esc(s.leader)}</strong> is now the bask leader`);
+        }
+        S.lastLeader = s.leader || null;
       }
-      S.lastLeader = s.leader || null;
-    }
+      // A late joiner catching up on a long bask: keep paging.
+    } while (Array.isArray(res.ticks) && res.ticks.length >= net.POLL_TICK_LIMIT && ++rounds < 10);
+    S.lastPoll = Date.now();
     if (S.mode === 'spectate') S.syncError = null;
   } catch (err) {
     S.syncError = `Couldn't fetch the group's numbers: ${err.message}`;
@@ -404,7 +432,8 @@ async function syncLoop() {
   clearTimeout(S.syncTimer);
   const gen = ++S.loopGen;
   if (S.mode === 'live') await upload();
-  if (S.mode === 'live' || S.mode === 'spectate') await poll();
+  const due = !document.hidden || Date.now() - S.lastPoll >= HIDDEN_POLL_MS;
+  if ((S.mode === 'live' || S.mode === 'spectate') && due) await poll();
   if (gen !== S.loopGen) return;
   renderAll();
   if (S.mode === 'live' || S.mode === 'spectate') S.syncTimer = setTimeout(syncLoop, SYNC_MS);
@@ -549,7 +578,7 @@ function memberStatus(p) {
   const t = m.totals;
   if (t.paused) return 'stopped';
   const at = now();
-  if (S.mode !== 'offline' && at - Date.parse(m.updated_at) > PAGE_GONE_MS) return 'sleeping';
+  if (S.mode !== 'offline' && at - Date.parse(m.seen_at || m.updated_at) > PAGE_GONE_MS) return 'sleeping';
   const lastActive = t.lastActive || t.last || t.since || Date.parse(m.joined_at);
   return at - lastActive > SLEEP_MS ? 'sleeping' : 'active';
 }
@@ -686,6 +715,9 @@ function ago(ms) {
 }
 
 function renderBar() {
+  const w = el('barWatching');
+  w.hidden = S.mode === 'offline' || S.watching == null;
+  if (!w.hidden) w.textContent = `👀 ${S.watching} watching`;
   if (S.mode === 'offline') el('barExpires').textContent = `saved ${new Date(S.exportedAt).toLocaleString()}`;
   else if (S.session) el('barExpires').textContent = fmtExpires(S.session.expires_at);
   const me = el('barMe');
@@ -955,7 +987,15 @@ function renderDeathblows(c) {
 
 const RENDER = { overview: renderOverview, damage: renderDamage, healing: renderHealing, pets: renderPets, cooldowns: renderCooldowns, deathblows: renderDeathblows };
 
+// Your own numbers come straight from this page (no 30s wait for the
+// server round trip).
+function applyOwnTotals() {
+  if (S.mode !== 'live' || !S.summarizer || !S.members.has(S.player)) return;
+  S.members.get(S.player).totals = cleanTotals(S.summarizer.snapshot());
+}
+
 function renderAll() {
+  applyOwnTotals();
   renderBar();
   renderRoster();
   RENDER[S.tab](el(`panel-${S.tab}`));
@@ -1016,7 +1056,7 @@ el('nameForm').addEventListener('submit', async (ev) => {
   if (!hasMemberKey(S.code, name)) {
     try {
       const m = await net.fetchMember(S.code, name);
-      if (m && !m.left_at && Date.now() - Date.parse(m.updated_at) < 5 * 60000) {
+      if (m && !m.left_at && Date.now() - Date.parse(m.seen_at || m.updated_at) < 5 * 60000) {
         setError('joinError', `${m.player} is already in this bask. Pick your own character name.`);
         return;
       }
@@ -1039,6 +1079,11 @@ el('btnSpectate').addEventListener('click', () => {
   enterBask();
 });
 el('btnResume').addEventListener('click', resumeSharing);
+
+// Coming back to a background tab: catch up right away.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && (S.mode === 'live' || S.mode === 'spectate') && Date.now() - S.lastPoll > 3000) syncLoop();
+});
 
 el('roster').addEventListener('click', async (ev) => {
   const b = ev.target.closest('[data-boot],[data-ban]');

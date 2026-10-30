@@ -95,20 +95,6 @@ export async function upsertMember(code, player, totals, memberKey) {
   });
 }
 
-// All members, or only those whose row changed after `sinceIso` (pass a cursor
-// with some overlap, same as fetchTicksSince) — members who've gone quiet
-// then cost nothing to poll.
-export async function fetchMembers(code, sinceIso) {
-  const filter = sinceIso ? `&updated_at=gt.${encodeURIComponent(sinceIso)}` : '';
-  return rest(`bask_members?code=eq.${encodeURIComponent(code)}${filter}&select=player,joined_at,updated_at,left_at,totals&order=joined_at.asc`);
-}
-
-// Just the names currently in the bask — how viewers notice someone was booted.
-export async function fetchMemberNames(code) {
-  const rows = await rest(`bask_members?code=eq.${encodeURIComponent(code)}&select=player`);
-  return rows.map((r) => r.player);
-}
-
 // Leader only (me/key prove it): remove a player and their time buckets. A
 // booted player can join again; with ban=true their name is kept out.
 export async function kickPlayer(code, me, key, player, ban = false) {
@@ -121,11 +107,6 @@ export async function unbanPlayer(code, me, key, player) {
 export async function leaveBask(code, me, key) {
   await rest('rpc/bask_leave', { method: 'POST', body: { p_code: code, p_me: me, p_key: key } });
 }
-export async function fetchBanned(code) {
-  const rows = await rest(`bask_banned?code=eq.${encodeURIComponent(code)}&select=player,banned_at&order=banned_at.asc`);
-  return rows.map((r) => r.player);
-}
-
 // After joining, a player updates their own row rather than upserting it, so
 // a page that was booted can't quietly put itself back. Returns false when
 // the row is gone (booted).
@@ -139,7 +120,7 @@ export async function updateMember(code, player, totals) {
 // Case-insensitive: "dexii" finds Dexii (the server treats them as one name).
 export async function fetchMember(code, player) {
   const pattern = String(player).replace(/[\\%_]/g, (c) => `\\${c}`);
-  const rows = await rest(`bask_members?code=eq.${encodeURIComponent(code)}&player=ilike.${encodeURIComponent(pattern)}&select=player,joined_at,updated_at,left_at,totals`);
+  const rows = await rest(`bask_members?code=eq.${encodeURIComponent(code)}&player=ilike.${encodeURIComponent(pattern)}&select=player,joined_at,updated_at,seen_at,left_at,totals`);
   return rows.find((r) => r.player === player) || rows[0] || null;
 }
 
@@ -155,20 +136,19 @@ export async function upsertTicks(code, player, ticks) {
   }
 }
 
-// Every bucket written or rewritten after `sinceIso` (server time). Rows from
-// one batched upsert share the same updated_at, and a slow transaction can
-// commit with an updated_at a little in the past, so callers should pass a
-// cursor with some overlap (a few seconds back) and merge rows by
-// (player, t) — re-reading a bucket is harmless, missing one is not.
-// Pages with offset (stable order) so a late joiner can catch up on a long
-// session.
-export async function fetchTicksSince(code, sinceIso) {
-  const out = [];
-  const filter = sinceIso ? `&updated_at=gt.${encodeURIComponent(sinceIso)}` : '';
-  for (let page = 0; page < 200; page++) {
-    const rows = await rest(`bask_ticks?code=eq.${encodeURIComponent(code)}${filter}&select=player,t,updated_at,data&order=updated_at.asc,player.asc,t.asc&limit=1000&offset=${page * 1000}`);
-    out.push(...rows);
-    if (rows.length < 1000) break;
-  }
-  return out;
+// ---- polling ----------------------------------------------------------------
+// One round trip for everything a page shows (see bask_poll in
+// supabase/bask.sql): session, banned names, presence, only the members and
+// time buckets that changed since the cursors, and the spectator count.
+// viewerId (just-watching pages only) counts this browser as a spectator.
+export async function poll(code, membersSince, ticksSince, viewerId) {
+  return rest('rpc/bask_poll', { method: 'POST', body: {
+    p_code: code, p_members_since: membersSince || null, p_ticks_since: ticksSince || null, p_viewer: viewerId || null,
+  } });
+}
+export const POLL_TICK_LIMIT = 3000;
+
+// "Still here" for a player whose numbers haven't changed. false = booted.
+export async function ping(code, me, key) {
+  return (await rest('rpc/bask_ping', { method: 'POST', body: { p_code: code, p_me: me, p_key: key } })) === true;
 }

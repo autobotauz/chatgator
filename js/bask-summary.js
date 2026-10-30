@@ -358,7 +358,8 @@ export class GroupSummarizer {
   // [{ t: bucketStartEpochMs, data }] for buckets touched since the last call.
   takeDirtyTicks() {
     const out = [];
-    for (const k of this.dirty) out.push({ t: k, data: { ...this.ticks.get(k) } });
+    // Zero fields are left out (readers treat missing as 0): smaller rows.
+    for (const k of this.dirty) out.push({ t: k, data: Object.fromEntries(Object.entries(this.ticks.get(k)).filter(([, v]) => v)) });
     this.dirty.clear();
     return out.sort((a, b) => a.t - b.t);
   }
