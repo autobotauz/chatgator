@@ -1,8 +1,9 @@
 -- Chat Gator "Bask" — shared group sessions (1-8 players per invite code).
 --
 -- Everything here is deliberately ephemeral: a session (and every member
--- row and time bucket hanging off it, via ON DELETE CASCADE) expires 48h
--- after its invite code was created. Expired rows are hidden by RLS the
+-- row and time bucket hanging off it, via ON DELETE CASCADE) expires 12h
+-- after its last activity -- a player joining, or new combat numbers (see
+-- bask_extend). An open page that's just idling doesn't count. Expired rows are hidden by RLS the
 -- moment they expire and physically deleted by the hourly pg_cron job at
 -- the bottom. Nothing in these tables is sensitive: player names, the names
 -- of who they hit/healed/were hit by, and numbers. No chat, no raw log lines.
@@ -26,11 +27,12 @@
 create table if not exists public.bask_sessions (
   code        text primary key check (code ~ '^[A-Z2-9]{6}$'),
   created_at  timestamptz not null default now(),
-  expires_at  timestamptz not null default now() + interval '48 hours',
+  expires_at  timestamptz not null default now() + interval '12 hours',
   leader      text            -- maintained by bask_fix_leader(); clients can't set it
 );
 alter table public.bask_sessions drop column if exists host_hash;  -- from an earlier version
 alter table public.bask_sessions add column if not exists leader text;
+alter table public.bask_sessions alter column expires_at set default now() + interval '12 hours';
 
 create table if not exists public.bask_members (
   code        text not null references public.bask_sessions(code) on delete cascade,
@@ -153,6 +155,23 @@ drop trigger if exists bask_members_leader on public.bask_members;
 create trigger bask_members_leader after insert or update or delete on public.bask_members
   for each row execute function public.bask_fix_leader();
 
+-- Activity pushes expiry out to 12 hours from now. Activity = a player
+-- joining or rejoining, or their numbers changing; the once-a-minute
+-- heartbeat from an open-but-idle page doesn't count.
+create or replace function public.bask_extend() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'INSERT' or new.totals is distinct from old.totals
+     or (old.left_at is not null and new.left_at is null) then
+    update bask_sessions s set expires_at = greatest(s.expires_at, now() + interval '12 hours')
+    where s.code = new.code and s.expires_at > now();
+  end if;
+  return null;
+end $$;
+drop trigger if exists bask_members_extend on public.bask_members;
+create trigger bask_members_extend after insert or update on public.bask_members
+  for each row execute function public.bask_extend();
+
 -- Time buckets can only be written while their session is alive.
 create or replace function public.bask_tick_guard() returns trigger
 language plpgsql security definer set search_path = public as $$
@@ -181,11 +200,13 @@ drop policy if exists bask_sessions_read   on public.bask_sessions;
 drop policy if exists bask_sessions_create on public.bask_sessions;
 create policy bask_sessions_read on public.bask_sessions
   for select to anon using (expires_at > now());
--- A new session always gets the default 48h; the client can't pick its own.
+-- A new session always gets the default 12h and no leader; the client can't
+-- pick its own.
 create policy bask_sessions_create on public.bask_sessions
   for insert to anon with check (
     created_at between now() - interval '1 minute' and now() + interval '1 minute'
-    and expires_at <= now() + interval '48 hours 1 minute'
+    and expires_at <= now() + interval '12 hours 1 minute'
+    and leader is null
   );
 
 drop policy if exists bask_members_read  on public.bask_members;

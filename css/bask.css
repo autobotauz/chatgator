@@ -110,3 +110,26 @@
   background: color-mix(in srgb, var(--series-1) 10%, var(--surface-1)); border: 1px solid color-mix(in srgb, var(--series-1) 35%, var(--border));
   font-size: 13.5px;
 }
+
+/* ---------- class tag ---------- */
+.class-tag {
+  font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 999px; margin-left: 4px; white-space: nowrap;
+  color: rgb(var(--realm, 137, 135, 129));
+  background: rgba(var(--realm, 137, 135, 129), .12);
+}
+
+/* ---------- lobby: recent baskets, tip ---------- */
+.recent-box { margin-bottom: 14px; }
+.recent-box h3, .tip-card h3 { margin: 0 0 8px; font-size: 15px; }
+.recent-box p { margin: 6px 0 0; }
+.recent-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.recent-list li { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.recent-code {
+  font-weight: 700; letter-spacing: .14em; font-variant-numeric: tabular-nums; text-decoration: none;
+  color: var(--text-primary); padding: 3px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-0);
+}
+.recent-code:hover { border-color: var(--series-1); }
+.tip-card { margin-top: 18px; max-width: 760px; }
+.tip-card p, .tip-card ol { margin: 0 0 8px; color: var(--text-secondary); line-height: 1.55; font-size: 13.5px; }
+.tip-card ol { padding-left: 20px; }
+.tip-card .sub { margin: 0; }

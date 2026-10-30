@@ -1054,7 +1054,7 @@ function pct(n, total) { return total ? +(100 * n / total).toFixed(1) : 0; }
 const MIN_CLASS_SCORE = 2;
 const MIN_CLASS_MARGIN = 0.4;
 
-function inferClass(castNames) {
+export function inferClass(castNames) {
   const scores = {};
   for (const name of castNames) {
     const info = ABILITY_DATABASE[name];

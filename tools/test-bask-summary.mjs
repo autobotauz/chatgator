@@ -7,6 +7,6 @@ for (const f of ['dexii','bainshee']) {
   const snap = s.snapshot();
   const j = JSON.stringify(snap);
   console.log(f, 'bytes', j.length, 'dmgOut', snap.dmgOut.total, 'exportSummary', JSON.stringify(d.summary).slice(0,300));
-  console.log(' dmgIn', snap.dmgIn.total, 'healOut', snap.healOut.total, 'healIn', snap.healIn.total, 'res', snap.resists.total, 'int', snap.interrupts.total, 'db', snap.deathblows.length, 'deaths', snap.deaths.length, 'pets', Object.keys(snap.pets), 'cd', Object.keys(snap.cooldowns));
+  console.log(' dmgIn', snap.dmgIn.total, 'healOut', snap.healOut.total, 'healIn', snap.healIn.total, 'res', snap.resists.total, 'int', snap.interrupts.total, 'db', snap.deathblows.length, 'deaths', snap.deaths.length, 'pets', Object.keys(snap.pets), 'cd', Object.keys(snap.cooldowns), 'class', snap.cls);
   const ticks = s.takeDirtyTicks(); console.log(' ticks', ticks.length, JSON.stringify(ticks[ticks.length-1]));
 }

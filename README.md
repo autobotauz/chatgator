@@ -106,13 +106,19 @@ of the line. Each player's browser proves who it is with a per-join secret
 (only its SHA-256 is stored). A booted player's page notices, stops sharing
 and offers to rejoin.
 
+Each player's class is worked out in their own browser the same way the main
+page does (`inferClass` in `js/aggregate.js`), and only the class name is
+shared once it's confident. The lobby lists this browser's recent baskets
+that are still open.
+
 A name that's actively in a bask (written in the last 5 minutes) can't be
 joined from another browser. Refreshing the page puts you back in your bask;
 sharing resumes with one click (the chat.log file handle is kept in
 IndexedDB, `js/bask-store.js`).
 
-Everything is ephemeral: a bask expires 48 hours after its code is created,
-is hidden the moment it expires, and is deleted by an hourly `pg_cron` job.
+Everything is ephemeral: a bask closes 12 hours after its last activity (a
+player joining or new combat numbers; an idle open page doesn't count), is
+hidden the moment it expires, and is deleted by an hourly `pg_cron` job.
 **Download bask** saves a file that opens again later on the same page
 without any database. `.github/workflows/bask-keepalive.yml` pings the
 database every few days so the free Supabase project doesn't pause.

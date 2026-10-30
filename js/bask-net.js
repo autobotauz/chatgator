@@ -72,6 +72,13 @@ export async function createSession() {
   throw new Error('Could not create a bask. Try again in a moment.');
 }
 
+// Which of these codes still exist (expired ones are hidden by the server).
+export async function fetchSessions(codes) {
+  const ok = codes.filter((c) => CODE_RE.test(c));
+  if (!ok.length) return [];
+  return rest(`bask_sessions?code=in.(${ok.join(',')})&select=code,expires_at,leader`);
+}
+
 export async function getSession(code) {
   const rows = await rest(`bask_sessions?code=eq.${encodeURIComponent(code)}&select=*`);
   return rows[0] || null; // null = never existed, or expired

@@ -15,6 +15,7 @@ import { iconHtml } from './icons.js';
 import { GroupSummarizer, TICK_MS } from './bask-summary.js';
 import * as net from './bask-net.js';
 import { saveHandle, loadHandle, forgetHandle } from './bask-store.js';
+import { CLASS_REALM, realmColorForClass } from './realm.js';
 
 const CL_COOLDOWNS = Object.fromEntries(
   Object.entries(CL_ABILITY_DATABASE)
@@ -28,6 +29,7 @@ const HEARTBEAT_MS = 60000;     // re-send totals this often even when idle
 const QUIET_MS = 90000;         // no update for this long = "quiet"
 const CURSOR_OVERLAP_MS = 15000;
 const SAVE_KEY = 'chatgator:bask';
+const RECENT_KEY = 'chatgator:bask-recent'; // baskets this browser joined or watched
 const KEYS_KEY = 'chatgator:bask-keys';  // `${code}|${player}` -> this browser's per-join secret
 
 const el = (id) => document.getElementById(id);
@@ -97,6 +99,7 @@ function cleanTotals(t) {
     deathblows: list(t.deathblows, (d) => ({ at: num(obj(d).at), victim: str(obj(d).victim), zone: obj(d).zone ? str(obj(d).zone) : null })),
     deaths: list(t.deaths, (d) => ({ at: num(obj(d).at), killer: obj(d).killer ? str(obj(d).killer) : null })),
     cooldowns,
+    cls: t.cls && CLASS_REALM[t.cls.name] !== undefined ? String(t.cls.name) : null,
   };
 }
 const cleanTick = (d) => { d = obj(d); return { do: num(d.do), di: num(d.di), ho: num(d.ho), hi: num(d.hi), pd: num(d.pd), rs: num(d.rs), ir: num(d.ir), db: num(d.db), dd: num(d.dd) }; };
@@ -161,7 +164,7 @@ function fmtExpires(iso) {
   if (!Number.isFinite(ms)) return '';
   if (ms <= 0) return 'expired';
   const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
-  return `expires in ${h ? `${h}h ` : ''}${m}m`;
+  return `closes in ${h ? `${h}h ` : ''}${m}m if idle`;
 }
 
 async function goJoinStep(code, { fresh = null } = {}) {
@@ -171,13 +174,14 @@ async function goJoinStep(code, { fresh = null } = {}) {
     try { session = await net.getSession(code); }
     catch (err) { setError('lobbyError', `Couldn't reach the bask server: ${err.message}`); return; }
   }
-  if (!session) { setError('lobbyError', `No bask with code ${code} — it may have expired (a bask lasts 48 hours).`); return; }
+  if (!session) { forgetRecent(code); setError('lobbyError', `No bask with code ${code} — it may have expired (a bask closes after 12 hours with no activity).`); return; }
   S.code = session.code; S.session = session;
   history.replaceState(null, '', `?code=${S.code}`);
   el('joinCodeShow').textContent = S.code;
   el('joinExpires').textContent = fmtExpires(session.expires_at);
   const saved = loadSaved();
-  el('playerName').value = (saved && saved.player) || '';
+  const recent = loadRecent().find((r) => r.code === S.code);
+  el('playerName').value = (recent && recent.player) || (saved && saved.player) || '';
   show('watchUnsupported', !isWatchSupported());
   el('btnPickLog').disabled = !isWatchSupported();
   show('lobby', false); show('joinStep', true);
@@ -194,10 +198,43 @@ function memberKeyFor(code, player) {
   if (!entry || !entry.key) entry = { key: net.newMemberKey() };
   entry.at = Date.now();
   keys[id] = entry;
-  // A bask lasts 48h, so anything older than a few days is dead.
+  // Long-dead baskets: drop their secrets after a few days.
   for (const [k, v] of Object.entries(keys)) if (!v || Date.now() - v.at > 4 * 86400000) delete keys[k];
   try { localStorage.setItem(KEYS_KEY, JSON.stringify(keys)); } catch { /* ignore */ }
   return entry.key;
+}
+
+// ---- recent baskets (this browser only) ------------------------------------
+function loadRecent() {
+  try { const v = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); return Array.isArray(v) ? v : []; } catch { return []; }
+}
+function writeRecent(list) { try { localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 8))); } catch { /* ignore */ } }
+function rememberRecent(code, fields = {}) {
+  const list = loadRecent();
+  const prev = list.find((r) => r.code === code) || { code };
+  writeRecent([{ ...prev, ...fields, code, at: Date.now() }, ...list.filter((r) => r.code !== code)]);
+}
+function forgetRecent(code) { writeRecent(loadRecent().filter((r) => r.code !== code)); }
+
+// Lobby list: only baskets the server still has (anything expired is dropped
+// from the list for good).
+async function renderRecent() {
+  const list = loadRecent();
+  const box = el('recentBox');
+  if (!list.length || !net.isConfigured()) { box.hidden = true; return; }
+  let alive;
+  try { alive = await net.fetchSessions(list.map((r) => r.code)); } catch { box.hidden = true; return; }
+  const byCode = new Map(alive.map((x) => [x.code, x]));
+  const live = list.filter((r) => byCode.has(r.code));
+  if (live.length !== list.length) writeRecent(live);
+  if (!live.length) { box.hidden = true; return; }
+  el('recentList').innerHTML = live.map((r) => {
+    const sess = byCode.get(r.code);
+    const who = r.player ? `as <strong>${esc(r.player)}</strong>` : 'watching';
+    return `<li><a class="recent-code" href="?code=${encodeURIComponent(r.code)}">${esc(r.code)}</a>
+      <span class="sub">${who} · ${esc(fmtExpires(sess.expires_at))}${sess.leader ? ` · 👑 ${esc(sess.leader)}` : ''}</span></li>`;
+  }).join('');
+  box.hidden = false;
 }
 
 function hasMemberKey(code, player) { return !!loadKeys()[`${code}|${player.toLowerCase()}`]; }
@@ -256,6 +293,7 @@ async function startLive(handle, player) {
   S.lastSent = Date.now(); summarizer.changed = false;
   S.resume = null; S.booted = false;
   save({ code: S.code, player, mode: 'live' });
+  rememberRecent(S.code, { player });
   saveHandle(S.code, handle);
   enterBask();
 }
@@ -571,7 +609,14 @@ function card(parent, titleHtml) {
 }
 function empty(parent, text) { const d = document.createElement('div'); d.className = 'empty-state'; d.textContent = text; parent.appendChild(d); }
 const swatch = (p) => `<span class="swatch-dot" style="background:${playerColor(p)}"></span>`;
-const nameCell = (p) => `${swatch(p)}${esc(p)}`;
+// "Cleric" in its realm's color (red Albion, blue Midgard, green Hibernia).
+function classTag(p) {
+  const c = S.members.get(p)?.totals.cls;
+  if (!c) return '';
+  const rgb = realmColorForClass(c);
+  return ` <span class="class-tag"${rgb ? ` style="--realm:${rgb}"` : ''}>${esc(c)}</span>`;
+}
+const nameCell = (p) => `${swatch(p)}${esc(p)}${classTag(p)}`;
 const amtItems = (by) => Object.entries(by).map(([label, v]) => ({ label, value: v[0], hits: v[1], crits: v[2] })).filter((x) => x.value > 0);
 const countItems = (by) => Object.entries(by).map(([label, v]) => ({ label, value: v })).filter((x) => x.value > 0);
 const total = (f) => S.order.reduce((a, p) => a + f(T(p)), 0);
@@ -632,7 +677,7 @@ function renderRoster() {
       : quiet ? 'No update from this player for a while — not playing, or their log or browser tab is idle.' : 'Sharing live';
     return `<li class="roster-chip${quiet || left ? ' quiet' : ''}" title="${title}">
       <span class="roster-dot" style="background:${playerColor(p)}"></span>
-      <span class="roster-name">${p === leader && !left && S.mode !== 'offline' ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}</span>
+      <span class="roster-name">${p === leader && !left && S.mode !== 'offline' ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${classTag(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}</span>
       <span class="roster-stats">⚔ ${fmtNum(t.dmgOut.total)} · ✚ ${fmtNum(t.healOut.total)}</span>
       ${left ? '<span class="roster-quiet">left</span>' : quiet ? '<span class="roster-quiet">quiet</span>' : ''}
       ${isLeader() && p !== S.player ? `<span class="roster-actions">
@@ -737,14 +782,14 @@ function renderDamage(c) {
 
   const g2 = grid(section(c, 'Who hit each player', 'Everything that damaged each groupmate, by attacker.'), 2);
   for (const p of S.order) {
-    const cc = card(g2, `${swatch(p)}${esc(p)} <span class="sub">took ${fmtExact(T(p).dmgIn.total)}</span>`);
+    const cc = card(g2, `${nameCell(p)} <span class="sub">took ${fmtExact(T(p).dmgIn.total)}</span>`);
     const items = amtItems(T(p).dmgIn.by);
     if (!items.length) empty(cc, 'No damage taken.'); else barChart(cc, { items, maxItems: 10, colorFn: () => 'var(--series-8)' });
   }
 
   const g3 = grid(section(c, 'Who each player hit'), 2);
   for (const p of S.order) {
-    const cc = card(g3, `${swatch(p)}${esc(p)} <span class="sub">dealt ${fmtExact(T(p).dmgOut.total)}</span>`);
+    const cc = card(g3, `${nameCell(p)} <span class="sub">dealt ${fmtExact(T(p).dmgOut.total)}</span>`);
     const items = amtItems(T(p).dmgOut.by);
     if (!items.length) empty(cc, 'No damage dealt.'); else barChart(cc, { items, maxItems: 10, colorFn: () => playerColor(p) });
   }
@@ -753,7 +798,7 @@ function renderDamage(c) {
   for (const p of S.order) {
     const t = T(p);
     if (!t.resists.total && !t.interrupts.total) continue;
-    const cc = card(g4, `${swatch(p)}${esc(p)} <span class="sub">${t.resists.total} resisted · ${t.interrupts.total} interrupted</span>`);
+    const cc = card(g4, `${nameCell(p)} <span class="sub">${t.resists.total} resisted · ${t.interrupts.total} interrupted</span>`);
     const sub = (text) => { const h = document.createElement('div'); h.className = 'sub mini-head'; h.textContent = text; cc.appendChild(h); };
     if (t.resists.total) { sub('Resisted by'); barChart(cc, { items: countItems(t.resists.by), maxItems: 6, valueFmt: countFmt, colorFn: () => 'var(--series-4)' }); }
     if (t.interrupts.total) { sub('Interrupted by'); barChart(cc, { items: countItems(t.interrupts.by), maxItems: 6, valueFmt: countFmt, colorFn: () => 'var(--series-2)' }); }
@@ -784,14 +829,14 @@ function renderHealing(c) {
   for (const r of S.order) {
     const list = hm.fromOutside.get(r);
     if (!list.length) continue;
-    barChart(card(g2, `${swatch(r)}${esc(r)}`), { items: list.map(([label, value]) => ({ label, value })), maxItems: 8, colorFn: () => 'var(--series-6)' });
+    barChart(card(g2, nameCell(r)), { items: list.map(([label, value]) => ({ label, value })), maxItems: 8, colorFn: () => 'var(--series-6)' });
   }
   if (!g2.children.length) empty(g2, 'None yet.');
 
   if (healers.length) {
     const g3 = grid(section(c, 'Who each healer healed'), 2);
     for (const h of healers) {
-      barChart(card(g3, `${swatch(h)}${esc(h)} <span class="sub">healed ${fmtExact(T(h).healOut.total)}</span>`), { items: amtItems(T(h).healOut.by), maxItems: 10, colorFn: () => 'var(--series-3)' });
+      barChart(card(g3, `${nameCell(h)} <span class="sub">healed ${fmtExact(T(h).healOut.total)}</span>`), { items: amtItems(T(h).healOut.by), maxItems: 10, colorFn: () => 'var(--series-3)' });
     }
   }
 }
@@ -835,7 +880,7 @@ function renderCooldowns(c) {
         <span class="cooldown-pill-bar"><span class="cooldown-pill-bar-fill" style="width:${pct}%"></span></span>
         <span class="cooldown-pill-time">${ready ? 'Ready' : fmtRemaining(left)}</span></li>`;
     }).join('');
-    return `<div class="card cd-card"><h4 class="card-title">${swatch(p)}${esc(p)}</h4>${cds.length ? `<ul class="cd-list">${pills}</ul>` : '<div class="empty-state">No tracked cooldowns used yet.</div>'}</div>`;
+    return `<div class="card cd-card"><h4 class="card-title">${nameCell(p)}</h4>${cds.length ? `<ul class="cd-list">${pills}</ul>` : '<div class="empty-state">No tracked cooldowns used yet.</div>'}</div>`;
   });
   const note = S.mode === 'offline'
     ? `As of when this bask was saved (${new Date(S.exportedAt).toLocaleString()}).`
@@ -943,6 +988,7 @@ el('nameForm').addEventListener('submit', async (ev) => {
 el('btnSpectate').addEventListener('click', () => {
   S.mode = 'spectate';
   save({ code: S.code, mode: 'spectate' });
+  if (!loadRecent().some((r) => r.code === S.code)) rememberRecent(S.code, {});
   enterBask();
 });
 el('btnResume').addEventListener('click', resumeSharing);
@@ -1017,11 +1063,12 @@ el('btnLeave').addEventListener('click', () => {
     return;
   }
   const code = net.normalizeCode(new URLSearchParams(location.search).get('code'));
-  if (!net.CODE_RE.test(code)) return;
+  if (!net.CODE_RE.test(code)) { renderRecent(); return; }
   el('joinCode').value = code;
   const saved = loadSaved();
   (async () => {
     if (saved && saved.code === code && saved.mode && await resumeSaved(saved)) return;
-    goJoinStep(code);
+    await goJoinStep(code);
+    if (!el('lobby').hidden) renderRecent(); // code was dead: show what's still alive
   })();
 })();

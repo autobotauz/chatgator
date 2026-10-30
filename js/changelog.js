@@ -11,6 +11,16 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-10-30',
+    title: 'Bask: classes, recent baskets, 12-hour expiry',
+    bullets: [
+      'Each player now shows their class (in their realm color), worked out from the spells and styles they use, the same way the main page does',
+      'The Bask start page lists your recent baskets, so you can get back in even if you lost the code. Closed baskets drop off the list',
+      'A bask now closes after 12 hours with no activity instead of 48 hours after it was made -- playing keeps it open',
+      'New tip on the start page: begin with a fresh chat.log for faster joining',
+    ],
+  },
+  {
     date: '2026-10-29',
     title: 'Bask: survives a page refresh, and names are taken',
     bullets: [

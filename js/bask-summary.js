@@ -15,10 +15,17 @@
 // view), realm points, /stats output. Only names of the people involved and
 // numbers.
 //
+// Class: worked out the same way the main page does (aggregate.js's
+// inferClass) from the spells and styles this player is seen to use, and only
+// shared once it's confident. Only the class name is sent, never the ability
+// names behind the guess.
+//
 // Times are real wall-clock epoch ms, not the parser's synthetic `clock`: the
 // game prints each line's local [HH:MM:SS], so each player's own browser turns
 // that into an absolute moment (see wallClockFor) and every member's data
 // lines up on one shared timeline regardless of their time zone.
+
+import { inferClass } from './aggregate.js';
 
 export const TICK_MS = 15000;
 export const SUMMARY_VERSION = 1;
@@ -115,6 +122,8 @@ export class GroupSummarizer {
     this._lastAbilityTarget = new Map(); // ability/pet name -> last target
     this._lastHealTarget = null;
     this._pendingDeathAt = null;
+    this.abilityNames = new Set();       // for the class guess only; never sent
+    this.cls = null;                     // { name, confidence } once confident
   }
 
   // Events from BEFORE the session started: used only to learn which names
@@ -256,13 +265,23 @@ export class GroupSummarizer {
         break;
       }
 
-      // ---- cooldowns -------------------------------------------------------
+      // ---- cooldowns (and class evidence) ---------------------------------
       case 'cast':
         if (e.name && this.cooldowns[e.name]) this.cdUsed[e.name] = at;
+        if (e.name) this._sawAbility(e.name);
         break;
     }
+    if (e.styleName) this._sawAbility(e.styleName);
     // A styled weapon swing can also start a cooldown.
     if (e.type === 'melee_weapon' && e.styleName && this.cooldowns[e.styleName]) this.cdUsed[e.styleName] = at;
+  }
+
+  _sawAbility(name) {
+    if (this.abilityNames.has(name) || this.abilityNames.size >= 400) return;
+    this.abilityNames.add(name);
+    const guess = inferClass(this.abilityNames);
+    // Keep the last confident answer if a new ability briefly muddies it.
+    if (guess) this.cls = { name: guess.name, confidence: guess.confidence };
   }
 
   _death(at, killer) {
@@ -286,6 +305,7 @@ export class GroupSummarizer {
       interrupts: capCount(this.interrupts),
       deathblows: this.deathblows.slice(),
       deaths: this.deaths.slice(),
+      cls: this.cls ? { ...this.cls } : null,
       cooldowns: Object.fromEntries(Object.entries(this.cdUsed).map(([n, at]) => [n, [at, this.cooldowns[n]?.cooldownSeconds ?? null]])),
     };
   }
@@ -307,6 +327,7 @@ export class GroupSummarizer {
     this.deathblows = Array.isArray(snap.deathblows) ? snap.deathblows.slice(-MAX_LOG) : [];
     this.deaths = Array.isArray(snap.deaths) ? snap.deaths.slice(-MAX_LOG) : [];
     for (const [n, v] of Object.entries(snap.cooldowns || {})) if (Array.isArray(v)) this.cdUsed[n] = +v[0];
+    if (snap.cls && typeof snap.cls.name === 'string') this.cls = { name: snap.cls.name, confidence: +snap.cls.confidence || 0 };
   }
 
   // [{ t: bucketStartEpochMs, data }] for buckets touched since the last call.
