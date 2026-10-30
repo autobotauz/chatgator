@@ -13,6 +13,7 @@
 // isAbilityGhost in ui.js.
 
 import { ABILITY_DATABASE } from './ability-database.js';
+import { NOT_BG_BROADCAST } from './parser.js';
 
 const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts the next
 // A stretch this long with no encounter at all is "idle" -- the time-series
@@ -145,6 +146,7 @@ export function getBgBroadcasts(events) {
   const map = new Map(); // text -> { text, clock, count }
   for (const e of events) {
     if (e.type !== 'bg_broadcast') continue;
+    if (NOT_BG_BROADCAST.some(re => re.test(e.text))) continue; // e.g. a resumed session parsed before these were excluded
     const existing = map.get(e.text);
     if (existing) { existing.clock = e.clock; existing.count++; }
     else map.set(e.text, { text: e.text, clock: e.clock, count: 1 });

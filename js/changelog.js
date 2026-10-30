@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Cleaner /bg center ticker',
+    bullets: [
+      'Guild info (/gc info), alliance/guild messages, and any line starting with "You" or "Your" no longer show up as /bg center callouts -- those are the game talking to you, not someone\'s broadcast',
+      'Quick-cast spells ("You begin quick-casting ...") now count toward Attempted on Spells & Styles',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Fixed: blocks, parries and evades missing from Defense',
     bullets: [
       'Lines like "X attacks you and you evade the blow!" (and block / parry) weren\'t being counted at all -- only the older "You evade X\'s attack!" wording was. Both count now',

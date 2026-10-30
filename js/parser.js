@@ -43,6 +43,23 @@ function stripAt(line) {
 // and returns the event payload (without t/clock/type/raw, which the
 // caller attaches). First match wins, so more specific patterns are listed
 // before their more general overlapping cousins.
+// Text that looks like a bare /bg center line but isn't one:
+//   - the alliance / guild message of the day ("Alliance Message: ...")
+//   - the /gc info block ("Guild Info for X:", "Realm Points: ... Bounty
+//     Points: ...", "Guild Level:", "Dues:", "RP Bonus:", "Webpage:",
+//     "Discord Link:", "Message:", ...)
+//   - anything starting "You"/"Your" -- that's the game describing what
+//     YOU did, never someone's /bg center text (reported directly: stray
+//     "You ..."/"Your ..." lines showing up in the ticker).
+export const NOT_BG_BROADCAST = [
+  /^(?:Alliance|Guild) ?Message:/,
+  /^Guild Info for .+:$/,
+  /^Realm Points: [\d,]+ Bounty Points: [\d,]+/,
+  /^(?:Guild Level|Dues|Current Merit Bonuses|RP Bonus|XP Bonus|Webpage|Contact Email|Discord Link|Message):/,
+  /^Your?\b/,
+];
+const NOT_BG_BROADCAST_RE = new RegExp(NOT_BG_BROADCAST.map(re => `(?:${re.source})`).join('|'));
+
 const RULES = [
   // ---- /stats block -------------------------------------------------
   ['stats_header', /^Statistics for (.+?) this Session:$/, m => ({ player: m[1] })],
@@ -59,7 +76,8 @@ const RULES = [
   ['stats_standing', /^"I Remain Standing\.\.\.":\s*([\d,]+)$/, m => ({ value: toNum(m[1]) })],
 
   // ---- casting --------------------------------------------------------
-  ['cast_begin', /^You begin casting an?\s+(.+?)\s+spell!$/, m => ({ name: m[1] })],
+  // "quick-casting" is the same start line after /quickcast (QC) was used.
+  ['cast_begin', /^You begin (?:casting|quick-casting) an?\s+(.+?)\s+spell!$/, m => ({ name: m[1] })],
   ['cast', /^You cast an?\s+(.+?)\s+spell!$/, m => ({ name: m[1] })],
 
   // ---- pet lifecycle ----------------------------------------------------
@@ -792,6 +810,13 @@ const RULES = [
   ['flavor', /^Record with name <.+?> saved\.$/, () => ({})],
   ['flavor', /^Record \[.+?\] contains \d+ actions?\.$/, () => ({})],
   ['flavor', /^\(\d+\) \w+: .+$/, () => ({})],
+
+  // ---- lines that are never a /bg center broadcast ------------------------
+  // Bare, untagged system text that would otherwise reach the catch-all
+  // below. See NOT_BG_BROADCAST (exported, also applied by aggregate.js's
+  // getBgBroadcasts so sessions parsed before this rule existed are
+  // cleaned up too).
+  ['flavor', NOT_BG_BROADCAST_RE, () => ({})],
 
   // ---- /bg center screen-broadcast (catch-all — MUST stay last) -----------
   // /bg center puts arbitrary free-typed text in the middle of everyone's
