@@ -139,6 +139,7 @@ a { color: var(--series-1); }
   background: var(--surface-1); color: var(--text-primary); padding: 7px 12px; cursor: pointer;
 }
 .btn.primary { background: var(--series-1); color: white; border-color: transparent; }
+a.btn { text-decoration: none; display: inline-flex; align-items: center; } /* the "Bask with your group" link styled as a button */
 .btn.danger { border-color: var(--status-critical); color: var(--status-critical); }
 .btn.danger:hover { background: color-mix(in srgb, var(--status-critical) 10%, var(--surface-1)); }
 .btn:hover, .icon-btn:hover { filter: brightness(1.06); }

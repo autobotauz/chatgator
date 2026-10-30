@@ -12,6 +12,16 @@
 export const CHANGELOG = [
   {
     date: '2026-10-29',
+    title: 'New: Bask, live group sessions',
+    bullets: [
+      'Start a bask on the new Bask page, send the 6-letter invite code to up to 7 groupmates, and everyone shares live combat numbers from their own chat.log (Chrome/Edge)',
+      'Group view: damage and healing in and out over time, who hit each player, who healed whom, resists, interrupts, pets, cooldowns and deathblows',
+      'Only names and numbers are shared -- never chat, raw log lines, ability breakdowns or realm points. A bask is deleted 48 hours after it is created; download it first to keep it',
+      'Group leaders can "just watch" without a log, from any browser',
+    ],
+  },
+  {
+    date: '2026-10-29',
     title: 'Fixed: enemies row refreshing when switching tabs',
     bullets: [
       'The Enemies targeted row no longer redraws every time you change tabs -- it only updates when someone new is examined or the window is resized',

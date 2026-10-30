@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bask — Chat Gator group sessions</title>
+<meta name="description" content="Bask: share live DAoC combat numbers with up to 8 groupmates. Damage and healing in and out, who hit whom, resists, interrupts, pets, cooldowns and deathblows — no chat, no raw logs.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐊</text></svg>">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/bask.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="app-header">
+    <div class="app-title">
+      <h1><a href="../" class="home-link">🐊 Chat Gator</a> <span class="bask-word">· Bask</span></h1>
+      <span class="tag">group sessions · combat numbers only</span>
+    </div>
+    <div class="header-actions">
+      <span class="watch-status" id="watchStatus" hidden><span class="watch-dot live"></span><span id="watchLabel">Sharing live</span></span>
+      <button class="btn" id="btnDownload" hidden title="Save everything in this bask to a file you can open again later on this page — no account or connection needed.">⬇ Download bask</button>
+      <button class="btn" id="btnLeave" hidden>Leave</button>
+      <button class="icon-btn" id="btnTheme" title="Toggle light/dark">🌓</button>
+    </div>
+  </header>
+
+  <!-- ===================== lobby ===================== -->
+  <section id="lobby">
+    <div class="bask-hero">
+      <h2>Gather your gators</h2>
+      <p>A <strong>bask</strong> is a shared view for up to 8 players. Each player's Chat Gator reads their own <code>chat.log</code> live and shares only combat numbers: damage and healing in and out (and who it went to or came from), resists, interrupts, pets, cooldowns and deathblows. No chat, no raw log lines, no ability breakdowns, no realm points. A bask and everything in it is deleted 48 hours after its invite code is created.</p>
+    </div>
+
+    <div class="grid cols-3 lobby-cards">
+      <div class="card lobby-card">
+        <h3>🥚 Start a bask</h3>
+        <p class="sub">Get an invite code to send to your group.</p>
+        <button class="btn primary" id="btnCreate">Create invite code</button>
+      </div>
+      <div class="card lobby-card">
+        <h3>🐊 Join a bask</h3>
+        <p class="sub">Got a code from your group leader?</p>
+        <form id="joinForm" class="inline-form">
+          <input id="joinCode" class="code-input" maxlength="6" autocomplete="off" spellcheck="false" placeholder="ABC234" aria-label="Invite code">
+          <button class="btn primary" type="submit">Join</button>
+        </form>
+      </div>
+      <div class="card lobby-card">
+        <h3>📂 Open a saved bask</h3>
+        <p class="sub">A file someone downloaded earlier. Opens right here, nothing is uploaded.</p>
+        <button class="btn" id="btnOpenFile">Choose bask file…</button>
+        <input type="file" id="fileInput" class="file-input-hidden" accept=".json,application/json">
+      </div>
+    </div>
+    <p class="lobby-error" id="lobbyError" hidden></p>
+    <p class="sub config-warning" id="configWarning" hidden>Live baskets aren't set up on this copy of Chat Gator yet (no database key in <code>js/bask-config.js</code>). Saved bask files still open fine.</p>
+  </section>
+
+  <!-- ===================== join step ===================== -->
+  <section id="joinStep" hidden>
+    <div class="card join-card">
+      <div class="join-code-row">
+        <div>
+          <div class="sub">Invite code</div>
+          <div class="big-code" id="joinCodeShow">——————</div>
+          <div class="sub" id="joinExpires"></div>
+        </div>
+        <div class="join-share">
+          <button class="btn" id="btnCopyLink">🔗 Copy invite link</button>
+          <button class="btn" id="btnCopyCode">Copy code</button>
+        </div>
+      </div>
+      <hr>
+      <form id="nameForm" class="join-form">
+        <label for="playerName"><strong>Your character name</strong> <span class="sub">exactly as it shows in game, so groupmates' heals on you line up with your own numbers</span></label>
+        <input id="playerName" maxlength="40" autocomplete="off" spellcheck="false" placeholder="e.g. Dexii">
+        <div class="join-actions">
+          <button class="btn primary" type="submit" id="btnPickLog">Pick my chat.log and slide in</button>
+          <button class="btn" type="button" id="btnSpectate" title="Watch the group's numbers without sharing a log — for a leader who isn't playing, or anyone just looking.">Just watch</button>
+        </div>
+        <p class="sub" id="watchUnsupported" hidden>Sharing a live log needs Chrome or Edge (they let a page re-read a file as it grows). You can still <strong>just watch</strong> from this browser.</p>
+        <p class="sub">Only numbers from lines written <em>after</em> you join are shared. Turn on chat logging in game (<code>/chat log</code>) if it isn't already.</p>
+      </form>
+      <p class="lobby-error" id="joinError" hidden></p>
+    </div>
+  </section>
+
+  <!-- ===================== the bask ===================== -->
+  <main id="baskMain" hidden>
+    <div class="bask-bar">
+      <div class="bask-bar-code">
+        <span class="sub">Bask</span> <strong id="barCode">——————</strong>
+        <button class="icon-btn" id="btnBarCopy" title="Copy invite link">🔗</button>
+        <span class="pill" id="barExpires"></span>
+        <span class="pill" id="barOffline" hidden>📦 Saved bask</span>
+      </div>
+      <div class="bask-bar-me sub" id="barMe"></div>
+    </div>
+
+    <ul class="roster" id="roster"></ul>
+    <ul class="feed" id="feed"></ul>
+
+    <nav class="tabbar">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="damage">Damage</button>
+      <button class="tab" data-tab="healing">Healing</button>
+      <button class="tab" data-tab="pets">Pets</button>
+      <button class="tab" data-tab="cooldowns">Cooldowns</button>
+      <button class="tab" data-tab="deathblows">Deathblows</button>
+    </nav>
+
+    <section class="panel active" id="panel-overview"></section>
+    <section class="panel" id="panel-damage"></section>
+    <section class="panel" id="panel-healing"></section>
+    <section class="panel" id="panel-pets"></section>
+    <section class="panel" id="panel-cooldowns"></section>
+    <section class="panel" id="panel-deathblows"></section>
+  </main>
+
+  <p class="footer-note">
+    Bask shares names and combat numbers only, through a small database that deletes every bask 48 hours after it's created.<br>
+    Your own full breakdown stays on the <a href="../">main Chat Gator page</a>, which never uploads anything.
+  </p>
+</div>
+<script type="module" src="../js/bask.js"></script>
+</body>
+</html>

@@ -14,7 +14,7 @@ It's the spiritual successor to [daoc-chat-gator](https://github.com/autobotauz/
 
 Everything — reading the file, parsing it, computing every stat, drawing
 every chart — happens **inside your browser tab**, in plain JavaScript.
-There is no backend. Your `chat.log` is never uploaded anywhere. You can
+There is no backend. Your `chat.log` is never uploaded anywhere. (The one opt-in exception is a Bask group session — see below — which shares names and numbers only, never log lines.) You can
 verify this yourself: open your browser's network panel while using the
 site and you'll see zero outgoing requests except, optionally, one to a
 public Eden spell database used only to label spell names with their damage
@@ -71,6 +71,36 @@ says "You hit...", "You cast...", etc.) — there's just no name to display.
    or two later.
 
 No build step, no `package.json`, no CI — it's just static files.
+
+## Bask — live group sessions
+
+`bask/` (published at `…/chatgator/bask/`) lets up to 8 players share a live
+group view. One person creates a 6-letter invite code, everyone else joins
+with it, and each player picks their own `chat.log` (Chrome/Edge, same
+live-watch mode as above). A group leader can also **just watch** without a
+log, from any browser.
+
+What's shared is deliberately small: each player's browser parses their own
+log locally and sends only names and numbers — damage and healing in and out
+(and who it went to or came from), resists, interrupts, pets, cooldown
+last-use times, deathblows and deaths, plus 15-second time buckets for the
+charts. Never chat, raw log lines, per-ability breakdowns or realm points.
+Only lines written *after* a player joins are counted.
+
+- `js/bask-summary.js` — events → the shared summary (pure, unit-testable:
+  `node tools/test-bask-summary.mjs`).
+- `js/bask-net.js` — plain `fetch` to Supabase's REST API; the only code in
+  Chat Gator that talks to a server.
+- `js/bask.js`, `css/bask.css`, `bask/index.html` — the page.
+- `js/bask-config.js` — Supabase project URL + **public** (publishable) key.
+- `supabase/bask.sql` — tables, row-level security, the 8-player cap and the
+  hourly cleanup job. Safe to re-run in the Supabase SQL editor.
+
+Everything is ephemeral: a bask expires 48 hours after its code is created,
+is hidden the moment it expires, and is deleted by an hourly `pg_cron` job.
+**Download bask** saves a file that opens again later on the same page
+without any database. `.github/workflows/bask-keepalive.yml` pings the
+database every few days so the free Supabase project doesn't pause.
 
 ## How the parsing works
 
