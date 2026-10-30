@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Fixed: realm points from battle ticks and support activity',
+    bullets: [
+      '"You get N realm points from a Greater/Major/Minor Battle Tick" and "...for your support activity in battle" weren\'t being counted -- in a busy BG session that\'s close to half your RP',
+      'Both now count toward your totals and RP/hour, and show as their own sources on the Realm Points tab. Totals now line up with the game\'s own /stats',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Pets tab: clearer damage types',
     bullets: [
       'A pet\'s spell damage (e.g. a dread lich\'s nuke right after "casts a spell!") now shows as Spell instead of Proc',

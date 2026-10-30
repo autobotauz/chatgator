@@ -418,7 +418,12 @@ const RULES = [
   ['flavor', /^XP (Group|Camp|Frontier|Guild|Social|Buff|Guard) Bonus: [\d,]+(\s*\([\d.]+%.*?\))?$/, () => ({})],
   ['flavor', /^You receive [\d,]+ (gold|silver|copper)(?:,\s*[\d,]+ (?:gold|silver|copper))*[.!]?$/, () => ({})],
   ['flavor', /^You (get \d+ campaign points|have gained a realm level)!$/, () => ({})],
-  ['flavor', /^You get \d+ realm points from a (Minor|Major|Greater) Battle Tick for your efforts!$/, () => ({})],
+  // Battle ticks and the support-activity award are real RP, each a
+  // standalone line (no "You get N realm points!" total follows them, unlike
+  // the realm-rank/guild-buff bonus lines) -- verified against /stats Total
+  // RP deltas in a real log, which only reconcile with these counted. They
+  // used to be flavor, under-counting a BG session by ~45%.
+  ['rp_reason', /^You get (\d+) realm points? from a (Minor|Major|Greater) Battle Tick for your efforts!$/, m => ({ amount: +m[1], reason: `${m[2]} Battle Tick` })],
   ['flavor', /^You get an extra .+? from bonuses\.$/, () => ({})],
   ['flavor', /^You gain an additional \d+ bounty points for adventuring in this zone!$/, () => ({})],
   ['flavor', /^You earned extra XP for adventuring in this zone!$/, () => ({})],
@@ -433,7 +438,7 @@ const RULES = [
   ['flavor', /^Your (hits|power|stats) raises? by \d+ points?\.$/, () => ({})],
   ['flavor', /^Your stats raise!$/, () => ({})],
   ['flavor', /^Your stats and abilities return to normal\.?$/, () => ({})],
-  ['flavor', /^You get an additional \d+ realm points for your support activity in battle!$/, () => ({})],
+  ['rp_reason', /^You get an additional (\d+) realm points? for your support activity in battle!$/, m => ({ amount: +m[1], reason: 'support activity in battle' })],
   ['flavor', /^.+? has been killed recently and is worth no (realm points|experience)!$/, () => ({})],
   ['flavor', /^.+?'s skin erupts in open wounds!$/, () => ({})],
   ['flavor', /^Your skin erupts in open wounds!$/, () => ({})],
