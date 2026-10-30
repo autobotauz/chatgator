@@ -360,7 +360,7 @@ export function buildStats(events, playerNameHint) {
   const dmgOutPoints = [];
   const petStats = {}; // name -> { dmg, heals, hits, crits, bySource:{} }
   function petBucket(name) {
-    if (!petStats[name]) petStats[name] = { dmg: 0, heals: 0, hits: 0, crits: 0, bySource: {}, spellsCast: 0, resists: 0 };
+    if (!petStats[name]) petStats[name] = { dmg: 0, heals: 0, hits: 0, crits: 0, bySource: {}, spellsCast: 0, resists: 0, points: [] }; // points: raw { clock, amount } for the Pets tab's damage-over-time chart
     return petStats[name];
   }
 
@@ -487,7 +487,7 @@ export function buildStats(events, playerNameHint) {
           // both describe a pet's own spell-like damage, not its melee
           // attack, so they share one label rather than inventing a second
           // name for the identical concept.
-          const p = petBucket(e.name); p.dmg += e.dmg; p.hits++;
+          const p = petBucket(e.name); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.hits++;
           bump(p.bySource, 'Proc', e.dmg, false);
         } else {
           bump(dmgOutBySource, e.name, e.dmg, false);
@@ -507,7 +507,7 @@ export function buildStats(events, playerNameHint) {
           // match that removed case exactly, not because this line is
           // actually distinguishable from a pet's proc-spell crit — it
           // isn't, in the log text itself.
-          const p = petBucket(e.name); p.dmg += e.dmg; p.crits++;
+          const p = petBucket(e.name); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.crits++;
           bump(p.bySource, 'Melee', e.dmg, true);
         } else {
           bump(dmgOutBySource, e.name, e.dmg, true);
@@ -518,19 +518,19 @@ export function buildStats(events, playerNameHint) {
       }
 
       case 'pet_melee': {
-        const p = petBucket(e.pet); p.dmg += e.dmg; p.hits++;
+        const p = petBucket(e.pet); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.hits++;
         bump(p.bySource, 'Melee', e.dmg, false);
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
       case 'pet_melee_stray': {
-        const p = petBucket(e.pet); p.dmg += e.dmg; p.hits++;
+        const p = petBucket(e.pet); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.hits++;
         bump(p.bySource, 'Melee (stray)', e.dmg, false);
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
       case 'pet_hit': {
-        const p = petBucket(e.pet); p.dmg += e.dmg; p.hits++;
+        const p = petBucket(e.pet); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.hits++;
         bump(p.bySource, 'Proc', e.dmg, false);
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;

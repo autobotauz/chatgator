@@ -12,6 +12,20 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Fixed: blocks, parries and evades missing from Defense',
+    bullets: [
+      'Lines like "X attacks you and you evade the blow!" (and block / parry) weren\'t being counted at all -- only the older "You evade X\'s attack!" wording was. Both count now',
+    ],
+  },
+  {
+    date: '2026-10-30',
+    title: 'New: pet damage over time',
+    bullets: [
+      'The Pets tab has a damage-over-time chart with one line per pet, with the same drag-to-zoom and hide-idle-time options as Overview',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Bask: lighter on data, and a watching count',
     bullets: [
       'Bask now downloads far less: one small request per refresh, players\' numbers only when they change, and once a minute when the Bask tab is in the background (it catches up as soon as you switch back)',

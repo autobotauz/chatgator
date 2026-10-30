@@ -410,6 +410,20 @@ export function renderPets(container, stats, ctx) {
     colorFn: (_, i) => seriesColor(i + 4),
   });
 
+  // One line per pet, same zoom / hide-idle-time behaviour as Overview.
+  if (names.some(n => (stats.pets.byPet[n].points || []).length)) {
+    const tlSec = section(container);
+    h3(tlSec, 'Pet damage over time');
+    const tlCard = card(tlSec);
+    legend(tlCard, names.map((n, i) => ({ color: seriesColor(i + 4), label: n })));
+    timelineChart(tlCard, {
+      id: 'pets-damage',
+      domain: [stats.meta.startClock, stats.meta.endClock],
+      idleGaps: stats.meta.idleGaps,
+      series: names.map((n, i) => ({ name: n, color: seriesColor(i + 4), raw: stats.pets.byPet[n].points || [] })),
+    });
+  }
+
   for (const name of names) {
     const p = stats.pets.byPet[name];
     const s = section(container);

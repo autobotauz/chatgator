@@ -107,6 +107,17 @@ const RULES = [
   // flavor-only pet announcement (attack telegraph with no damage number,
   // the real hit/miss comes from a separate "Your <pet> ..." line) — not
   // counted, but useful for pet-name discovery and keeps it out of unmatched.
+  // Your own block/parry/evade, in the "<attacker> attacks you and you
+  // <verb> the blow!" wording (the other phrasing, "You evade X's attack!",
+  // is further down). Must sit above pet_flavor just below and the generic
+  // "attacks" flavor rules, which otherwise swallowed these silently -- a
+  // mob named "The tawny lynx cub" even got mistaken for a pet.
+  ['block', /^(.+?) attacks you and you block the blow!(?:\s*\(Block Chance:\s*([\d.]+)%\))?$/,
+    m => ({ attacker: m[1], defended: 'You', pct: m[2] ? parseFloat(m[2]) : null })],
+  ['you_parry', /^(.+?) attacks you and you parry the blow!(?:\s*\(Parry Chance:\s*([\d.]+)%\))?$/,
+    m => ({ attacker: m[1], pct: m[2] ? parseFloat(m[2]) : null })],
+  ['you_evade', /^(.+?) attacks you and you evade the blow!(?:\s*\(Evade Chance:\s*([\d.]+)%\))?$/,
+    m => ({ attacker: m[1], pct: m[2] ? parseFloat(m[2]) : null })],
   ['pet_flavor', /^The (.+?) attacks /, m => ({ pet: m[1] })],
 
   // ---- named ability (spell / style / RA / proc) damage -----------------
