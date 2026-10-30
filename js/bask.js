@@ -111,6 +111,10 @@ function cleanTotals(t) {
     deaths: list(t.deaths, (d) => ({ at: num(obj(d).at), killer: obj(d).killer ? str(obj(d).killer) : null })),
     cooldowns,
     lastActive: num(t.lastActive) || null,
+    aka: Array.isArray(t.aka) ? t.aka.slice(0, 4).map((n) => str(n, 40)).filter(Boolean) : [],
+    nameOk: !!t.nameOk,
+    rezzes: list(t.rezzes, (x) => ({ at: num(obj(x).at), by: obj(x).by ? str(obj(x).by, 40) : null, on: obj(x).on ? str(obj(x).on, 40) : null })),
+    cures: list(t.cures, (x) => ({ at: num(obj(x).at), by: obj(x).by ? str(obj(x).by, 40) : null, on: obj(x).on ? str(obj(x).on, 40) : null, spell: obj(x).spell ? str(obj(x).spell, 60) : null })),
     paused: num(t.paused) || null,
     cls: t.cls && CLASS_REALM[t.cls.name] !== undefined ? String(t.cls.name) : null,
   };
@@ -286,6 +290,14 @@ async function startLive(handle, player) {
   await watcher.startWithHandle(handle);
   const text = await watcher.readAll();
   const r = parseLogText(text);
+  // The log's own /stats knows the real character name; offer it if the
+  // typed one differs (the kill feed only ever uses the real name).
+  let statsName = null;
+  for (const e of r.events) if (e.type === 'stats_header' && e.player) statsName = e.player;
+  if (statsName && statsName.toLowerCase() !== player.toLowerCase() && !S.resume
+      && confirm(`Your chat.log's /stats says your character is ${statsName}. Join as ${statsName} instead of ${player}?\n\nThe kill feed and other players' heals use the exact character name.`)) {
+    player = statsName;
+  }
   const summarizer = new GroupSummarizer({ player, cooldowns: ALL_COOLDOWNS, since });
   summarizer.primePets(r.events);
 
@@ -595,7 +607,10 @@ const norm = (s) => String(s || '').trim().toLowerCase();
 
 function memberKeyMap() {
   const m = new Map();
-  for (const p of S.order) m.set(norm(p), p);
+  for (const p of S.order) {
+    m.set(norm(p), p);
+    for (const n of S.members.get(p)?.totals.aka || []) m.set(norm(n), p);
+  }
   return m;
 }
 
@@ -683,7 +698,12 @@ function classTag(p) {
   const rgb = realmColorForClass(c);
   return ` <span class="class-tag"${rgb ? ` style="--realm:${rgb}"` : ''}>${esc(c)}</span>`;
 }
-const nameCell = (p) => `${swatch(p)}${esc(p)}${classTag(p)}`;
+// The character name the log revealed, when it differs from what was typed.
+function akaTag(p) {
+  const aka = S.members.get(p)?.totals.aka || [];
+  return aka.length ? ` <span class="aka" title="Character name from their log">${esc(aka[0])}</span>` : '';
+}
+const nameCell = (p) => `${swatch(p)}${esc(p)}${akaTag(p)}${classTag(p)}`;
 const amtItems = (by) => Object.entries(by).map(([label, v]) => ({ label, value: v[0], hits: v[1], crits: v[2] })).filter((x) => x.value > 0);
 const countItems = (by) => Object.entries(by).map(([label, v]) => ({ label, value: v })).filter((x) => x.value > 0);
 const total = (f) => S.order.reduce((a, p) => a + f(T(p)), 0);
@@ -728,6 +748,8 @@ function renderBar() {
   if (S.syncError) { me.innerHTML = `<span class="bask-error">⚠️ ${esc(S.syncError)}</span>`; return; }
   if (S.mode === 'live' && S.summarizer?.paused) {
     me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}<span class="bask-warn">⚠️ Not reading your chat.log (idle an hour)</span>`;
+  } else if (S.mode === 'live' && S.summarizer && !S.summarizer.nameOk) {
+    me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · <span class="bask-warn">❔ Type <code>/stats</code> in game once so Bask can confirm your character name. Deathblows and deaths need the exact name.</span>`;
   } else if (S.mode === 'live') {
     me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)} · sent ${ago(S.lastSent)}`;
   } else if (S.mode === 'spectate') {
@@ -753,7 +775,7 @@ function renderRoster() {
     }[st];
     return `<li class="roster-chip st-${st}" title="${title}">
       <span class="roster-dot" style="background:${playerColor(p)}"></span>
-      <span class="roster-name">${p === leader && !left && S.mode !== 'offline' ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${classTag(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}</span>
+      <span class="roster-name">${p === leader && !left && S.mode !== 'offline' ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${akaTag(p)}${classTag(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}${!m.totals.nameOk && S.mode !== 'offline' ? ' <span class="name-check" title="Character name not confirmed from their log yet, so their deathblows and deaths may be missing. They can type /stats in game once to fix it.">❔ name</span>' : ''}</span>
       <span class="roster-stats">⚔ ${fmtNum(t.dmgOut.total)} · ✚ ${fmtNum(t.healOut.total)}</span>
       ${{ left: '<span class="roster-quiet">left</span>',
           sleeping: '<span class="roster-zzz" aria-label="sleeping">💤 Z<span>z</span>Z<span>z</span>Z<span>z</span></span>',
@@ -917,6 +939,53 @@ function renderHealing(c) {
     for (const h of healers) {
       barChart(card(g3, `${nameCell(h)} <span class="sub">healed ${fmtExact(T(h).healOut.total)}</span>`), { items: amtItems(T(h).healOut.by), maxItems: 10, colorFn: () => 'var(--series-3)' });
     }
+  }
+  renderSupport(c);
+}
+
+// Resurrects and cure mezz, from both sides: the caster's cast (aimed at
+// their current target) and the "You have been resurrected by X!" line in the
+// rezzed player's log. One rez seen from both sides is merged.
+const SAME_REZ_MS = 3 * 60000;
+function supportEvents(kind) {
+  const keys = memberKeyMap();
+  const resolve = (n) => (n ? keys.get(norm(n)) || n : null);
+  const isMember = (n) => !!n && S.members.has(n);
+  const all = [];
+  for (const p of S.order) for (const x of T(p)[kind] || []) all.push({ at: x.at, by: resolve(x.by), on: resolve(x.on), spell: x.spell || null });
+  all.sort((a, b) => a.at - b.at);
+  if (kind !== 'rezzes') return all;
+  const out = [];
+  for (const e of all) {
+    const m = out.find((o) => Math.abs(o.at - e.at) <= SAME_REZ_MS
+      && ((e.on && o.on && norm(e.on) === norm(o.on)) || (norm(e.by) === norm(o.by) && (!e.on || !o.on))));
+    if (!m) { out.push({ ...e }); continue; }
+    if (!m.on) m.on = e.on;
+    if (!isMember(m.by) && isMember(e.by)) m.by = e.by;
+  }
+  return out;
+}
+const who = (n) => (!n ? '<span class="sub">target unknown</span>' : S.members.has(n) ? nameCell(n) : esc(n));
+const countBy = (list, f) => { const m = {}; for (const x of list) { const k = f(x); if (k) m[k] = (m[k] || 0) + 1; } return Object.entries(m).map(([label, value]) => ({ label, value })); };
+
+function renderSupport(c) {
+  const rez = supportEvents('rezzes');
+  const sr = section(c, `Resurrections (${rez.length})`, 'Who brought whom back. The caster\u2019s side uses their current target; the rezzed player\u2019s log names who rezzed them.');
+  if (!rez.length) empty(card(sr), 'No resurrections yet.');
+  else {
+    const g = grid(sr, 2);
+    barChart(card(g, 'Rezzes cast'), { items: countBy(rez, (x) => x.by), valueFmt: countFmt, colorFn: (i) => (S.members.has(i.label) ? playerColor(i.label) : 'var(--series-3)') });
+    barChart(card(g, 'Rezzed'), { items: countBy(rez, (x) => x.on), valueFmt: countFmt, colorFn: (i) => (S.members.has(i.label) ? playerColor(i.label) : 'var(--series-6)') });
+    table(sr, ['Time', 'Rezzed by', 'Player rezzed'], rez.slice().reverse().slice(0, 200).map((x) => [fmtTimeSec(x.at), who(x.by), who(x.on)]), { numericFrom: 99 });
+  }
+  const cures = supportEvents('cures');
+  const sc = section(c, `Cure mezz (${cures.length})`, 'Who cast a Cure Mezz spell, and on whom (their target when they cast it; group cures may show no target).');
+  if (!cures.length) empty(card(sc), 'No cure mezz casts yet.');
+  else {
+    const g = grid(sc, 2);
+    barChart(card(g, 'Cure mezz cast'), { items: countBy(cures, (x) => x.by), valueFmt: countFmt, colorFn: (i) => (S.members.has(i.label) ? playerColor(i.label) : 'var(--series-5)') });
+    barChart(card(g, 'Cured'), { items: countBy(cures, (x) => x.on), valueFmt: countFmt, colorFn: (i) => (S.members.has(i.label) ? playerColor(i.label) : 'var(--series-5)') });
+    table(sc, ['Time', 'Cast by', 'On', 'Spell'], cures.slice().reverse().slice(0, 200).map((x) => [fmtTimeSec(x.at), who(x.by), who(x.on), x.spell ? `${icon(x.spell)}${esc(x.spell)}` : '']), { numericFrom: 99 });
   }
 }
 

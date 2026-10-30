@@ -26,6 +26,7 @@
 // lines up on one shared timeline regardless of their time zone.
 
 import { inferClass } from './aggregate.js';
+import { ABILITY_DATABASE } from './ability-database.js';
 
 export const TICK_MS = 15000;
 export const SUMMARY_VERSION = 1;
@@ -95,8 +96,10 @@ const ACTIVITY = new Set([
   'incoming_dmg', 'incoming_crit', 'incoming_extra', 'heal_out', 'heal_out_crit', 'heal_in', 'power_transfer',
   'resist_named', 'resist_generic', 'cast', 'cast_begin', 'cast_failed', 'cast_interrupted', 'cc_landed',
   'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in', 'ablative', 'bladeturn',
-  'you_died', 'target', 'item_use',
+  'you_died', 'target', 'item_use', 'resurrected_by',
 ]);
+const MAX_SUPPORT = 150;      // resurrect / cure mezz lists
+const KILL_MEMORY = 5000;     // recent kill-feed lines kept in memory (never sent)
 
 const EMPTY_TICK = () => ({ do: 0, di: 0, ho: 0, hi: 0, pd: 0, rs: 0, ir: 0, db: 0, dd: 0 });
 
@@ -137,6 +140,17 @@ export class GroupSummarizer {
     this._pendingDeathAt = null;
     this.abilityNames = new Set();       // for the class guess only; never sent
     this.cls = null;                     // { name, confidence } once confident
+    // Character name: what was typed can be a nickname ("Dexi" for Dexxii),
+    // and the kill feed only ever uses the real name. Real names learned from
+    // the log (/stats, or the kill feed line for our own death) are added
+    // here, and kills we missed under that name are picked back up.
+    this.names = new Set([this.playerKey]);
+    this.aka = [];                       // real names that differ from what was typed
+    this.nameOk = false;                 // the log has confirmed a name for us
+    this.killFeed = [];                  // recent kill feed: { at, killer, victim, zone }
+    this.lastTarget = null;
+    this.rezzes = [];                    // { at, by, on } -- our casts, and rezzes we received
+    this.cures = [];                     // { at, by, on, spell } -- our Cure Mezz casts
     this.lastActive = null;              // epoch ms of this player's last own activity
     this.paused = null;                  // epoch ms when the page stopped reading the log (idle 1h)
   }
@@ -267,30 +281,55 @@ export class GroupSummarizer {
         break;
 
       // ---- kills & deaths --------------------------------------------------
-      case 'kill_feed':
-        if (norm(e.killer) === this.playerKey) {
-          this.deathblows.push({ at, victim: e.victim, zone: e.zone || null });
-          if (this.deathblows.length > MAX_LOG) this.deathblows.shift();
-          this._tick(at).db++;
-        } else if (norm(e.victim) === this.playerKey) {
+      case 'kill_feed': {
+        this.killFeed.push({ at, killer: e.killer, victim: e.victim, zone: e.zone || null });
+        if (this.killFeed.length > KILL_MEMORY) this.killFeed.shift();
+        const k = norm(e.killer), v = norm(e.victim);
+        if (this.names.has(k)) {
+          if (k === this.playerKey) this.nameOk = true;
+          this._deathblow(at, e.victim, e.zone);
+        } else if (this.names.has(v)) {
+          if (v === this.playerKey) this.nameOk = true;
           // Name the killer on the "You have died." we already counted, if any.
           const d = this.deaths[this.deaths.length - 1];
           if (d && !d.killer && Math.abs(d.at - at) < 10000) d.killer = e.killer;
           else this._death(at, e.killer);
+        } else {
+          this._matchOwnDeath();
         }
         break;
+      }
       case 'you_died': {
         const d = this.deaths[this.deaths.length - 1];
         if (d && Math.abs(d.at - at) < 10000) break; // kill feed got here first
         this._death(at, null);
+        this._matchOwnDeath();
         break;
       }
+      case 'stats_header':
+        // /stats only ever shows your own character.
+        if (e.player) this._learnName(e.player);
+        break;
+
+      // ---- resurrects & cure mezz -------------------------------------------
+      case 'target':
+        this.lastTarget = e.target || null;
+        break;
+      case 'resurrected_by':
+        this._support(this.rezzes, { at, by: e.healer, on: this.player });
+        break;
 
       // ---- cooldowns (and class evidence) ---------------------------------
-      case 'cast':
+      case 'cast': {
         if (e.name && this.cooldowns[e.name]) this.cdUsed[e.name] = at;
         if (e.name) this._sawAbility(e.name);
+        // The cast line doesn't say who it was on: use the current target,
+        // unless that's someone we've been hitting (then it's unknown).
+        const type = e.name && ABILITY_DATABASE[e.name]?.type;
+        if (type === 'Resurrect') this._support(this.rezzes, { at, by: this.player, on: this._friendlyTarget() });
+        else if (type === 'Cure Mezz') this._support(this.cures, { at, by: this.player, on: this._friendlyTarget(), spell: e.name });
         break;
+      }
     }
     if (e.styleName) this._sawAbility(e.styleName);
     // A styled weapon swing can also start a cooldown.
@@ -303,6 +342,50 @@ export class GroupSummarizer {
     const guess = inferClass(this.abilityNames);
     // Keep the last confident answer if a new ability briefly muddies it.
     if (guess) this.cls = { name: guess.name, confidence: guess.confidence };
+  }
+
+  _friendlyTarget() {
+    const t = this.lastTarget;
+    if (!t || this.dmgOut.by[t]) return null;
+    return /^(you|yourself)$/i.test(t) ? this.player : t;
+  }
+
+  _support(list, entry) {
+    list.push(entry);
+    if (list.length > MAX_SUPPORT) list.shift();
+  }
+
+  _deathblow(at, victim, zone) {
+    if (this.deathblows.some((d) => d.at === at && d.victim === victim)) return;
+    this.deathblows.push({ at, victim, zone: zone || null });
+    this.deathblows.sort((a, b) => a.at - b.at);
+    if (this.deathblows.length > MAX_LOG) this.deathblows.shift();
+    this._tick(at).db++;
+  }
+
+  // Our own death, matched to the kill feed line that announced it: the one
+  // within a few seconds whose killer had been hitting us. Only trusted when
+  // exactly one such line fits (busy fights put many deaths in the feed).
+  _matchOwnDeath() {
+    const d = this.deaths[this.deaths.length - 1];
+    if (!d || d.matched || (this.last != null && this.last - d.at > 10000)) return;
+    const fits = this.killFeed.filter((x) => Math.abs(x.at - d.at) <= 3000 && this.dmgIn.by[x.killer]);
+    const victims = new Set(fits.map((x) => norm(x.victim)));
+    if (victims.size !== 1) return;
+    d.matched = true;
+    if (!d.killer) d.killer = fits[0].killer;
+    this._learnName(fits[0].victim);
+  }
+
+  _learnName(name) {
+    const key = norm(name);
+    this.nameOk = true;
+    if (!key || this.names.has(key)) return;
+    this.names.add(key);
+    this.aka.push(String(name).slice(0, 40));
+    this.changed = true;
+    // Pick up deathblows the feed already showed under that name.
+    for (const x of this.killFeed) if (norm(x.killer) === key) this._deathblow(x.at, x.victim, x.zone);
   }
 
   _death(at, killer) {
@@ -328,6 +411,10 @@ export class GroupSummarizer {
       deaths: this.deaths.slice(),
       cls: this.cls ? { ...this.cls } : null,
       lastActive: this.lastActive,
+      aka: this.aka.slice(),
+      nameOk: this.nameOk,
+      rezzes: this.rezzes.slice(),
+      cures: this.cures.slice(),
       paused: this.paused,
       cooldowns: Object.fromEntries(Object.entries(this.cdUsed).map(([n, at]) => [n, [at, this.cooldowns[n]?.cooldownSeconds ?? null]])),
     };
@@ -351,6 +438,10 @@ export class GroupSummarizer {
     this.deaths = Array.isArray(snap.deaths) ? snap.deaths.slice(-MAX_LOG) : [];
     for (const [n, v] of Object.entries(snap.cooldowns || {})) if (Array.isArray(v)) this.cdUsed[n] = +v[0];
     if (Number.isFinite(+snap.lastActive) && +snap.lastActive > 0) this.lastActive = +snap.lastActive;
+    for (const n of Array.isArray(snap.aka) ? snap.aka : []) if (typeof n === 'string' && !this.names.has(norm(n))) { this.names.add(norm(n)); this.aka.push(n); }
+    if (snap.nameOk) this.nameOk = true;
+    if (Array.isArray(snap.rezzes)) this.rezzes = snap.rezzes.slice(-MAX_SUPPORT);
+    if (Array.isArray(snap.cures)) this.cures = snap.cures.slice(-MAX_SUPPORT);
     // (snap.paused is deliberately not restored: picking the log again resumes.)
     if (snap.cls && typeof snap.cls.name === 'string') this.cls = { name: snap.cls.name, confidence: +snap.cls.confidence || 0 };
   }

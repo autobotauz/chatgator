@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Bask: deathblows fixed, rezzes and cure mezz, leader hand-off',
+    bullets: [
+      'Deathblows and deaths were missing for anyone who joined under a nickname (the kill feed only uses real character names). Bask now offers the name from your log\'s /stats when you join, and typing /stats in game during a bask confirms it and recovers kills it missed. Unconfirmed names show ❔ name',
+      'New on the Healing tab: who resurrected whom, and who cast Cure Mezz on whom',
+      'The bask leader now passes to the next player after 30 minutes of the leader not playing. If everyone is idle the last one active keeps it, and the first one back takes over',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Fixed: crit heals were counted twice',
     bullets: [
       '"You heal X for N" already includes the crit (capped at what the target was missing); the "Your heal criticals for an extra N" line is the raw bonus, mostly overheal. We were adding both, and counting each crit as an extra heal',

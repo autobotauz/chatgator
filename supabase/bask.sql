@@ -15,10 +15,10 @@
 -- expiry or delete anything, except through the functions at the bottom:
 -- the bask's leader can boot/ban/unban, and a player can leave.
 --
--- Leadership: the earliest-joined player still in the bask who has written
--- in the last 5 minutes. It only moves when the current leader leaves, is
--- removed, or goes quiet; someone who leaves and rejoins goes to the back of
--- the line. A player proves who they are with a per-join secret their
+-- Leadership: sticks with the leader while they're playing; after 30 idle
+-- minutes (or leaving, being removed, closing their page) it passes to the
+-- earliest-joined player who is playing (see bask_fix_leader). Someone who
+-- leaves and rejoins goes to the back of the line. A player proves who they are with a per-join secret their
 -- browser keeps (only its SHA-256 is stored, in bask_members.key_hash).
 --
 -- Safe to re-run: every statement is idempotent.
@@ -150,21 +150,52 @@ drop trigger if exists bask_members_guard on public.bask_members;
 create trigger bask_members_guard before insert or update on public.bask_members
   for each row execute function public.bask_member_guard();
 
--- Leadership is sticky: it only moves when the current leader has left, been
--- removed, or gone quiet for 5 minutes; then it goes to the earliest-joined
--- active player. Re-checked on every member write (players write at least
--- once a minute while their page is open).
+-- When a player last did something in game (lastActive in their numbers),
+-- or when their numbers last changed for older pages. An hour-idle player
+-- whose page stopped reading their log (paused) counts as long ago.
+create or replace function public.bask_last_active(t jsonb, updated timestamptz) returns timestamptz
+language sql immutable as $$
+  select case
+    when jsonb_typeof(t->'paused') = 'number' then '-infinity'::timestamptz
+    when jsonb_typeof(t->'lastActive') = 'number' then to_timestamp((t->>'lastActive')::double precision / 1000)
+    else updated end;
+$$;
+
+-- Leadership. Present = page open (checked in within 5 min) and not left.
+-- Active = present and played within the last 30 minutes.
+-- The leader keeps it while active. Otherwise it goes to the earliest-joined
+-- active player. If nobody is active, the leader keeps it (they were the last
+-- to go idle) -- unless their page is gone, then the most recently active
+-- present player takes it. So the first player to become active again takes
+-- over from an idle leader. Re-checked on every member write (pages check in
+-- at least once a minute).
 create or replace function public.bask_fix_leader() returns trigger
 language plpgsql security definer set search_path = public as $$
-declare c text := coalesce(new.code, old.code);
+declare
+  c text := coalesce(new.code, old.code);
+  cur text;
+  cand text;
 begin
-  update bask_sessions s set leader = (
-      select m.player from bask_members m
+  select s.leader into cur from bask_sessions s where s.code = c;
+  if cur is not null and exists (select 1 from bask_members m where m.code = c and m.player = cur
+       and m.left_at is null and m.seen_at > now() - interval '5 minutes'
+       and bask_last_active(m.totals, m.updated_at) > now() - interval '30 minutes') then
+    return null;
+  end if;
+  select m.player into cand from bask_members m
+    where m.code = c and m.left_at is null and m.seen_at > now() - interval '5 minutes'
+      and bask_last_active(m.totals, m.updated_at) > now() - interval '30 minutes'
+    order by m.joined_at limit 1;
+  if cand is null then
+    if cur is not null and exists (select 1 from bask_members m where m.code = c and m.player = cur
+         and m.left_at is null and m.seen_at > now() - interval '5 minutes') then
+      return null;
+    end if;
+    select m.player into cand from bask_members m
       where m.code = c and m.left_at is null and m.seen_at > now() - interval '5 minutes'
-      order by m.joined_at limit 1)
-  where s.code = c and (s.leader is null or not exists (
-      select 1 from bask_members m where m.code = c and m.player = s.leader
-        and m.left_at is null and m.seen_at > now() - interval '5 minutes'));
+      order by bask_last_active(m.totals, m.updated_at) desc, m.joined_at limit 1;
+  end if;
+  update bask_sessions s set leader = cand where s.code = c and s.leader is distinct from cand;
   return null;
 end $$;
 drop trigger if exists bask_members_leader on public.bask_members;

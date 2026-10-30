@@ -96,20 +96,22 @@ Only lines written *after* a player joins are counted.
 - `supabase/bask.sql` — tables, row-level security, the 8-player cap and the
   hourly cleanup job. Safe to re-run in the Supabase SQL editor.
 
-The bask's **leader** is the earliest-joined player still in it (normally
-whoever created the code). The leader can **boot** a player — removes them and
-their numbers, frees the spot, and they can join again — **ban** a name, which
-also keeps it out, and **unban** from the banned-players list. Leadership only
-moves when the leader leaves or goes quiet for 5 minutes; it then passes to
-the next player in line, and someone who leaves and rejoins goes to the back
-of the line. Each player's browser proves who it is with a per-join secret
-(only its SHA-256 is stored). A booted player's page notices, stops sharing
-and offers to rejoin.
+The bask's **leader** starts as the first player to join. The leader can
+**boot** a player — removes them and their numbers, frees the spot, and they
+can join again — **ban** a name, which also keeps it out, and **unban** from
+the banned-players list. Leadership passes to the earliest-joined player who
+is playing once the leader has been idle for 30 minutes (or leaves, or closes
+their page); if everyone is idle the last one active keeps it and the first
+one back takes over. Each player's browser proves who it is with a per-join
+secret (only its SHA-256 is stored). A booted player's page notices, stops
+sharing and offers to rejoin.
 
-Each player's class is worked out in their own browser the same way the main
-page does (`inferClass` in `js/aggregate.js`), and only the class name is
-shared once it's confident. The lobby lists this browser's recent baskets
-that are still open.
+Character names matter: the kill feed (Eden logs deaths only there) and
+groupmates' heal lines use the real name, so a nickname loses deathblows and
+deaths. The join step offers the name from the log's `/stats`, and `/stats`
+typed during a bask confirms it and recovers missed kills. The Healing tab
+also shows resurrects and Cure Mezz casts (ability types from the bundled
+ability database), merging the caster's and the rezzed player's side.
 
 A name that's actively in a bask (written in the last 5 minutes) can't be
 joined from another browser. Refreshing the page puts you back in your bask;
