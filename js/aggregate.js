@@ -612,17 +612,38 @@ export function buildStats(events, playerNameHint) {
   const healOutBySpell = {};
   const healOutPoints = [];
   let healOutTotal = 0, healOutHits = 0, healOutCrits = 0;
+  // A heal crit ("Your heal criticals for an extra N amount of hit
+  // points!") is NOT extra healing on top of the "You heal X for N" line
+  // before it: that line already reports what actually landed, crit
+  // included, capped at the target's missing health. The crit line is the
+  // raw bonus, mostly overheal -- in a real log a 98 crit follows "You heal
+  // Tina for 22", and spreadheal crits of 1,000-1,900 come with no heal
+  // line at all. Adding it double-counted (~7% of a healer's total) and
+  // counted each crit as an extra heal. So a crit now only flips the heal
+  // it follows from a normal hit to a crit -- amounts untouched.
+  let lastHeal = null; // { targetKey, spellKey } of the previous heal_out
+  const flipToCrit = (map, key) => {
+    const s = map[key];
+    if (s && s.hits > 0) { s.hits--; s.crits++; }
+  };
   for (const e of events) {
     if (e.type === 'heal_out') {
-      bump(healOutByTarget, healTargetKey(e.target), e.amount, false);
-      bump(healOutBySpell, e.spellName || 'Heal (spell not identified)', e.amount, false);
+      const targetKey = healTargetKey(e.target);
+      const spellKey = e.spellName || 'Heal (spell not identified)';
+      bump(healOutByTarget, targetKey, e.amount, false);
+      bump(healOutBySpell, spellKey, e.amount, false);
       healOutTotal += e.amount; healOutHits++;
       healOutPoints.push({ clock: e.clock, amount: e.amount });
+      lastHeal = { targetKey, spellKey, clock: e.clock };
     } else if (e.type === 'heal_out_crit') {
-      bump(healOutByTarget, healTargetKey(e.target), e.amount, true);
-      bump(healOutBySpell, e.spellName || 'Heal (spell not identified)', e.amount, true);
-      healOutTotal += e.amount; healOutCrits++;
-      healOutPoints.push({ clock: e.clock, amount: e.amount });
+      // Only the heal logged in the same second -- a spreadheal crit often
+      // has no heal line of its own and mustn't flip some earlier heal.
+      if (lastHeal && e.clock != null && lastHeal.clock != null && e.clock - lastHeal.clock <= 1000) {
+        flipToCrit(healOutByTarget, lastHeal.targetKey);
+        flipToCrit(healOutBySpell, lastHeal.spellKey);
+        healOutHits--; healOutCrits++;
+        lastHeal = null; // one crit per heal
+      }
     }
   }
   // ---- ability timeline (Spells & Styles dot chart) ----------------------
@@ -666,7 +687,8 @@ export function buildStats(events, playerNameHint) {
           add({ clock: e.clock, name: e.spellName || 'Heal (spell not identified)', target: e.target ? healTargetKey(e.target) : null, amount: e.amount, kind: 'heal' });
           break;
         case 'heal_out_crit':
-          if (last && last.kind === 'heal') last.crit = (last.crit || 0) + e.amount;
+          // already included in the heal's own amount -- see healOut above
+          if (last && last.kind === 'heal') last.crit = true;
           break;
         case 'cc_landed':
           if (e.sourceName && !e.isPet) add({ clock: e.clock, name: e.sourceName, target: e.target || null, kind: 'effect', effect: e.effect });

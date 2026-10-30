@@ -789,7 +789,7 @@ function renderAbilityTimeline(container, stats, inferredClass) {
         if (d.kind === 'cast') what = 'landed';
         else if (d.kind === 'effect') what = (d.target ? `on ${escHtml(d.target)} ` : '') + `(${EFFECT_WORDS[d.effect] || 'landed'})`;
         else {
-          const amt = d.amount != null ? `${fmtExact(d.amount)}${d.crit ? ` +${fmtExact(d.crit)} crit` : ''}` : '';
+          const amt = d.amount != null ? `${fmtExact(d.amount)}${d.crit === true ? ' (crit)' : d.crit ? ` +${fmtExact(d.crit)} crit` : ''}` : '';
           const verb = d.kind === 'heal' ? 'healed' : 'hit';
           what = `${verb}${d.target ? ` ${escHtml(d.target)}` : ''}${amt ? ` for ${amt}` : ''}${d.weapon ? ` <span style="opacity:.7">(${escHtml(d.weapon)})</span>` : ''}`;
         }

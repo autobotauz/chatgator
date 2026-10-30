@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Fixed: crit heals were counted twice',
+    bullets: [
+      '"You heal X for N" already includes the crit (capped at what the target was missing); the "Your heal criticals for an extra N" line is the raw bonus, mostly overheal. We were adding both, and counting each crit as an extra heal',
+      'Healing totals and HPS now count only what actually landed. Crit rate still counts crits',
+      'Note: the game\'s own /stats "HP healed" only counts some of your heals, so it will usually read lower than Chat Gator',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Fixed: realm points from battle ticks and support activity',
     bullets: [
       '"You get N realm points from a Greater/Major/Minor Battle Tick" and "...for your support activity in battle" weren\'t being counted -- in a busy BG session that\'s close to half your RP',
