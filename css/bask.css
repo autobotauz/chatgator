@@ -52,6 +52,13 @@
 .roster-name { font-weight: 600; }
 .roster-stats { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .roster-quiet { font-size: 11px; color: var(--text-muted); }
+.roster-actions { display: inline-flex; gap: 2px; margin-left: 2px; }
+.roster-act {
+  font: inherit; font-size: 13px; line-height: 1; padding: 3px 5px; border-radius: 6px; cursor: pointer;
+  border: 1px solid transparent; background: none; opacity: .55;
+}
+.roster-act:hover, .roster-act:focus-visible { opacity: 1; border-color: var(--border); background: var(--surface-2); }
+.leader-note { margin: 0 0 12px; color: var(--text-secondary); }
 
 .feed { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: var(--text-secondary); }
 .feed:empty { display: none; }

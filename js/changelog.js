@@ -12,6 +12,16 @@
 export const CHANGELOG = [
   {
     date: '2026-10-29',
+    title: 'Bask: leaders can boot or ban',
+    bullets: [
+      'Whoever created a bask is its leader and gets two buttons on each player in the roster',
+      'Boot (🥾) removes a player and their numbers -- handy when someone logged off but left their page sharing. They can join again any time',
+      'Ban (⛔) does the same and keeps that name out of the bask',
+      'Leadership stays with the browser that created the bask',
+    ],
+  },
+  {
+    date: '2026-10-29',
     title: 'New: Bask, live group sessions',
     bullets: [
       'Start a bask on the new Bask page, send the 6-letter invite code to up to 7 groupmates, and everyone shares live combat numbers from their own chat.log (Chrome/Edge)',

@@ -45,12 +45,25 @@ async function rest(path, { method = 'GET', body, prefer } = {}) {
   return data;
 }
 
+export async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// A random secret that makes this browser the bask's leader. Only its hash
+// goes to the server (bask_sessions.host_hash); the secret itself stays in
+// this browser's localStorage and is sent only to bask_kick().
+export function newHostKey() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 // ---- sessions ---------------------------------------------------------------
-export async function createSession() {
+export async function createSession(hostKey) {
+  const host_hash = hostKey ? await sha256Hex(hostKey) : null;
   for (let attempt = 0; attempt < 5; attempt++) {
     const code = randomCode();
     try {
-      const rows = await rest('bask_sessions', { method: 'POST', body: { code }, prefer: 'return=representation' });
+      const rows = await rest('bask_sessions', { method: 'POST', body: { code, host_hash }, prefer: 'return=representation' });
       return rows[0];
     } catch (err) {
       if (err.status === 409) continue; // code collision — roll again
@@ -79,6 +92,28 @@ export async function upsertMember(code, player, totals) {
 export async function fetchMembers(code, sinceIso) {
   const filter = sinceIso ? `&updated_at=gt.${encodeURIComponent(sinceIso)}` : '';
   return rest(`bask_members?code=eq.${encodeURIComponent(code)}${filter}&select=player,joined_at,updated_at,totals&order=joined_at.asc`);
+}
+
+// Just the names currently in the bask — how viewers notice someone was booted.
+export async function fetchMemberNames(code) {
+  const rows = await rest(`bask_members?code=eq.${encodeURIComponent(code)}&select=player`);
+  return rows.map((r) => r.player);
+}
+
+// Leader only: remove a player and their time buckets. A booted player can
+// join again; with ban=true their name is kept out for the rest of the bask.
+export async function kickPlayer(code, hostKey, player, ban = false) {
+  await rest('rpc/bask_kick', { method: 'POST', body: { p_code: code, p_key: hostKey, p_player: player, p_ban: !!ban } });
+}
+
+// After joining, a player updates their own row rather than upserting it, so
+// a page that was booted can't quietly put itself back. Returns false when
+// the row is gone (booted).
+export async function updateMember(code, player, totals) {
+  const rows = await rest(`bask_members?code=eq.${encodeURIComponent(code)}&player=eq.${encodeURIComponent(player)}&select=player`, {
+    method: 'PATCH', body: { totals }, prefer: 'return=representation',
+  });
+  return Array.isArray(rows) && rows.length > 0;
 }
 
 export async function fetchMember(code, player) {

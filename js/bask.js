@@ -28,6 +28,7 @@ const QUIET_MS = 90000;         // no update for this long = "quiet"
 const CURSOR_OVERLAP_MS = 15000;
 const SESSION_CHECK_MS = 5 * 60000;
 const SAVE_KEY = 'chatgator:bask';
+const HOSTS_KEY = 'chatgator:bask-hosts'; // code -> leader secret, for baskets this browser created
 
 const el = (id) => document.getElementById(id);
 const show = (id, on = true) => { el(id).hidden = !on; };
@@ -54,6 +55,8 @@ const S = {
   lastSent: 0, lastChecked: null, lastNewLines: null, syncError: null,
   syncTimer: null, clockTimer: null, lastSessionCheck: 0,
   tab: 'overview', metric: 'do',
+  hostKey: null,         // set when this browser created the bask (leader)
+  booted: false,
 };
 
 const now = () => (S.mode === 'offline' ? S.exportedAt : Date.now());
@@ -106,7 +109,7 @@ function mergeMembers(rows) {
     if (isNew) {
       S.order.push(player);
       S.order.sort((a, b) => Date.parse(S.members.get(a).joined_at) - Date.parse(S.members.get(b).joined_at));
-      pushFeed(`join:${player}`, Date.parse(r.joined_at), `🐊 <strong>${esc(player)}</strong> slid into the bask`);
+      pushFeed(`join:${player}:${r.joined_at}`, Date.parse(r.joined_at), `🐊 <strong>${esc(player)}</strong> slid into the bask`);
     }
     const t = S.members.get(player).totals;
     for (const d of t.deathblows) pushFeed(`db:${player}:${d.at}:${d.victim}`, d.at, `⚔️ <strong>${esc(player)}</strong> took down ${heraldLink(d.victim)}`);
@@ -164,6 +167,8 @@ async function goJoinStep(code, { fresh = null } = {}) {
   }
   if (!session) { setError('lobbyError', `No bask with code ${code} — it may have expired (a bask lasts 48 hours).`); return; }
   S.code = session.code; S.session = session;
+  S.hostKey = hostKeyFor(S.code);
+  show('leaderNote', !!S.hostKey);
   history.replaceState(null, '', `?code=${S.code}`);
   el('joinCodeShow').textContent = S.code;
   el('joinExpires').textContent = fmtExpires(session.expires_at);
@@ -174,6 +179,16 @@ async function goJoinStep(code, { fresh = null } = {}) {
   show('lobby', false); show('joinStep', true);
   el('playerName').focus();
 }
+
+function loadHosts() { try { return JSON.parse(localStorage.getItem(HOSTS_KEY) || '{}') || {}; } catch { return {}; } }
+function saveHost(code, key) {
+  const hosts = loadHosts();
+  hosts[code] = { key, at: Date.now() };
+  // Keep it small: a bask lasts 48h, so anything older than a few days is dead.
+  for (const [c, v] of Object.entries(hosts)) if (!v || Date.now() - v.at > 4 * 86400000) delete hosts[c];
+  try { localStorage.setItem(HOSTS_KEY, JSON.stringify(hosts)); } catch { /* ignore */ }
+}
+function hostKeyFor(code) { const v = loadHosts()[code]; return v && v.key ? v.key : null; }
 
 function loadSaved() { try { return JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch { return null; } }
 function save(v) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(v)); } catch { /* ignore */ } }
@@ -237,7 +252,7 @@ async function upload() {
   try {
     if (sum.changed || Date.now() - S.lastSent > HEARTBEAT_MS) {
       sum.changed = false;
-      await net.upsertMember(S.code, S.player, sum.snapshot());
+      if (!(await net.updateMember(S.code, S.player, sum.snapshot()))) { sum.requeueTicks(ticks); onBooted(); return; }
     }
     await net.upsertTicks(S.code, S.player, ticks);
     S.lastSent = Date.now();
@@ -249,8 +264,26 @@ async function upload() {
   }
 }
 
+// Someone booted (or banned) disappears from the server; drop them here too.
+// Names are fetched before the changed rows, so a player who joins in between
+// is never mistaken for one who left.
+function pruneMembers(names, bannedName = null) {
+  const present = new Set(names);
+  for (const p of [...S.order]) {
+    if (present.has(p)) continue;
+    if (S.mode === 'live' && p === S.player) { onBooted(); continue; }
+    S.members.delete(p); S.ticks.delete(p);
+    S.order = S.order.filter((x) => x !== p);
+    pushFeed(`left:${p}:${Date.now()}`, Date.now(), p === bannedName
+      ? `⛔ <strong>${esc(p)}</strong> was banned from the bask`
+      : `🥾 <strong>${esc(p)}</strong> was booted from the bask`);
+  }
+}
+
 async function poll() {
   try {
+    pruneMembers(await net.fetchMemberNames(S.code));
+    if (S.booted) return;
     const [members, ticks] = await Promise.all([
       net.fetchMembers(S.code, cursorMinus(S.memberCursor)),
       net.fetchTicksSince(S.code, cursorMinus(S.tickCursor)),
@@ -267,6 +300,19 @@ async function poll() {
   } catch (err) {
     S.syncError = `Couldn't fetch the group's numbers: ${err.message}`;
   }
+}
+
+function onBooted() {
+  if (S.booted) return;
+  S.booted = true;
+  if (S.watcher) S.watcher.stop();
+  S.watcher = null; S.summarizer = null;
+  clearTimeout(S.syncTimer);
+  S.mode = 'spectate'; // keep showing the group, just stop sharing
+  show('watchStatus', false);
+  S.syncError = null;
+  renderAll();
+  S.syncTimer = setTimeout(syncLoop, SYNC_MS);
 }
 
 async function syncLoop() {
@@ -469,11 +515,15 @@ function renderBar() {
   if (S.mode === 'offline') el('barExpires').textContent = `saved ${new Date(S.exportedAt).toLocaleString()}`;
   else if (S.session) el('barExpires').textContent = fmtExpires(S.session.expires_at);
   const me = el('barMe');
+  if (S.booted) {
+    me.innerHTML = `<span class="bask-error">🥾 You were booted from this bask, so your numbers aren't being shared.</span> <a class="btn" href="?code=${encodeURIComponent(S.code)}">Rejoin</a>`;
+    return;
+  }
   if (S.syncError) { me.innerHTML = `<span class="bask-error">⚠️ ${esc(S.syncError)}</span>`; return; }
   if (S.mode === 'live') {
-    me.innerHTML = `Sharing as <strong>${esc(S.player)}</strong> · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)} · sent ${ago(S.lastSent)}`;
+    me.innerHTML = `${S.hostKey ? '👑 Leader · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)} · sent ${ago(S.lastSent)}`;
   } else if (S.mode === 'spectate') {
-    me.textContent = 'Just watching · updates every 10 seconds';
+    me.textContent = `${S.hostKey ? '👑 Leader · ' : ''}Just watching · updates every 10 seconds`;
   } else {
     me.textContent = `${S.order.length} player${S.order.length === 1 ? '' : 's'} in this saved bask`;
   }
@@ -490,6 +540,10 @@ function renderRoster() {
       <span class="roster-name">${esc(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}</span>
       <span class="roster-stats">⚔ ${fmtNum(t.dmgOut.total)} · ✚ ${fmtNum(t.healOut.total)}</span>
       ${quiet ? '<span class="roster-quiet">quiet</span>' : ''}
+      ${S.hostKey && S.mode !== 'offline' && p !== S.player ? `<span class="roster-actions">
+        <button class="roster-act" data-boot="${esc(p)}" title="Boot ${esc(p)}: removes them and their numbers from the bask. They can join again.">🥾</button>
+        <button class="roster-act" data-ban="${esc(p)}" title="Ban ${esc(p)}: removes them and keeps that name out of this bask.">⛔</button>
+      </span>` : ''}
     </li>`;
   }).join('') + (S.mode !== 'offline' && open > 0 ? `<li class="roster-chip empty-slot">${open} open spot${open === 1 ? '' : 's'}</li>` : '');
   el('feed').innerHTML = S.feed.map((f) => `<li><span class="feed-time">${fmtTimeSec(f.at)}</span> ${f.html}</li>`).join('');
@@ -731,7 +785,12 @@ document.querySelector('.tabbar').addEventListener('click', (ev) => {
 
 el('btnCreate').addEventListener('click', async (ev) => {
   const btn = ev.currentTarget; btn.disabled = true;
-  try { const s = await net.createSession(); await goJoinStep(s.code, { fresh: s }); }
+  try {
+    const key = net.newHostKey();
+    const s = await net.createSession(key);
+    saveHost(s.code, key);
+    await goJoinStep(s.code, { fresh: s });
+  }
   catch (err) { setError('lobbyError', `Couldn't create a bask: ${err.message}`); }
   finally { btn.disabled = false; }
 });
@@ -770,6 +829,27 @@ el('nameForm').addEventListener('submit', async (ev) => {
 el('btnSpectate').addEventListener('click', () => {
   S.mode = 'spectate';
   enterBask();
+});
+
+el('roster').addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-boot],[data-ban]');
+  if (!b || !S.hostKey) return;
+  const ban = b.hasAttribute('data-ban');
+  const player = ban ? b.dataset.ban : b.dataset.boot;
+  const msg = ban
+    ? `Ban ${player}? Their numbers are removed from the bask and that name can't join it again.`
+    : `Boot ${player}? Their numbers are removed from the bask and their spot opens up. They can join again with the code.`;
+  if (!confirm(msg)) return;
+  b.disabled = true;
+  try {
+    await net.kickPlayer(S.code, S.hostKey, player, ban);
+    pruneMembers(S.order.filter((p) => p.toLowerCase() !== player.toLowerCase()), ban ? player : null);
+    renderAll();
+  } catch (err) {
+    S.syncError = `Couldn't ${ban ? 'ban' : 'boot'} ${player}: ${err.message}`;
+    b.disabled = false;
+    renderBar();
+  }
 });
 
 el('btnDownload').addEventListener('click', exportBask);

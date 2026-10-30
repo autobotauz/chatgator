@@ -96,6 +96,13 @@ Only lines written *after* a player joins are counted.
 - `supabase/bask.sql` — tables, row-level security, the 8-player cap and the
   hourly cleanup job. Safe to re-run in the Supabase SQL editor.
 
+Whoever creates a bask is its **leader**: their browser keeps a random
+secret (only its SHA-256 goes to the database) that lets them **boot** a
+player — removes them and their numbers, frees the spot, and they can join
+again — or **ban** one, which also keeps that name out. A booted player's
+page notices, stops sharing and offers to rejoin. Leadership lives in the
+browser that created the bask.
+
 Everything is ephemeral: a bask expires 48 hours after its code is created,
 is hidden the moment it expires, and is deleted by an hourly `pg_cron` job.
 **Download bask** saves a file that opens again later on the same page
