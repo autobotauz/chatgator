@@ -272,6 +272,16 @@ export function buildStats(events, playerNameHint) {
       petNames.add(e.pet);
     }
   }
+  // A caster pet (e.g. a bone warmage) may never melee, get commanded or be
+  // seen summoned in the window you're looking at -- it only ever "casts a
+  // spell!" and then "Your <pet> hits X". "Your" makes it yours (other
+  // people's pets cast in a BG too, but never as "Your ..."), and the same
+  // name casting is what tells it apart from one of your own named spells
+  // -- also checked against the ability database to be safe.
+  const castingPets = new Set(events.filter(e => e.type === 'pet_cast').map(e => e.pet));
+  for (const e of events) {
+    if (e.type === 'ability_hit' && castingPets.has(e.name) && !ABILITY_DATABASE[e.name]) petNames.add(e.name);
+  }
 
   // ---- /stats snapshots (most recent wins) --------------------------------
   let playerName = playerNameHint || null;
@@ -403,6 +413,19 @@ export function buildStats(events, playerNameHint) {
   // can still show "Numb" as the Name and the weapon in its own column.
   const dmgOutBaseName = {};
 
+  // Pet damage types (Pets tab breakdown):
+  //   Melee       "Your <pet> attacks X and hits for N damage!"
+  //   Spell       "Your <pet> hits X for N damage!" within PET_SPELL_WINDOW_MS
+  //               of "The <pet> casts a spell!" (e.g. a dread lich's nuke)
+  //   Proc        that same "hits" line with no cast before it (e.g. the
+  //               spirit aegis' AoE proc off its melee swings)
+  //   Damage add  "Your <pet> hit X for N damage!" -- singular "hit", the
+  //               pet's damage-add buff firing on a swing
+  // A crit line goes to whichever type the pet's previous hit was.
+  const PET_SPELL_WINDOW_MS = 4000;
+  const petLastCastAt = {};
+  const petLastLabel = {};
+
   for (const e of events) {
     switch (e.type) {
       case 'melee_weapon': {
@@ -490,7 +513,10 @@ export function buildStats(events, playerNameHint) {
           // attack, so they share one label rather than inventing a second
           // name for the identical concept.
           const p = petBucket(e.name); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.hits++;
-          bump(p.bySource, 'Proc', e.dmg, false);
+          const castAt = petLastCastAt[e.name];
+          const label = castAt != null && e.clock != null && e.clock - castAt <= PET_SPELL_WINDOW_MS ? 'Spell' : 'Proc';
+          petLastLabel[e.name] = label;
+          bump(p.bySource, label, e.dmg, false);
         } else {
           bump(dmgOutBySource, e.name, e.dmg, false);
           if (e.target) bump(dmgOutByTarget, e.target, e.dmg, false);
@@ -510,7 +536,7 @@ export function buildStats(events, playerNameHint) {
           // actually distinguishable from a pet's proc-spell crit — it
           // isn't, in the log text itself.
           const p = petBucket(e.name); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.crits++;
-          bump(p.bySource, 'Melee', e.dmg, true);
+          bump(p.bySource, petLastLabel[e.name] || 'Melee', e.dmg, true);
         } else {
           bump(dmgOutBySource, e.name, e.dmg, true);
           if (e.target) bump(dmgOutByTarget, e.target, e.dmg, true);
@@ -521,19 +547,21 @@ export function buildStats(events, playerNameHint) {
 
       case 'pet_melee': {
         const p = petBucket(e.pet); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.hits++;
+        petLastLabel[e.pet] = 'Melee';
         bump(p.bySource, 'Melee', e.dmg, false);
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
       case 'pet_melee_stray': {
         const p = petBucket(e.pet); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.hits++;
+        petLastLabel[e.pet] = 'Melee (stray)';
         bump(p.bySource, 'Melee (stray)', e.dmg, false);
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
       case 'pet_hit': {
         const p = petBucket(e.pet); p.dmg += e.dmg; p.points.push({ clock: e.clock, amount: e.dmg }); p.hits++;
-        bump(p.bySource, 'Proc', e.dmg, false);
+        bump(p.bySource, 'Damage add', e.dmg, false); // singular "hit" -- the damage-add buff, see above
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
@@ -546,6 +574,7 @@ export function buildStats(events, playerNameHint) {
         // yours (via a summon/melee/self-heal line) — a BG log is full of
         // other players' pets casting the same generic "The X casts a
         // spell!" text, and we don't want those miscounted as yours.
+        if (e.clock != null) petLastCastAt[e.pet] = e.clock;
         if (petNames.has(e.pet)) petBucket(e.pet).spellsCast++;
         break;
       }

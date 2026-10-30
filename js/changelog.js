@@ -12,6 +12,16 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Pets tab: clearer damage types',
+    bullets: [
+      'A pet\'s spell damage (e.g. a dread lich\'s nuke right after "casts a spell!") now shows as Spell instead of Proc',
+      'The damage-add buff hits ("Your bonerazer hit X for N damage!") now show as Damage add instead of Proc',
+      'A pet\'s crit is added to the same type as the hit it followed, instead of always to Melee',
+      'Caster pets that only ever cast (e.g. a bone warmage) are now recognised as pets -- their damage was being counted as yours',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Cleaner /bg center ticker',
     bullets: [
       'Guild info (/gc info), alliance/guild messages, and any line starting with "You" or "Your" no longer show up as /bg center callouts -- those are the game talking to you, not someone\'s broadcast',
