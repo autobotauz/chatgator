@@ -14,6 +14,7 @@ import { escHtml, heraldLink } from './ui.js';
 import { iconHtml } from './icons.js';
 import { GroupSummarizer, TICK_MS } from './bask-summary.js';
 import * as net from './bask-net.js';
+import { saveHandle, loadHandle, forgetHandle } from './bask-store.js';
 
 const CL_COOLDOWNS = Object.fromEntries(
   Object.entries(CL_ABILITY_DATABASE)
@@ -58,6 +59,8 @@ const S = {
   banned: [],            // names the leader banned
   lastLeader: undefined,
   booted: false,
+  resume: null,          // { player, handle } while a refreshed page waits to resume sharing
+  loopGen: 0,
 };
 
 const now = () => (S.mode === 'offline' ? S.exportedAt : Date.now());
@@ -197,6 +200,8 @@ function memberKeyFor(code, player) {
   return entry.key;
 }
 
+function hasMemberKey(code, player) { return !!loadKeys()[`${code}|${player.toLowerCase()}`]; }
+
 function loadSaved() { try { return JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch { return null; } }
 function save(v) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(v)); } catch { /* ignore */ } }
 
@@ -249,7 +254,9 @@ async function startLive(handle, player) {
   S.summarizer = summarizer;
   S.watcher = watcher;
   S.lastSent = Date.now(); summarizer.changed = false;
-  save({ code: S.code, player });
+  S.resume = null; S.booted = false;
+  save({ code: S.code, player, mode: 'live' });
+  saveHandle(S.code, handle);
   enterBask();
 }
 
@@ -323,14 +330,20 @@ function onBooted() {
   S.mode = 'spectate'; // keep showing the group, just stop sharing
   show('watchStatus', false);
   S.syncError = null;
+  save({ code: S.code, mode: 'spectate' });
+  forgetHandle(S.code);
   renderAll();
   S.syncTimer = setTimeout(syncLoop, SYNC_MS);
 }
 
+// Only the newest loop keeps running (resuming sharing restarts it while a
+// poll from the old one may still be in flight).
 async function syncLoop() {
   clearTimeout(S.syncTimer);
+  const gen = ++S.loopGen;
   if (S.mode === 'live') await upload();
   if (S.mode === 'live' || S.mode === 'spectate') await poll();
+  if (gen !== S.loopGen) return;
   renderAll();
   if (S.mode === 'live' || S.mode === 'spectate') S.syncTimer = setTimeout(syncLoop, SYNC_MS);
 }
@@ -350,11 +363,74 @@ function enterBask() {
   syncLoop();
 }
 
-function leave() {
+async function leave() {
   if (S.watcher) S.watcher.stop();
   clearTimeout(S.syncTimer); clearInterval(S.clockTimer);
   try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ }
+  if (S.code) await forgetHandle(S.code);
   location.href = location.pathname;
+}
+
+// ---------------------------------------------------------------------------
+// coming back after a refresh
+// ---------------------------------------------------------------------------
+// Straight back into the bask: watching resumes by itself; sharing resumes by
+// itself too when Chrome still allows reading the file, otherwise one click
+// on "Resume sharing" (browsers require a click before a reloaded page may
+// read a file again).
+async function resumeSaved(saved) {
+  let session = null;
+  try { session = await net.getSession(saved.code); } catch { return false; }
+  if (!session) { try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ } forgetHandle(saved.code); return false; }
+  S.code = session.code; S.session = session;
+  if (saved.mode === 'live' && saved.player && isWatchSupported()) {
+    const handle = await loadHandle(S.code);
+    S.resume = { player: saved.player, handle };
+    if (handle && typeof handle.queryPermission === 'function') {
+      try {
+        if (await handle.queryPermission({ mode: 'read' }) === 'granted') {
+          await startLive(handle, saved.player);
+          return true;
+        }
+      } catch { /* fall through to the button */ }
+    }
+    S.mode = 'spectate';
+    showResume();
+    enterBask();
+    return true;
+  }
+  S.mode = 'spectate';
+  enterBask();
+  return true;
+}
+
+function showResume(msg) {
+  if (!S.resume) { show('resumeBanner', false); return; }
+  el('resumeText').innerHTML = msg || `You're still in this bask as <strong>${esc(S.resume.player)}</strong>, but your numbers aren't being shared since the page reloaded.`;
+  el('btnResume').textContent = S.resume.handle ? '▶ Resume sharing' : '▶ Pick my chat.log to resume';
+  show('resumeBanner', true);
+}
+
+async function resumeSharing() {
+  const r = S.resume;
+  if (!r) return;
+  el('btnResume').disabled = true;
+  try {
+    let handle = r.handle;
+    if (handle && typeof handle.requestPermission === 'function') {
+      if (await handle.requestPermission({ mode: 'read' }) !== 'granted') handle = null;
+    }
+    if (!handle) {
+      try { [handle] = await window.showOpenFilePicker({ types: [{ description: 'DAoC chat log', accept: { 'text/plain': ['.log', '.txt'] } }] }); }
+      catch { return; } // cancelled
+    }
+    await startLive(handle, r.player);
+    show('resumeBanner', false);
+  } catch (err) {
+    showResume(`Couldn't resume sharing as <strong>${esc(r.player)}</strong>: ${esc(err.message || String(err))}`);
+  } finally {
+    el('btnResume').disabled = false;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -844,6 +920,16 @@ el('nameForm').addEventListener('submit', async (ev) => {
   const name = el('playerName').value.trim();
   if (!name) { setError('joinError', 'Enter your character name first.'); el('playerName').focus(); return; }
   if (!isWatchSupported()) return;
+  // Someone is already sharing under this name, and it isn't this browser.
+  if (!hasMemberKey(S.code, name)) {
+    try {
+      const m = await net.fetchMember(S.code, name);
+      if (m && !m.left_at && Date.now() - Date.parse(m.updated_at) < 5 * 60000) {
+        setError('joinError', `${m.player} is already in this bask. Pick your own character name.`);
+        return;
+      }
+    } catch { /* the server checks again on join */ }
+  }
   let handle;
   try {
     [handle] = await window.showOpenFilePicker({ types: [{ description: 'DAoC chat log', accept: { 'text/plain': ['.log', '.txt'] } }] });
@@ -856,8 +942,10 @@ el('nameForm').addEventListener('submit', async (ev) => {
 
 el('btnSpectate').addEventListener('click', () => {
   S.mode = 'spectate';
+  save({ code: S.code, mode: 'spectate' });
   enterBask();
 });
+el('btnResume').addEventListener('click', resumeSharing);
 
 el('roster').addEventListener('click', async (ev) => {
   const b = ev.target.closest('[data-boot],[data-ban]');
@@ -929,5 +1017,11 @@ el('btnLeave').addEventListener('click', () => {
     return;
   }
   const code = net.normalizeCode(new URLSearchParams(location.search).get('code'));
-  if (net.CODE_RE.test(code)) { el('joinCode').value = code; goJoinStep(code); }
+  if (!net.CODE_RE.test(code)) return;
+  el('joinCode').value = code;
+  const saved = loadSaved();
+  (async () => {
+    if (saved && saved.code === code && saved.mode && await resumeSaved(saved)) return;
+    goJoinStep(code);
+  })();
 })();

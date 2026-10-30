@@ -102,3 +102,11 @@
   background: var(--surface-0); color: var(--text-primary); width: 14em; max-width: 100%;
 }
 .ban-form { max-width: 340px; }
+
+/* ---------- resume after a refresh ---------- */
+.resume-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap;
+  margin: 0 0 12px; padding: 10px 14px; border-radius: var(--radius);
+  background: color-mix(in srgb, var(--series-1) 10%, var(--surface-1)); border: 1px solid color-mix(in srgb, var(--series-1) 35%, var(--border));
+  font-size: 13.5px;
+}

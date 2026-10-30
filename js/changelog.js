@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-29',
+    title: 'Bask: survives a page refresh, and names are taken',
+    bullets: [
+      'Refreshing the Bask page now puts you straight back in your bask. If you were sharing, one click on Resume sharing picks your log back up (or it resumes by itself if Chrome is set to always allow the file)',
+      'You can no longer join as a name someone else is actively using -- you will see "Hebor is already in this bask". The real player can still rejoin from their own browser, or from anywhere once their old page has been quiet for 5 minutes',
+    ],
+  },
+  {
+    date: '2026-10-29',
     title: 'Bask: a leader who can boot, ban and unban',
     bullets: [
       'The first player to join a bask leads it (👑 in the roster) and gets boot and ban buttons on everyone else',

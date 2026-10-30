@@ -85,9 +85,11 @@ create trigger bask_ticks_touch before insert or update on public.bask_ticks
 
 -- Session must be alive, the name not banned, and at most 8 active players
 -- per code. Runs as definer so the count sees every member regardless of RLS.
--- On update joined_at and key_hash are pinned, so an upsert can't rewrite
--- history or take over someone's seat -- except when a player who left
--- rejoins: they go to the back of the line with a fresh secret.
+-- A name someone is actively using (written in the last 5 minutes) can't be
+-- joined from another browser: different secret = "already in this bask".
+-- A seat quiet for 5+ minutes can be reclaimed (the real player on another
+-- computer). joined_at is pinned, except a player who left and rejoins goes
+-- to the back of the line.
 create or replace function public.bask_member_guard() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare rejoining boolean;
@@ -97,6 +99,11 @@ begin
   end if;
   if exists (select 1 from bask_banned b where b.code = new.code and lower(b.player) = lower(new.player)) then
     raise exception 'The bask leader banned % from this bask.', new.player using errcode = 'P0001';
+  end if;
+  if tg_op = 'INSERT' and exists (select 1 from bask_members m where m.code = new.code
+       and lower(m.player) = lower(new.player) and m.player <> new.player
+       and m.left_at is null and m.updated_at > now() - interval '5 minutes') then
+    raise exception '% is already in this bask.', new.player using errcode = 'P0001';
   end if;
   rejoining := tg_op = 'UPDATE' and old.left_at is not null and new.left_at is null;
   if tg_op = 'INSERT' or rejoining then
@@ -111,7 +118,11 @@ begin
       new.joined_at := now();
     else
       new.joined_at := old.joined_at;
-      new.key_hash := coalesce(old.key_hash, new.key_hash);
+      if old.key_hash is not null and new.key_hash is distinct from old.key_hash
+         and old.updated_at > now() - interval '5 minutes' then
+        raise exception '% is already in this bask.', new.player using errcode = 'P0001';
+      end if;
+      new.key_hash := coalesce(new.key_hash, old.key_hash);
     end if;
   end if;
   return new;

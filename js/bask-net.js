@@ -129,9 +129,11 @@ export async function updateMember(code, player, totals) {
   return Array.isArray(rows) && rows.length > 0;
 }
 
+// Case-insensitive: "dexii" finds Dexii (the server treats them as one name).
 export async function fetchMember(code, player) {
-  const rows = await rest(`bask_members?code=eq.${encodeURIComponent(code)}&player=eq.${encodeURIComponent(player)}&select=player,joined_at,updated_at,left_at,totals`);
-  return rows[0] || null;
+  const pattern = String(player).replace(/[\\%_]/g, (c) => `\\${c}`);
+  const rows = await rest(`bask_members?code=eq.${encodeURIComponent(code)}&player=ilike.${encodeURIComponent(pattern)}&select=player,joined_at,updated_at,left_at,totals`);
+  return rows.find((r) => r.player === player) || rows[0] || null;
 }
 
 // ---- time buckets -------------------------------------------------------------

@@ -106,6 +106,11 @@ of the line. Each player's browser proves who it is with a per-join secret
 (only its SHA-256 is stored). A booted player's page notices, stops sharing
 and offers to rejoin.
 
+A name that's actively in a bask (written in the last 5 minutes) can't be
+joined from another browser. Refreshing the page puts you back in your bask;
+sharing resumes with one click (the chat.log file handle is kept in
+IndexedDB, `js/bask-store.js`).
+
 Everything is ephemeral: a bask expires 48 hours after its code is created,
 is hidden the moment it expires, and is deleted by an hourly `pg_cron` job.
 **Download bask** saves a file that opens again later on the same page
