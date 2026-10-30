@@ -26,9 +26,8 @@ const SYNC_MS = 10000;          // upload + poll cadence
 const HEARTBEAT_MS = 60000;     // re-send totals this often even when idle
 const QUIET_MS = 90000;         // no update for this long = "quiet"
 const CURSOR_OVERLAP_MS = 15000;
-const SESSION_CHECK_MS = 5 * 60000;
 const SAVE_KEY = 'chatgator:bask';
-const HOSTS_KEY = 'chatgator:bask-hosts'; // code -> leader secret, for baskets this browser created
+const KEYS_KEY = 'chatgator:bask-keys';  // `${code}|${player}` -> this browser's per-join secret
 
 const el = (id) => document.getElementById(id);
 const show = (id, on = true) => { el(id).hidden = !on; };
@@ -53,9 +52,11 @@ const S = {
   feed: [], feedKeys: new Set(),
   summarizer: null, watcher: null, parseState: null,
   lastSent: 0, lastChecked: null, lastNewLines: null, syncError: null,
-  syncTimer: null, clockTimer: null, lastSessionCheck: 0,
+  syncTimer: null, clockTimer: null,
   tab: 'overview', metric: 'do',
-  hostKey: null,         // set when this browser created the bask (leader)
+  memberKey: null,       // secret proving we're S.player (leader actions, leaving)
+  banned: [],            // names the leader banned
+  lastLeader: undefined,
   booted: false,
 };
 
@@ -105,9 +106,11 @@ function mergeMembers(rows) {
     const player = str(r.player, 40);
     if (!player) continue;
     const isNew = !S.members.has(player);
-    S.members.set(player, { player, joined_at: r.joined_at, updated_at: r.updated_at, totals: cleanTotals(r.totals) });
-    if (isNew) {
-      S.order.push(player);
+    const wasLeft = !isNew && !!S.members.get(player).left_at;
+    S.members.set(player, { player, joined_at: r.joined_at, updated_at: r.updated_at, left_at: r.left_at || null, totals: cleanTotals(r.totals) });
+    if (r.left_at && !wasLeft) pushFeed(`leftvol:${player}:${r.left_at}`, Date.parse(r.left_at), `👋 <strong>${esc(player)}</strong> left the bask`);
+    if (isNew || (wasLeft && !r.left_at)) {
+      if (isNew) S.order.push(player);
       S.order.sort((a, b) => Date.parse(S.members.get(a).joined_at) - Date.parse(S.members.get(b).joined_at));
       pushFeed(`join:${player}:${r.joined_at}`, Date.parse(r.joined_at), `🐊 <strong>${esc(player)}</strong> slid into the bask`);
     }
@@ -167,8 +170,6 @@ async function goJoinStep(code, { fresh = null } = {}) {
   }
   if (!session) { setError('lobbyError', `No bask with code ${code} — it may have expired (a bask lasts 48 hours).`); return; }
   S.code = session.code; S.session = session;
-  S.hostKey = hostKeyFor(S.code);
-  show('leaderNote', !!S.hostKey);
   history.replaceState(null, '', `?code=${S.code}`);
   el('joinCodeShow').textContent = S.code;
   el('joinExpires').textContent = fmtExpires(session.expires_at);
@@ -180,15 +181,21 @@ async function goJoinStep(code, { fresh = null } = {}) {
   el('playerName').focus();
 }
 
-function loadHosts() { try { return JSON.parse(localStorage.getItem(HOSTS_KEY) || '{}') || {}; } catch { return {}; } }
-function saveHost(code, key) {
-  const hosts = loadHosts();
-  hosts[code] = { key, at: Date.now() };
-  // Keep it small: a bask lasts 48h, so anything older than a few days is dead.
-  for (const [c, v] of Object.entries(hosts)) if (!v || Date.now() - v.at > 4 * 86400000) delete hosts[c];
-  try { localStorage.setItem(HOSTS_KEY, JSON.stringify(hosts)); } catch { /* ignore */ }
+function loadKeys() { try { return JSON.parse(localStorage.getItem(KEYS_KEY) || '{}') || {}; } catch { return {}; } }
+// Reuse the same secret for the same name in the same bask (page refresh),
+// so a leader who reloads is still recognized as themselves.
+function memberKeyFor(code, player) {
+  const keys = loadKeys();
+  const id = `${code}|${player.toLowerCase()}`;
+  let entry = keys[id];
+  if (!entry || !entry.key) entry = { key: net.newMemberKey() };
+  entry.at = Date.now();
+  keys[id] = entry;
+  // A bask lasts 48h, so anything older than a few days is dead.
+  for (const [k, v] of Object.entries(keys)) if (!v || Date.now() - v.at > 4 * 86400000) delete keys[k];
+  try { localStorage.setItem(KEYS_KEY, JSON.stringify(keys)); } catch { /* ignore */ }
+  return entry.key;
 }
-function hostKeyFor(code) { const v = loadHosts()[code]; return v && v.key ? v.key : null; }
 
 function loadSaved() { try { return JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch { return null; } }
 function save(v) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(v)); } catch { /* ignore */ } }
@@ -228,15 +235,16 @@ async function startLive(handle, player) {
 
   // Rejoining (page refresh, came back later): carry on from what the
   // server already has for this name instead of starting over at zero.
+  const memberKey = memberKeyFor(S.code, player);
   try {
     const existing = await net.fetchMember(S.code, player);
     if (existing) summarizer.restore(existing.totals);
-    await net.upsertMember(S.code, player, summarizer.snapshot());
+    await net.upsertMember(S.code, player, summarizer.snapshot(), memberKey);
   } catch (err) {
     watcher.stop();
     throw err;
   }
-  S.mode = 'live'; S.player = player;
+  S.mode = 'live'; S.player = player; S.memberKey = memberKey;
   S.parseState = r.state;
   S.summarizer = summarizer;
   S.watcher = watcher;
@@ -290,11 +298,15 @@ async function poll() {
     ]);
     mergeMembers(members);
     mergeTicks(ticks);
-    if (Date.now() - S.lastSessionCheck > SESSION_CHECK_MS) {
-      S.lastSessionCheck = Date.now();
-      const s = await net.getSession(S.code);
-      if (!s) S.syncError = 'This bask has expired — download it now if you want to keep it.';
-      else S.session = s;
+    const [s, banned] = await Promise.all([net.getSession(S.code), net.fetchBanned(S.code)]);
+    S.banned = banned;
+    if (!s) S.syncError = 'This bask has expired — download it now if you want to keep it.';
+    else {
+      S.session = s;
+      if (S.lastLeader !== undefined && s.leader && s.leader !== S.lastLeader) {
+        pushFeed(`leader:${s.leader}:${Date.now()}`, Date.now(), `👑 <strong>${esc(s.leader)}</strong> is now the bask leader`);
+      }
+      S.lastLeader = s.leader || null;
     }
     if (S.mode === 'spectate') S.syncError = null;
   } catch (err) {
@@ -389,6 +401,9 @@ async function openSavedFile(file) {
   mergeTicks(doc.ticks);
   enterBask();
 }
+
+const isLeader = () => S.mode === 'live' && !S.booted && !!S.player && S.session?.leader === S.player;
+const isActive = (p) => !S.members.get(p)?.left_at;
 
 // ---------------------------------------------------------------------------
 // derived group numbers
@@ -521,32 +536,50 @@ function renderBar() {
   }
   if (S.syncError) { me.innerHTML = `<span class="bask-error">⚠️ ${esc(S.syncError)}</span>`; return; }
   if (S.mode === 'live') {
-    me.innerHTML = `${S.hostKey ? '👑 Leader · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)} · sent ${ago(S.lastSent)}`;
+    me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)} · sent ${ago(S.lastSent)}`;
   } else if (S.mode === 'spectate') {
-    me.textContent = `${S.hostKey ? '👑 Leader · ' : ''}Just watching · updates every 10 seconds`;
+    me.textContent = `Just watching · updates every 10 seconds${S.session?.leader ? ` · 👑 ${S.session.leader} leads` : ''}`;
   } else {
     me.textContent = `${S.order.length} player${S.order.length === 1 ? '' : 's'} in this saved bask`;
   }
 }
 
 function renderRoster() {
-  const open = 8 - S.order.length;
+  const open = 8 - S.order.filter(isActive).length;
+  const leader = S.session?.leader;
   el('roster').innerHTML = S.order.map((p) => {
     const m = S.members.get(p);
-    const quiet = S.mode !== 'offline' && Date.now() - Date.parse(m.updated_at) > QUIET_MS;
+    const left = !!m.left_at;
+    const quiet = !left && S.mode !== 'offline' && Date.now() - Date.parse(m.updated_at) > QUIET_MS;
     const t = m.totals;
-    return `<li class="roster-chip${quiet ? ' quiet' : ''}" title="${quiet ? 'No update from this player for a while — not playing, or their log or browser tab is idle.' : 'Sharing live'}">
+    const title = left ? 'Left the bask. Their numbers so far stay in the group view.'
+      : quiet ? 'No update from this player for a while — not playing, or their log or browser tab is idle.' : 'Sharing live';
+    return `<li class="roster-chip${quiet || left ? ' quiet' : ''}" title="${title}">
       <span class="roster-dot" style="background:${playerColor(p)}"></span>
-      <span class="roster-name">${esc(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}</span>
+      <span class="roster-name">${p === leader && !left && S.mode !== 'offline' ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}</span>
       <span class="roster-stats">⚔ ${fmtNum(t.dmgOut.total)} · ✚ ${fmtNum(t.healOut.total)}</span>
-      ${quiet ? '<span class="roster-quiet">quiet</span>' : ''}
-      ${S.hostKey && S.mode !== 'offline' && p !== S.player ? `<span class="roster-actions">
+      ${left ? '<span class="roster-quiet">left</span>' : quiet ? '<span class="roster-quiet">quiet</span>' : ''}
+      ${isLeader() && p !== S.player ? `<span class="roster-actions">
         <button class="roster-act" data-boot="${esc(p)}" title="Boot ${esc(p)}: removes them and their numbers from the bask. They can join again.">🥾</button>
         <button class="roster-act" data-ban="${esc(p)}" title="Ban ${esc(p)}: removes them and keeps that name out of this bask.">⛔</button>
       </span>` : ''}
     </li>`;
   }).join('') + (S.mode !== 'offline' && open > 0 ? `<li class="roster-chip empty-slot">${open} open spot${open === 1 ? '' : 's'}</li>` : '');
+  renderBanned();
   el('feed').innerHTML = S.feed.map((f) => `<li><span class="feed-time">${fmtTimeSec(f.at)}</span> ${f.html}</li>`).join('');
+}
+
+// Who's banned, and (for the leader) unban / ban-by-name.
+function renderBanned() {
+  const box = el('bannedBox');
+  const lead = isLeader();
+  if (S.mode === 'offline' || (!S.banned.length && !lead)) { box.hidden = true; return; }
+  box.hidden = false;
+  el('bannedCount').textContent = S.banned.length ? `(${S.banned.length})` : '';
+  el('bannedList').innerHTML = S.banned.length
+    ? S.banned.map((n) => `<li><span>${esc(n)}</span>${lead ? ` <button class="btn btn-small" data-unban="${esc(n)}">Unban</button>` : ''}</li>`).join('')
+    : '<li class="sub">Nobody is banned.</li>';
+  show('banForm', lead);
 }
 
 // ---------------------------------------------------------------------------
@@ -785,12 +818,7 @@ document.querySelector('.tabbar').addEventListener('click', (ev) => {
 
 el('btnCreate').addEventListener('click', async (ev) => {
   const btn = ev.currentTarget; btn.disabled = true;
-  try {
-    const key = net.newHostKey();
-    const s = await net.createSession(key);
-    saveHost(s.code, key);
-    await goJoinStep(s.code, { fresh: s });
-  }
+  try { const s = await net.createSession(); await goJoinStep(s.code, { fresh: s }); }
   catch (err) { setError('lobbyError', `Couldn't create a bask: ${err.message}`); }
   finally { btn.disabled = false; }
 });
@@ -833,7 +861,7 @@ el('btnSpectate').addEventListener('click', () => {
 
 el('roster').addEventListener('click', async (ev) => {
   const b = ev.target.closest('[data-boot],[data-ban]');
-  if (!b || !S.hostKey) return;
+  if (!b || !isLeader()) return;
   const ban = b.hasAttribute('data-ban');
   const player = ban ? b.dataset.ban : b.dataset.boot;
   const msg = ban
@@ -842,7 +870,8 @@ el('roster').addEventListener('click', async (ev) => {
   if (!confirm(msg)) return;
   b.disabled = true;
   try {
-    await net.kickPlayer(S.code, S.hostKey, player, ban);
+    await net.kickPlayer(S.code, S.player, S.memberKey, player, ban);
+    if (ban && !S.banned.includes(player)) S.banned.push(player);
     pruneMembers(S.order.filter((p) => p.toLowerCase() !== player.toLowerCase()), ban ? player : null);
     renderAll();
   } catch (err) {
@@ -852,9 +881,43 @@ el('roster').addEventListener('click', async (ev) => {
   }
 });
 
+el('bannedList').addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-unban]');
+  if (!b || !isLeader()) return;
+  const player = b.dataset.unban;
+  b.disabled = true;
+  try {
+    await net.unbanPlayer(S.code, S.player, S.memberKey, player);
+    S.banned = S.banned.filter((n) => n.toLowerCase() !== player.toLowerCase());
+    pushFeed(`unban:${player}:${Date.now()}`, Date.now(), `✅ <strong>${esc(player)}</strong> was unbanned`);
+    renderRoster();
+  } catch (err) { S.syncError = `Couldn't unban ${player}: ${err.message}`; b.disabled = false; renderBar(); }
+});
+
+el('banForm').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const input = el('banName');
+  const player = input.value.trim();
+  if (!player || !isLeader()) return;
+  if (player.toLowerCase() === S.player.toLowerCase()) { S.syncError = "You can't ban yourself."; renderBar(); return; }
+  if (!confirm(`Ban ${player}? If they're in the bask their numbers are removed, and that name can't join until you unban it.`)) return;
+  try {
+    await net.kickPlayer(S.code, S.player, S.memberKey, player, true);
+    if (!S.banned.some((n) => n.toLowerCase() === player.toLowerCase())) S.banned.push(player);
+    pruneMembers(S.order.filter((p) => p.toLowerCase() !== player.toLowerCase()), player);
+    input.value = '';
+    renderAll();
+  } catch (err) { S.syncError = `Couldn't ban ${player}: ${err.message}`; renderBar(); }
+});
+
 el('btnDownload').addEventListener('click', exportBask);
 el('btnLeave').addEventListener('click', () => {
-  if (S.mode === 'live' && !confirm('Stop sharing and leave this bask? Your numbers so far stay in it until it expires.')) return;
+  if (S.mode === 'live' && !S.booted) {
+    const extra = isLeader() ? ' The next player in line becomes the leader.' : '';
+    if (!confirm(`Stop sharing and leave this bask? Your numbers so far stay in it, and your spot opens up.${extra}`)) return;
+    net.leaveBask(S.code, S.player, S.memberKey).catch(() => {}).finally(leave);
+    return;
+  }
   leave();
 });
 

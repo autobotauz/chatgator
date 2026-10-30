@@ -12,12 +12,12 @@
 export const CHANGELOG = [
   {
     date: '2026-10-29',
-    title: 'Bask: leaders can boot or ban',
+    title: 'Bask: a leader who can boot, ban and unban',
     bullets: [
-      'Whoever created a bask is its leader and gets two buttons on each player in the roster',
+      'The first player to join a bask leads it (👑 in the roster) and gets boot and ban buttons on everyone else',
       'Boot (🥾) removes a player and their numbers -- handy when someone logged off but left their page sharing. They can join again any time',
-      'Ban (⛔) does the same and keeps that name out of the bask',
-      'Leadership stays with the browser that created the bask',
+      'Ban (⛔) also keeps that name out. A new Banned players list shows who is banned; the leader can unban there, or ban a name before they even join',
+      'Leave now frees your spot and keeps your numbers in the group view. If the leader leaves (or goes quiet for 5 minutes) the next player in line takes over; rejoining puts you at the back of the line',
     ],
   },
   {

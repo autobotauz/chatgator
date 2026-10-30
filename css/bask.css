@@ -89,3 +89,16 @@
 }
 
 .cd-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ---------- banned players ---------- */
+.banned-box { margin: 0 0 10px; font-size: 13px; }
+.banned-box summary { cursor: pointer; color: var(--text-secondary); width: fit-content; }
+.banned-list { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.banned-list li { display: flex; align-items: center; gap: 6px; padding: 3px 4px 3px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-1); }
+.banned-list li.sub { border: none; background: none; padding-left: 0; }
+.btn-small { font-size: 12px; padding: 2px 8px; border-radius: 999px; }
+.ban-form #banName {
+  font: inherit; font-size: 13px; padding: 5px 9px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface-0); color: var(--text-primary); width: 14em; max-width: 100%;
+}
+.ban-form { max-width: 340px; }
