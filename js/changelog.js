@@ -14,8 +14,8 @@ export const CHANGELOG = [
     date: '2026-10-31',
     title: 'New: resurrects & demezzes on the Healing tab',
     bullets: [
-      'Counts your resurrects (including Perfect Recovery) and demezzes, with a list of each one -- when, which spell, and who you had targeted',
-      'Also shows how many times you were resurrected, and by whom',
+      'Same layout as Bask: Resurrections and Cure mezz sections showing who rezzed whom, with a table of each one',
+      'Covers rezzes you cast (including Perfect Recovery) and rezzes you received; your side shows who you had targeted, since the log doesn\'t say who it landed on',
     ],
   },
   {

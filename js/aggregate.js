@@ -749,7 +749,9 @@ export function buildStats(events, playerNameHint) {
   const supportCasts = [];
   {
     let curTarget = null, curTargetAt = null;
+    const hitTargets = new Set(); // anyone you've damaged -- never your rez/demez target (same rule as Bask)
     for (const e of events) {
+      if ((e.type === 'melee_weapon' || e.type === 'melee_plain' || e.type === 'ability_hit') && e.target) hitTargets.add(e.target);
       // only a player-shaped name (one capitalised word) -- "the walking tree"
       // is a mob you'd targeted, never who you rezzed/demezzed
       if (e.type === 'target') {
@@ -760,7 +762,7 @@ export function buildStats(events, playerNameHint) {
         const kind = supportKind(e.name);
         if (kind) supportCasts.push({
           clock: e.clock, kind, spell: e.name, failed: false,
-          target: curTarget && e.clock != null && curTargetAt != null && e.clock - curTargetAt <= 30000 ? curTarget : null,
+          target: curTarget && !hitTargets.has(curTarget) && e.clock != null && curTargetAt != null && e.clock - curTargetAt <= 30000 ? curTarget : null,
         });
       } else if (e.type === 'cast_failed' && e.spellName) {
         const c = [...supportCasts].reverse().find(s => s.spell === e.spellName);
@@ -1121,6 +1123,13 @@ export function buildStats(events, playerNameHint) {
       demezzes: landedSupport.filter(c => c.kind === 'Demez').length,
       casts: landedSupport,
       resurrectedBy,
+      // Same shape as Bask's Healing page: every rez from both sides --
+      // ones you cast (on your target) and ones you received.
+      rezzes: [
+        ...landedSupport.filter(c => c.kind === 'Resurrect').map(c => ({ clock: c.clock, by: playerName || 'You', on: c.target, spell: c.spell })),
+        ...resurrectedBy.map(r => ({ clock: r.clock, by: r.by, on: playerName || 'You', spell: null })),
+      ].sort((a, b) => a.clock - b.clock),
+      cures: landedSupport.filter(c => c.kind === 'Demez').map(c => ({ clock: c.clock, on: c.target, spell: c.spell })),
     },
     castCountByName,
     castFailedByName,
