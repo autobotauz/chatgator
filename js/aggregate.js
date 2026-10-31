@@ -729,6 +729,48 @@ export function buildStats(events, playerNameHint) {
     abilityTimeline.sort((a, b) => a.clock - b.clock);
   }
 
+  // ---- resurrects & demezzes (Healing tab) --------------------------------
+  // Neither leaves a "you resurrected X" / "X wakes up" line of its own, so
+  // they're counted from your casts by ability type (ABILITY_DATABASE
+  // 'Resurrect' / 'Cure Mezz', plus the Perfect Recovery realm ability,
+  // which has no type there). Checked against /stats in a real cleric log:
+  // 2 rez casts before the 2nd /stats ("Resurrections performed: 2"), 2
+  // more before the 3rd ("4"). A cast that fizzled (cast_failed) doesn't
+  // count. `target` is whoever you had selected ("You target [X]") within
+  // 30s before the cast -- a guess for a group/PBAoE demez, so it's labelled
+  // as your target at the time, not who it landed on.
+  const REZ_REALM_ABILITIES = new Set(['Perfect Recovery']);
+  const supportKind = (name) => {
+    const t = ABILITY_DATABASE[name]?.type;
+    if (t === 'Resurrect' || REZ_REALM_ABILITIES.has(name)) return 'Resurrect';
+    if (t === 'Cure Mezz') return 'Demez';
+    return null;
+  };
+  const supportCasts = [];
+  {
+    let curTarget = null, curTargetAt = null;
+    for (const e of events) {
+      // only a player-shaped name (one capitalised word) -- "the walking tree"
+      // is a mob you'd targeted, never who you rezzed/demezzed
+      if (e.type === 'target') {
+        if (/^[A-Z][a-z']+$/.test(e.target || '')) { curTarget = e.target; curTargetAt = e.clock; }
+        continue;
+      }
+      if (e.type === 'cast') {
+        const kind = supportKind(e.name);
+        if (kind) supportCasts.push({
+          clock: e.clock, kind, spell: e.name, failed: false,
+          target: curTarget && e.clock != null && curTargetAt != null && e.clock - curTargetAt <= 30000 ? curTarget : null,
+        });
+      } else if (e.type === 'cast_failed' && e.spellName) {
+        const c = [...supportCasts].reverse().find(s => s.spell === e.spellName);
+        if (c && e.clock - c.clock <= 4000) c.failed = true;
+      }
+    }
+  }
+  const landedSupport = supportCasts.filter(c => !c.failed);
+  const resurrectedBy = events.filter(e => e.type === 'resurrected_by').map(e => ({ clock: e.clock, by: e.healer }));
+
   const healInBySource = {};
   const healInPoints = [];
   let healInTotal = 0;
@@ -1074,6 +1116,12 @@ export function buildStats(events, playerNameHint) {
     kills: { deathblows, deaths, resurrectedCount, killVictims, deathblowLog, deathblowRpTotal, deathLog },
     spellsCast: Array.from(castNames),
     abilityTimeline,
+    support: {
+      resurrects: landedSupport.filter(c => c.kind === 'Resurrect').length,
+      demezzes: landedSupport.filter(c => c.kind === 'Demez').length,
+      casts: landedSupport,
+      resurrectedBy,
+    },
     castCountByName,
     castFailedByName,
     castAttemptedByName,

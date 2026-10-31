@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-31',
+    title: 'New: resurrects & demezzes on the Healing tab',
+    bullets: [
+      'Counts your resurrects (including Perfect Recovery) and demezzes, with a list of each one -- when, which spell, and who you had targeted',
+      'Also shows how many times you were resurrected, and by whom',
+    ],
+  },
+  {
+    date: '2026-10-31',
     title: 'New: @tag markers on the charts',
     bullets: [
       'Type "@tag <anything>" in any chat channel (e.g. in group chat: @tag koth) and a labelled line appears at that moment on every time chart -- Overview, Realm Points, Pets and the abilities timeline',

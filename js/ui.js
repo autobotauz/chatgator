@@ -328,6 +328,36 @@ export function heraldLink(name) {
 }
 
 // ===========================================================================
+// Resurrects & demezzes (aggregate.js stats.support) -- shown only when
+// there's something to show.
+function renderSupport(container, stats) {
+  const sup = stats.support;
+  if (!sup || (!sup.casts.length && !sup.resurrectedBy.length)) return;
+  const s = section(container);
+  h3(s, 'Resurrects & demezzes');
+  const g = grid(s, 3);
+  statTile(g, { label: 'Resurrects', value: fmtExact(sup.resurrects), title: 'Resurrect spells and Perfect Recovery you cast (fizzled casts not counted)' });
+  statTile(g, { label: 'Demezzes', value: fmtExact(sup.demezzes), title: 'Cure-mez spells you cast (fizzled casts not counted)' });
+  const byNames = [...new Set(sup.resurrectedBy.map(r => r.by))];
+  statTile(g, { label: 'You were resurrected', value: fmtExact(sup.resurrectedBy.length), sub: byNames.length ? `by ${byNames.join(', ')}` : '' });
+  if (sup.casts.length) {
+    const c = card(s);
+    const p = document.createElement('p');
+    p.className = 'sub';
+    p.textContent = 'The log doesn\'t say who a resurrect or demez landed on, so Target is whoever you had selected when you cast it, if anyone.';
+    c.appendChild(p);
+    dataTable(c, {
+      columns: [
+        { key: 'clock', label: 'Time', fmt: v => fmtClock(v, true) },
+        { key: 'kind', label: 'Type' },
+        { key: 'spell', label: 'Spell', html: (r) => `${iconHtml(r.spell)}${escHtml(r.spell)}` },
+        { key: 'target', label: 'Your target', fmt: v => (v ? heraldLink(v) : '—') },
+      ],
+      rows: sup.casts.map(c2 => ({ ...c2, name: c2.spell })),
+    });
+  }
+}
+
 export function renderHealing(container, stats, ctx) {
   clear(container);
   const g = grid(section(container), 4);
@@ -335,6 +365,8 @@ export function renderHealing(container, stats, ctx) {
   statTile(g, { label: 'HPS (this view)', value: fmtNum(stats.healOut.hps) });
   statTile(g, { label: 'Heal crit rate', value: stats.healOut.critRate + '%', sub: `${stats.healOut.crits} crit heals` });
   statTile(g, { label: 'Healing received', value: fmtNum(stats.healIn.total) });
+
+  renderSupport(container, stats);
 
   const spellSec = section(container);
   h3(spellSec, 'Healing done by spell');
