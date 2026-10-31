@@ -353,6 +353,30 @@ function timeFrame(container, { domain, idleGaps = [], id, width, height, pad, t
   return wrap;
 }
 
+// Vertical marker rules (deathblows, deaths, checkpoint seams, user tags).
+// Solid ones (checkpoint seams) go under dashed ones (events). Outside the
+// full view they're pinned to the nearest edge; outside a zoomed window
+// they're not drawn. A marker with `text` (a user @tag) also gets that text
+// written at the top of its line.
+function drawMarkers(svg, el, markers, { X, lo, hi, zoomed, top, bottom, labelY = top + 9 }) {
+  const visible = markers.filter(m => zoomed ? (m.t >= lo && m.t <= hi) : true);
+  [...visible.filter(m => m.solid), ...visible.filter(m => !m.solid)].forEach((m) => {
+    const mx = X(Math.min(hi, Math.max(lo, m.t)));
+    const rule = el('line', { x1: mx, x2: mx, y1: top, y2: bottom, stroke: m.color || 'var(--series-7)' });
+    if (m.solid) { rule.setAttribute('stroke-width', '1'); rule.setAttribute('opacity', '0.35'); }
+    else { rule.setAttribute('stroke-width', '1.5'); rule.setAttribute('stroke-dasharray', '3,3'); rule.setAttribute('opacity', '0.75'); }
+    svg.appendChild(rule);
+    if (m.text) {
+      const t = el('text', { x: mx + 3, y: labelY, 'font-size': 10, 'font-weight': 600, fill: m.color || 'var(--series-7)' });
+      t.textContent = m.text.length > 24 ? m.text.slice(0, 23) + '…' : m.text;
+      const title = el('title', {});
+      title.textContent = m.label || m.text;
+      t.appendChild(title);
+      svg.appendChild(t);
+    }
+  });
+}
+
 function emptyChart(container) {
   const div = document.createElement('div');
   div.className = 'empty-state';
@@ -438,17 +462,7 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
       }
       svg.appendChild(el('line', { x1: pad.left, x2: pad.left + innerW, y1: Y(0), y2: Y(0), stroke: 'var(--baseline)', 'stroke-width': 1 }));
 
-      // Markers: solid (checkpoint seams) under dashed (events). Outside the
-      // full view they're pinned to the nearest edge; outside a zoomed
-      // window they're simply not drawn.
-      const visible = markers.filter(m => zoomed ? (m.t >= lo && m.t <= hi) : true);
-      [...visible.filter(m => m.solid), ...visible.filter(m => !m.solid)].forEach((m) => {
-        const mx = X(Math.min(hi, Math.max(lo, m.t)));
-        const rule = el('line', { x1: mx, x2: mx, y1: pad.top, y2: pad.top + innerH, stroke: m.color || 'var(--series-7)' });
-        if (m.solid) { rule.setAttribute('stroke-width', '1'); rule.setAttribute('opacity', '0.35'); }
-        else { rule.setAttribute('stroke-width', '1.5'); rule.setAttribute('stroke-dasharray', '3,3'); rule.setAttribute('opacity', '0.75'); }
-        svg.appendChild(rule);
-      });
+      drawMarkers(svg, el, markers, { X, lo, hi, zoomed, top: pad.top, bottom: pad.top + innerH });
 
       const crosshair = el('line', { y1: pad.top, y2: pad.top + innerH, stroke: 'var(--baseline)', 'stroke-width': 1 });
       crosshair.style.display = 'none';
@@ -487,7 +501,7 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
 // vertically (within the row) so simultaneous uses stay visible as more
 // than one dot.
 // ---------------------------------------------------------------------------
-export function dotTimelineChart(container, { rows, dots, domain, idleGaps = [], id, width = 1040, rowHeight = 20, labelWidth = 170, dotTooltip, timeFmt }) {
+export function dotTimelineChart(container, { rows, dots, domain, idleGaps = [], id, width = 1040, rowHeight = 20, labelWidth = 170, dotTooltip, timeFmt, markers = [] }) {
   const dom = rawDomain(domain, dots);
   if (!dots.length || !rows.length || !dom) return emptyChart(container);
   const rowIndex = new Map(rows.map((r, i) => [r.name, i]));
@@ -496,7 +510,7 @@ export function dotTimelineChart(container, { rows, dots, domain, idleGaps = [],
 
   return timeFrame(container, {
     domain: dom, idleGaps, id, width, height, timeFmt, pad,
-    render: ({ svg, el, X, lo, hi, innerW, fmtT }) => {
+    render: ({ svg, el, X, lo, hi, innerW, fmtT, zoomed }) => {
       const rowY = (i) => pad.top + i * rowHeight + rowHeight / 2;
       // row stripes + labels
       rows.forEach((r, i) => {
@@ -509,6 +523,8 @@ export function dotTimelineChart(container, { rows, dots, domain, idleGaps = [],
         svg.appendChild(label);
       });
       svg.appendChild(el('line', { x1: pad.left, x2: pad.left, y1: pad.top, y2: pad.top + rows.length * rowHeight, stroke: 'var(--baseline)', 'stroke-width': 1 }));
+      // tag text goes just above the rows -- inside them it'd sit under the dots
+      drawMarkers(svg, el, markers, { X, lo, hi, zoomed, top: pad.top - 12, bottom: pad.top + rows.length * rowHeight, labelY: pad.top - 4 });
 
       // place dots; stack ones that would overlap within a row
       const R = 3.5;

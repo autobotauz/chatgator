@@ -921,6 +921,15 @@ export function buildStats(events, playerNameHint) {
   const durationMs = (startClock != null && endClock != null) ? Math.max(1000, endClock - startClock) : 1000;
   const durationSec = durationMs / 1000;
 
+  // User tags ("@tag koth" typed in chat -- see parser.js USER_TAG_RE):
+  // only the viewed character's own, so a groupmate's tag doesn't mark your
+  // charts. "You say, ..." is always yours; with no known player name, all
+  // tags are kept.
+  const userTags = events
+    .filter(e => e.type === 'user_tag' && e.clock != null)
+    .filter(e => !playerName || !e.speaker || /^you$/i.test(e.speaker) || normalizeName(e.speaker) === normalizeName(playerName))
+    .map(e => ({ clock: e.clock, text: e.text, speaker: e.speaker }));
+
   // Idle gaps: the space between two encounters when it's IDLE_GAP_MS or
   // longer -- you logged off, went AFK, etc. Charts can collapse these.
   const idleGaps = [];
@@ -991,7 +1000,7 @@ export function buildStats(events, playerNameHint) {
 
   return {
     meta: {
-      playerName, startClock, endClock, durationMs, idleGaps,
+      playerName, startClock, endClock, durationMs, idleGaps, userTags,
       statsSnapshots, latestSnapshot, checkpointStarts,
       petNames: Array.from(petNames),
       inferredClass,

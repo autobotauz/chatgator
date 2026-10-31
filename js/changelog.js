@@ -11,6 +11,14 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-10-31',
+    title: 'New: @tag markers on the charts',
+    bullets: [
+      'Type "@tag <anything>" in any chat channel (e.g. in group chat: @tag koth) and a labelled line appears at that moment on every time chart -- Overview, Realm Points, Pets and the abilities timeline',
+      'Only your own tags count, so a groupmate typing @tag won\'t mark your charts',
+    ],
+  },
+  {
     date: '2026-10-30',
     title: 'A cleaner header',
     bullets: [

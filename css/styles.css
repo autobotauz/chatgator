@@ -22,6 +22,7 @@
   --series-6: #008300; /* green  */
   --series-7: #6250d6; /* violet */
   --series-8: #e34948; /* red    */
+  --user-tag: #b4189e; /* @tag marker lines -- not a series colour, so it never matches a line it sits on */
 
   --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-450: #2a78d6; --seq-650: #104281;
 
@@ -52,6 +53,7 @@
 
     --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
     --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
+    --user-tag: #f07ce0;
   }
 }
 :root[data-theme="dark"] {
@@ -62,6 +64,7 @@
   --success: #0ca30c;
   --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
   --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
+  --user-tag: #f07ce0;
 }
 
 * { box-sizing: border-box; }

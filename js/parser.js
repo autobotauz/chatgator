@@ -35,6 +35,21 @@ const CLOSE_RE = /^\*\*\*\s*Chat Log Closed:\s*(.+)$/;
 // e.g. "@@[Region] Hilyth: ..." or "@@Bleblu says, "...""
 const CHAT_CHANNEL_RE = /^@@(\[[A-Za-z ]+\]\s*[^:]+:|[A-Za-z0-9'_-]+\s+(says|tells|yells|whispers|says to you|replies|sends?))/;
 
+// User tags: typing "@tag <text>" in any chat channel drops a labelled
+// marker line on the time-series charts at that moment, e.g.
+//   @@[Party] Hebstrel: "@tag koth"
+//   @@Hebstrel says, "@tag koth"     /   @@You say, "@tag koth"
+// The message has to START with @tag. Who said it is kept so aggregate.js
+// can keep only the viewed character's own tags.
+const USER_TAG_RE = /^@@(?:\[([^\]]+)\]\s*([^:]+?):|([A-Za-z0-9'_-]+)\s+(?:says?|sends?|yells?|whispers?|tells you|replies)[^"]*?)\s*"\s*@tag\s+(.+?)"?\s*$/i;
+function matchUserTag(body) {
+  const m = body.match(USER_TAG_RE);
+  if (!m) return null;
+  const text = m[4].replace(/"\s*$/, '').trim();
+  if (!text) return null;
+  return { text, speaker: (m[2] || m[3] || '').trim() || null, channel: m[1] || null };
+}
+
 function stripAt(line) {
   return line.startsWith('@@') ? line.slice(2) : line;
 }
@@ -1155,6 +1170,8 @@ export function parseLogText(rawText, resume) {
     }
 
     if (body.startsWith('@@')) {
+      const tag = matchUserTag(body);
+      if (tag) { events.push({ t: clockMs, clock: clockMs, type: 'user_tag', raw: body, ...tag }); continue; }
       if (CHAT_CHANNEL_RE.test(body)) continue; // pure chat, skip entirely
       body = stripAt(body);
     }

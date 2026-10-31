@@ -181,6 +181,7 @@ export function renderOverview(container, stats, ctx) {
     { color: 'var(--series-7)', label: 'Deathblow' },
     { color: 'var(--status-critical)', label: 'Death' },
     { color: 'var(--text-primary)', label: 'Checkpoint' },
+    ...((stats.meta.userTags || []).length ? [{ color: 'var(--user-tag)', label: '@tag' }] : []),
   ]);
   timelineChart(tlCard, {
     id: 'overview-activity',
@@ -216,6 +217,7 @@ export function renderOverview(container, stats, ctx) {
       ...stats.meta.checkpointStarts.map(t => ({ t, color: 'var(--text-primary)', solid: true, excludeFromTooltip: true })),
       ...stats.kills.deathblowLog.map(d => ({ t: d.clock, color: 'var(--series-7)', label: 'Deathblow' })),
       ...stats.kills.deathLog.map(d => ({ t: d.clock, color: 'var(--status-critical)', label: 'Death' })),
+      ...tagMarkers(stats),
     ],
   });
 
@@ -418,6 +420,7 @@ export function renderPets(container, stats, ctx) {
     legend(tlCard, names.map((n, i) => ({ color: seriesColor(i + 4), label: n })));
     timelineChart(tlCard, {
       id: 'pets-damage',
+      markers: tagMarkers(stats),
       domain: [stats.meta.startClock, stats.meta.endClock],
       idleGaps: stats.meta.idleGaps,
       series: names.map((n, i) => ({ name: n, color: seriesColor(i + 4), raw: stats.pets.byPet[n].points || [] })),
@@ -503,6 +506,7 @@ export function renderRealm(container, stats, ctx) {
   legend(tlCard, reasonEntries.map(([label]) => ({ color: colorForReason.get(label), label })));
   timelineChart(tlCard, {
     id: 'rp-by-source',
+    markers: tagMarkers(stats),
     stacked: true,
     domain: [stats.meta.startClock, stats.meta.endClock],
     idleGaps: stats.meta.idleGaps,
@@ -777,6 +781,7 @@ function renderAbilityTimeline(container, stats, inferredClass) {
   const c = card(s);
   dotTimelineChart(c, {
     id: 'spells-ability-timeline',
+    markers: tagMarkers(stats),
     rows,
     dots: all.filter(d => shownSet.has(d.name)),
     domain: [stats.meta.startClock, stats.meta.endClock],
@@ -799,6 +804,12 @@ function renderAbilityTimeline(container, stats, inferredClass) {
       return head + lines + more;
     },
   });
+}
+
+// Marker lines for your own "@tag <text>" chat lines (aggregate.js
+// meta.userTags) -- added to every time-series chart.
+function tagMarkers(stats) {
+  return (stats.meta.userTags || []).map(t => ({ t: t.clock, color: 'var(--user-tag)', label: `Tag: ${t.text}`, text: t.text }));
 }
 
 export function renderSpells(container, stats, ctx) {
