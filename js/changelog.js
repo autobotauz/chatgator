@@ -12,6 +12,13 @@
 export const CHANGELOG = [
   {
     date: '2026-10-31',
+    title: 'See which ability got the deathblow',
+    bullets: [
+      'On the Spells & Styles timeline, the hit that landed each deathblow gets a red ring (and a 💀 in its tooltip), so you can see which ability or style finished them off',
+    ],
+  },
+  {
+    date: '2026-10-31',
     title: 'New: resurrects & demezzes on the Healing tab',
     bullets: [
       'Same layout as Bask: Resurrections and Cure mezz sections showing who rezzed whom, with a table of each one',

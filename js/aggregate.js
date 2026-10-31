@@ -933,6 +933,21 @@ export function buildStats(events, playerNameHint) {
   }
   const deathblowRpTotal = deathblowLog.reduce((a, d) => a + (d.rpKnown ? d.rp : 0), 0);
 
+  // Which ability/style landed each deathblow: your last damage dot on that
+  // victim in the few seconds up to the "was just killed by you" line (the
+  // kill line is logged right after the hit). Marked on the dot so the
+  // Spells & Styles timeline can ring it.
+  const DEATHBLOW_HIT_WINDOW_MS = 5000;
+  for (const db of deathblowLog) {
+    const v = normalizeName(db.victim);
+    for (let i = abilityTimeline.length - 1; i >= 0; i--) {
+      const d = abilityTimeline[i];
+      if (d.clock > db.clock) continue;
+      if (db.clock - d.clock > DEATHBLOW_HIT_WINDOW_MS) break;
+      if (d.kind !== 'heal' && d.target && normalizeName(d.target) === v) { d.deathblow = true; break; }
+    }
+  }
+
   // ---- /bg center broadcasts ----------------------------------------------
   const bgBroadcasts = getBgBroadcasts(events);
 

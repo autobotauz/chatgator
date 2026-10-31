@@ -830,7 +830,7 @@ function renderAbilityTimeline(container, stats, inferredClass) {
   h3(s, 'Abilities & styles over time');
   const p = document.createElement('p');
   p.className = 'sub';
-  p.textContent = 'One dot each time an ability or style landed — a hit, a heal, a confirmed CC/debuff, or (for spells that land silently) a cast that wasn\'t resisted and didn\'t fail, shown faded. Ringed dots are crits. Hover a dot for the target, when the log names one.'
+  p.textContent = 'One dot each time an ability or style landed — a hit, a heal, a confirmed CC/debuff, or (for spells that land silently) a cast that wasn\'t resisted and didn\'t fail, shown faded. Ringed dots are crits; a red ring marks the hit that landed a deathblow. Hover a dot for the target, when the log names one.'
     + (names.length > shown.length ? ` Showing your ${shown.length} most-used of ${names.length}.` : '');
   s.appendChild(p);
   const c = card(s);
@@ -853,7 +853,7 @@ function renderAbilityTimeline(container, stats, inferredClass) {
           const verb = d.kind === 'heal' ? 'healed' : 'hit';
           what = `${verb}${d.target ? ` ${escHtml(d.target)}` : ''}${amt ? ` for ${amt}` : ''}${d.weapon ? ` <span style="opacity:.7">(${escHtml(d.weapon)})</span>` : ''}`;
         }
-        return `<div class="tt-row"><span>${fmtClock(d.clock, true)}</span><span>${what}</span></div>`;
+        return `<div class="tt-row"><span>${fmtClock(d.clock, true)}</span><span>${what}${d.deathblow ? ' 💀 deathblow' : ''}</span></div>`;
       }).join('');
       const more = list.length > 8 ? `<div class="tt-row"><span></span><span>+${list.length - 8} more</span></div>` : '';
       return head + lines + more;

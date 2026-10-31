@@ -548,6 +548,11 @@ export function dotTimelineChart(container, { rows, dots, domain, idleGaps = [],
         svg.appendChild(circle);
         placed.push({ d, px, py, ri });
       }
+      // Deathblow: a red ring around that hit's dot, drawn after every dot so
+      // neighbouring dots can't cover it.
+      for (const p of placed) {
+        if (p.d.deathblow) svg.appendChild(el('circle', { cx: p.px, cy: p.py, r: R + 3.5, fill: 'none', stroke: 'var(--status-critical)', 'stroke-width': 2 }));
+      }
 
       const ring = el('circle', { r: R + 3, fill: 'none', stroke: 'var(--text-primary)', 'stroke-width': 1.5 });
       ring.style.display = 'none';
