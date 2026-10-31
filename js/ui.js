@@ -181,7 +181,8 @@ export function renderOverview(container, stats, ctx) {
     { color: 'var(--series-7)', label: 'Deathblow' },
     { color: 'var(--status-critical)', label: 'Death' },
     { color: 'var(--text-primary)', label: 'Checkpoint' },
-    ...((stats.meta.userTags || []).length ? [{ color: 'var(--user-tag)', label: '@tag' }] : []),
+    // one entry per distinct tag, named by the tag itself ("koth"), not "@tag"
+    ...[...new Set((stats.meta.userTags || []).map(t => t.text))].map(text => ({ color: 'var(--user-tag)', label: text })),
   ]);
   timelineChart(tlCard, {
     id: 'overview-activity',
@@ -809,7 +810,7 @@ function renderAbilityTimeline(container, stats, inferredClass) {
 // Marker lines for your own "@tag <text>" chat lines (aggregate.js
 // meta.userTags) -- added to every time-series chart.
 function tagMarkers(stats) {
-  return (stats.meta.userTags || []).map(t => ({ t: t.clock, color: 'var(--user-tag)', label: `Tag: ${t.text}`, text: t.text }));
+  return (stats.meta.userTags || []).map(t => ({ t: t.clock, color: 'var(--user-tag)', label: t.text, text: t.text }));
 }
 
 export function renderSpells(container, stats, ctx) {
