@@ -455,3 +455,20 @@ details.debug pre { max-height: 220px; overflow: auto; background: var(--surface
 .chart-toggle { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-secondary); }
 .chart-reset { font: inherit; font-size: 12px; padding: 3px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); cursor: pointer; }
 .chart-reset:hover { background: var(--surface-2); }
+
+/* ---------- support (Buy Me a Coffee) ---------- */
+/* A plain link, not BMC's embed script: no third-party code on the page. */
+.btn.support-link { color: #b8860b; border-color: color-mix(in srgb, #ffdd00 45%, var(--border)); }
+.btn.support-link:hover { background: color-mix(in srgb, #ffdd00 14%, var(--surface-1)); }
+:root[data-theme="dark"] .btn.support-link { color: #f5c542; }
+@media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) .btn.support-link { color: #f5c542; } }
+.support-note {
+  display: flex; align-items: center; gap: 12px; max-width: 640px; margin: 36px auto 0; padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, #ffdd00 30%, var(--border)); border-radius: var(--radius);
+  background: color-mix(in srgb, #ffdd00 6%, var(--surface-1));
+  font-size: 13px; line-height: 1.55; color: var(--text-secondary);
+}
+.support-note p { margin: 0; }
+.support-note a { color: var(--text-primary); font-weight: 600; }
+.support-cup { font-size: 22px; flex: none; }
+.support-note + .footer-note { margin-top: 18px; }

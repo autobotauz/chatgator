@@ -12,6 +12,13 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'Support Chat Gator',
+    bullets: [
+      'Chat Gator and Bask are made by a fellow player in their spare time. If they help you or your group, there\'s now a ☕ Support link to buy me a coffee or become a member. Thank you!',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Bask: deathblows fixed, rezzes and cure mezz, leader hand-off',
     bullets: [
       'Deathblows and deaths were missing for anyone who joined under a nickname (the kill feed only uses real character names). Bask now offers the name from your log\'s /stats when you join, and typing /stats in game during a bask confirms it and recovers kills it missed. Unconfirmed names show ❔ name',
