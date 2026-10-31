@@ -115,20 +115,15 @@ const state = {
 // Theme
 // ---------------------------------------------------------------------------
 (function initTheme() {
-  const saved = localStorage.getItem('chatgator:theme');
-  if (saved) document.documentElement.setAttribute('data-theme', saved);
-  el('btnTheme').addEventListener('click', () => {
-    const cur = document.documentElement.getAttribute('data-theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    const next = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('chatgator:theme', next); } catch { /* ignore */ }
-  });
+  // Light/dark follows the system setting (styles.css's prefers-color-scheme).
+  // There used to be a toggle; drop any choice it saved so nobody is stuck
+  // on a theme with no way to change it back.
+  try { localStorage.removeItem('chatgator:theme'); } catch { /* ignore */ }
 
   // Classic vs. new in-game icon art (js/icons.js). Same ids either way, so
   // switching is just a re-render.
   const skinBtn = el('btnIconSkin');
-  const label = () => { skinBtn.textContent = getIconSkin() === 'classic' ? '🖼 Classic icons' : '🖼 New icons'; };
+  const label = () => { skinBtn.textContent = getIconSkin() === 'classic' ? '🖼 Icons: Classic' : '🖼 Icons: New'; };
   label();
   skinBtn.addEventListener('click', () => {
     setIconSkin(getIconSkin() === 'classic' ? 'new' : 'classic');
@@ -152,7 +147,21 @@ const state = {
     list.appendChild(item);
   }
   const dialog = el('changelogDialog');
-  el('btnChangelog').addEventListener('click', () => dialog.showModal());
+  // A small dot on the ⋯ menu (and "new" beside What's new) until the
+  // latest entry has been seen.
+  const SEEN_KEY = 'chatgator:changelogSeen';
+  const latest = CHANGELOG[0] ? `${CHANGELOG[0].date}|${CHANGELOG[0].title}` : '';
+  let seen = null;
+  try { seen = localStorage.getItem(SEEN_KEY); } catch { /* ignore */ }
+  const unseen = !!latest && seen !== latest;
+  el('menuDot').hidden = !unseen;
+  el('changelogNew').hidden = !unseen;
+  el('btnChangelog').addEventListener('click', () => {
+    dialog.showModal();
+    try { localStorage.setItem(SEEN_KEY, latest); } catch { /* ignore */ }
+    el('menuDot').hidden = true;
+    el('changelogNew').hidden = true;
+  });
   el('btnCloseChangelog').addEventListener('click', () => dialog.close());
   // Click on the backdrop (the native ::backdrop pseudo-element isn't a
   // real click target, so this is just "click landed on the <dialog> element
@@ -161,41 +170,47 @@ const state = {
 })();
 
 // ---------------------------------------------------------------------------
-// Live-watch refresh interval — how often LogWatcher re-reads the file while
-// "Watch a live log file…" is active. Some abilities have cooldowns as
-// short as 5s, so the old fixed 2s poll could still miss or badly lag a
-// fast one; letting the user dial it down (as low as 1s) makes the
-// cooldown tracker actually reliable for those. Each poll is still cheap
-// when idle — LogWatcher only re-parses once the file's size has actually
-// changed — so a short interval mostly costs a few extra stat() calls
-// between real updates, not full re-parses.
+// Header ⋯ menu: the occasional actions (download, clear log, what's new,
+// icon style), so the header itself stays to a few same-sized buttons.
 // ---------------------------------------------------------------------------
-const DEFAULT_WATCH_INTERVAL_MS = 2000;
-
-(function initWatchInterval() {
-  const sel = el('watchIntervalSelect');
-  for (let s = 1; s <= 30; s++) {
-    const opt = document.createElement('option');
-    opt.value = String(s * 1000);
-    opt.textContent = `${s}s`;
-    sel.appendChild(opt);
-  }
-  let saved = DEFAULT_WATCH_INTERVAL_MS;
-  try {
-    const raw = +localStorage.getItem('chatgator:watchIntervalMs');
-    if (raw >= 1000 && raw <= 30000) saved = raw;
-  } catch { /* ignore */ }
-  state.watchIntervalMs = saved;
-  sel.value = String(saved);
-  sel.addEventListener('change', () => {
-    const ms = +sel.value;
-    state.watchIntervalMs = ms;
-    try { localStorage.setItem('chatgator:watchIntervalMs', String(ms)); } catch { /* ignore */ }
-    // Already watching? Re-pace the running poll loop immediately instead
-    // of waiting for whatever interval it was already mid-wait on.
-    if (state.watcher) state.watcher.setPollMs(ms);
+(function initHeaderMenu() {
+  const btn = el('btnMenu');
+  const menu = el('headerMenu');
+  const items = () => [...menu.querySelectorAll('.menu-item')].filter((x) => !x.hidden);
+  const close = (focusButton) => {
+    if (menu.hidden) return;
+    menu.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+    if (focusButton) btn.focus();
+  };
+  const open = () => {
+    // The divider only makes sense when there's a session section above it.
+    el('menuSessionSep').hidden = el('btnDownloadSnapshot').hidden && el('btnClearLog').hidden;
+    menu.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    items()[0]?.focus();
+  };
+  btn.addEventListener('click', (e) => { e.stopPropagation(); menu.hidden ? open() : close(true); });
+  // Picking an item closes the menu (the item's own handler does the rest).
+  menu.addEventListener('click', (e) => { if (e.target.closest('.menu-item')) close(false); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.menu-wrap')) close(false); });
+  menu.addEventListener('keydown', (e) => {
+    const list = items();
+    const i = list.indexOf(document.activeElement);
+    if (e.key === 'Escape') { e.preventDefault(); close(true); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); list[(i + 1) % list.length]?.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); list[(i - 1 + list.length) % list.length]?.focus(); }
+    else if (e.key === 'Tab') close(false);
   });
 })();
+
+// ---------------------------------------------------------------------------
+// Live-watch refresh: a fixed 5s. Each poll only does real work when the
+// file has actually grown, and the game client buffers lines before writing
+// them anyway, so a shorter interval mostly bought re-reads of nothing.
+// ---------------------------------------------------------------------------
+state.watchIntervalMs = 5000;
+try { localStorage.removeItem('chatgator:watchIntervalMs'); } catch { /* ignore */ }
 
 // ---------------------------------------------------------------------------
 // File loading (drag/drop, picker, sample)
@@ -407,7 +422,7 @@ function ingestSnapshotEvents(data) {
 
   el('dropzoneSection').hidden = true;
   el('appMain').hidden = false;
-  el('btnLoadAnother').hidden = false;
+  el('btnLoadAnother').hidden = !!state.watcher; // while watching, Stop is the session control
   el('btnDownloadSnapshot').hidden = false;
   el('snapshotPill').hidden = false;
   el('snapshotPill').title = data.exportedAt
@@ -468,7 +483,7 @@ function ingestTexts(fileTexts) {
 
   el('dropzoneSection').hidden = true;
   el('appMain').hidden = false;
-  el('btnLoadAnother').hidden = false;
+  el('btnLoadAnother').hidden = !!state.watcher; // while watching, Stop is the session control
   el('btnDownloadSnapshot').hidden = false;
   el('snapshotPill').hidden = true;
 
@@ -540,7 +555,7 @@ function applyRestoredSnapshot(snapshot) {
 
   el('dropzoneSection').hidden = true;
   el('appMain').hidden = false;
-  el('btnLoadAnother').hidden = false;
+  el('btnLoadAnother').hidden = !!state.watcher; // while watching, Stop is the session control
   el('btnDownloadSnapshot').hidden = false;
   el('snapshotPill').hidden = true;
 
@@ -1498,10 +1513,9 @@ async function beginWatch(handle) {
     ingestTexts([{ name: 'live', text: initialText }]);
     el('watchStatus').hidden = false;
     el('watchDot').classList.add('live');
-    el('watchLabel').textContent = 'Watching live — keep this tab open';
-    el('watchIntervalWrap').hidden = false;
+    el('watchLabel').textContent = 'Watching live';
     el('btnStopWatch').hidden = false;
-    el('clearLogOptWrap').hidden = false;
+    el('btnLoadAnother').hidden = true;
     el('btnClearLog').hidden = false;
     startLiveBackground();
     // Saved right away (not just via the debounced hook above) so a
@@ -1528,9 +1542,8 @@ function stopWatching() {
   stopLiveBackground();
   el('watchStatus').hidden = true;
   el('watchDot').classList.remove('live');
-  el('watchIntervalWrap').hidden = true;
   el('btnStopWatch').hidden = true;
-  el('clearLogOptWrap').hidden = true;
+  el('btnLoadAnother').hidden = el('appMain').hidden; // a log is still on screen: offer a fresh start
   el('staleWatchBanner').hidden = true;
   el('btnClearLog').hidden = true;
 }
@@ -1634,17 +1647,19 @@ el('resumeSessionDismiss')?.addEventListener('click', () => {
 // the only time we hold a reference capable of writing back to disk at
 // all — there's no such handle for a plain <input type=file> load.
 // ---------------------------------------------------------------------------
-async function clearWatchedLogFile() {
+// Asks first in a small dialog: save a copy then clear (default), clear
+// without a copy, or cancel.
+function clearWatchedLogFile() {
   if (!state.watcher) return;
-  const confirmed = confirm(
-    "This clears the actual chat.log file Chat Gator is watching — not just this view.\n\n" +
-    "If DAoC still has chat logging on, pause it in-game first so the client isn't writing " +
-    "to the file at the same moment it's cleared.\n\nContinue?"
-  );
-  if (!confirmed) return;
+  el('clearLogDialog').showModal();
+  el('clearLogWithCopy').focus();
+}
 
+async function doClearLog(saveCopy) {
+  el('clearLogDialog').close();
+  if (!state.watcher) return;
   try {
-    if (el('chkBackupBeforeClear').checked) {
+    if (saveCopy) {
       const snapshot = await state.watcher.snapshotFile();
       const saveHandle = await window.showSaveFilePicker({
         suggestedName: `chat_${backupTimestamp()}.log`,
@@ -1659,13 +1674,17 @@ async function clearWatchedLogFile() {
     // reset on its own (same path as an external truncation/rotation) —
     // nothing else to do here; ingestTexts() picks it up from there.
   } catch (err) {
-    if (err && err.name === 'AbortError') return; // backup "Save As" dialog was cancelled
+    if (err && err.name === 'AbortError') return; // backup "Save As" dialog was cancelled: nothing cleared
     console.warn('[chatgator] could not clear the watched log file', err);
     alert(err && err.name === 'NotAllowedError'
       ? "Couldn't clear the log — write permission for the file was declined."
-      : "Couldn't clear the log file. If DAoC is still actively writing to it, try pausing in-game chat logging first, then clear again.");
+      : "Couldn't clear the log file. If DAoC is still actively writing to it, try turning chat logging off in game first, then clear again.");
   }
 }
+el('clearLogWithCopy').addEventListener('click', () => doClearLog(true));
+el('clearLogNoCopy').addEventListener('click', () => doClearLog(false));
+el('clearLogCancel').addEventListener('click', () => el('clearLogDialog').close());
+el('clearLogDialog').addEventListener('click', (e) => { if (e.target === el('clearLogDialog')) el('clearLogDialog').close(); });
 
 function backupTimestamp() {
   const d = new Date();

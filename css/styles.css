@@ -115,11 +115,54 @@ a { color: var(--series-1); }
 .ad-rail-bottom .adsbygoogle { display: block; width: 100%; min-height: 90px; }
 
 /* ---------- header ---------- */
-.app-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-.app-title { display: flex; align-items: baseline; gap: 10px; }
-.app-title h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
-.app-title .tag { font-size: 12px; color: var(--text-muted); background: var(--surface-2); padding: 3px 8px; border-radius: 999px; }
-.header-actions { display: flex; gap: 8px; align-items: center; }
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; margin-bottom: 20px; min-height: 36px; }
+.app-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.app-title h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; white-space: nowrap; }
+.header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+/* Every header control is the same height and never wraps its label. */
+.header-actions .btn, .header-actions .icon-btn {
+  height: 34px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; line-height: 1;
+}
+.header-actions .btn-square { width: 34px; padding: 0; justify-content: center; position: relative; color: var(--text-secondary); }
+/* Labels that drop words on narrow screens are wrapped in one inline span, so spacing is normal text spacing. */
+@media (max-width: 760px) { .hide-narrow { display: none; } }
+@media (max-width: 500px) { .hide-phone { display: none; } }
+.header-actions .btn-square .dots { fill: currentColor; display: block; }
+
+/* ---------- header ⋯ menu ---------- */
+.menu-wrap { position: relative; }
+.menu-dot {
+  position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--series-1); box-shadow: 0 0 0 2px var(--surface-1);
+}
+.menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 50; min-width: 220px; padding: 6px;
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .14), 0 2px 6px rgba(0, 0, 0, .08);
+  display: flex; flex-direction: column;
+}
+.menu[hidden], .menu-item[hidden], .menu-sep[hidden], .menu-dot[hidden], .menu-new[hidden] { display: none; }
+.menu-item {
+  font: inherit; font-size: 13.5px; text-align: left; padding: 8px 10px; border: 0; border-radius: var(--radius-sm);
+  background: none; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap;
+}
+.menu-item:hover, .menu-item:focus-visible { background: var(--surface-2); outline: none; }
+.menu-item.danger { color: var(--status-critical); }
+.menu-sep { height: 1px; background: var(--border); margin: 5px 4px; }
+.menu-new {
+  margin-left: auto; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--series-1); background: color-mix(in srgb, var(--series-1) 12%, transparent); padding: 2px 6px; border-radius: 999px;
+}
+
+/* ---------- small confirm dialog (clear log) ---------- */
+.small-dialog {
+  width: min(460px, 92vw); padding: 20px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface-1); color: var(--text-primary);
+}
+.small-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.small-dialog h2 { margin: 0 0 8px; font-size: 17px; }
+.small-dialog p { margin: 0 0 16px; color: var(--text-secondary); font-size: 13.5px; line-height: 1.55; }
+.dialog-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 
 /* Several controls below are shown/hidden purely via the `hidden` attribute
    from JS, but also set their own `display` (flex/inline-block) so they lay
@@ -130,7 +173,7 @@ a { color: var(--series-1); }
    render — empty or not — even while `hidden` is set. Caught via a
    Playwright check that found "Watching live" and an empty refresh-interval
    dropdown rendering in the header before any session had even started. */
-.watch-status[hidden], .watch-interval[hidden], .bg-ticker[hidden], .cooldown-tracker[hidden], .enemies-targeted[hidden], .pill[hidden], .clear-log-opt[hidden], .stale-watch-banner[hidden], .resume-session-banner[hidden] {
+.watch-status[hidden], .bg-ticker[hidden], .cooldown-tracker[hidden], .enemies-targeted[hidden], .pill[hidden], .stale-watch-banner[hidden], .resume-session-banner[hidden], .header-actions .btn[hidden] {
   display: none;
 }
 
@@ -145,8 +188,6 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; } /* t
 .btn:hover, .icon-btn:hover { filter: brightness(1.06); }
 .btn:active, .icon-btn:active { filter: brightness(0.96); }
 
-.clear-log-opt { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); cursor: pointer; }
-.clear-log-opt input { margin: 0; cursor: pointer; }
 
 /* ---------- drop zone ---------- */
 .dropzone {
@@ -406,24 +447,28 @@ details.debug { margin-top: 10px; font-size: 12.5px; color: var(--text-muted); }
 details.debug summary { cursor: pointer; }
 details.debug pre { max-height: 220px; overflow: auto; background: var(--surface-2); padding: 10px; border-radius: var(--radius-sm); white-space: pre-wrap; }
 
-.watch-status { display:flex; align-items:center; gap:9px; font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+/* A compact pill right beside the title. */
+.watch-status {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
+  padding: 4px 10px 4px 9px; border-radius: 999px; white-space: nowrap;
+  background: color-mix(in srgb, var(--watch-color) 10%, var(--surface-1));
+  border: 1px solid color-mix(in srgb, var(--watch-color) 30%, var(--border));
+}
 .watch-status:has(.watch-dot.live) { color: var(--watch-color); transition: color .2s; }
-.watch-dot { width:12px; height:12px; border-radius:50%; background: var(--text-muted); transition: background .2s; }
+.watch-dot { width:8px; height:8px; border-radius:50%; background: var(--text-muted); transition: background .2s; }
 .watch-dot.live {
   background: var(--watch-color);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--watch-color) 25%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--watch-color) 25%, transparent);
   animation: watch-pulse 1.6s ease-in-out infinite;
 }
 @keyframes watch-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--watch-color) 25%, transparent); }
-  50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--watch-color) 12%, transparent); }
+  0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--watch-color) 25%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--watch-color) 10%, transparent); }
 }
 @media (prefers-reduced-motion: reduce) {
   .watch-dot.live { animation: none; }
 }
 
-.watch-interval { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
-.watch-interval select#watchIntervalSelect { padding: 5px 8px; font-size: 12.5px; }
 
 .changelog-dialog {
   width: min(560px, 92vw); max-height: 80vh; padding: 0; border: 1px solid var(--border);

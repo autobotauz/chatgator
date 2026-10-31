@@ -45,7 +45,7 @@ type/class (and even that one fails silently and harmlessly if it's blocked
 
 Click **Watch a live log file…** and pick your actual `chat.log` while
 you're playing. This uses the browser's File System Access API to re-read
-only the newly-appended bytes every couple of seconds — there's still no
+only the newly-appended bytes every 5 seconds — there's still no
 upload, the file handle and its contents never leave the tab. Safari and
 Firefox don't support this API yet, so there the equivalent is just
 re-dropping the file whenever you want a refresh.

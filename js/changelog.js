@@ -12,6 +12,17 @@
 export const CHANGELOG = [
   {
     date: '2026-10-30',
+    title: 'A cleaner header',
+    bullets: [
+      'The top bar is down to a few same-sized buttons. "Watching live" now sits next to the Chat Gator name, and one button switches between Stop watching and New session',
+      'Download snapshot, Clear log file, What\'s new and the icon style moved into the ⋯ menu (a dot on it means there\'s something new here)',
+      'Clear log now asks in one step: save a copy then clear, clear without a copy, or cancel',
+      'Live watching refreshes every 5 seconds; the refresh picker is gone',
+      'Light and dark now follow your system setting',
+    ],
+  },
+  {
+    date: '2026-10-30',
     title: 'Support Chat Gator',
     bullets: [
       'Chat Gator and Bask are made by a fellow player in their spare time. If they help you or your group, there\'s now a ☕ Support link to buy me a coffee or become a member. Thank you!',

@@ -1074,15 +1074,9 @@ function renderAll() {
 // wiring
 // ---------------------------------------------------------------------------
 (function initTheme() {
-  const saved = localStorage.getItem('chatgator:theme');
-  if (saved) document.documentElement.setAttribute('data-theme', saved);
-  el('btnTheme').addEventListener('click', () => {
-    const cur = document.documentElement.getAttribute('data-theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    const next = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('chatgator:theme', next); } catch { /* ignore */ }
-  });
+  // Light/dark follows the system setting; drop any choice an older version
+  // of the page saved with its (now removed) toggle.
+  try { localStorage.removeItem('chatgator:theme'); } catch { /* ignore */ }
 })();
 
 document.querySelector('.tabbar').addEventListener('click', (ev) => {

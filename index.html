@@ -35,29 +35,36 @@
   <header class="app-header">
     <div class="app-title">
       <h1>🐊 Chat Gator</h1>
-      <span class="tag">static · runs 100% in your browser</span>
+      <span class="watch-status" id="watchStatus" hidden title="Re-reading your chat.log every 5 seconds. Keep this tab open while you play."><span class="watch-dot" id="watchDot"></span><span id="watchLabel">Watching live</span></span>
     </div>
     <div class="header-actions">
-      <span class="watch-status" id="watchStatus" hidden><span class="watch-dot" id="watchDot"></span><span id="watchLabel">Watching live</span></span>
-      <label class="watch-interval" id="watchIntervalWrap" hidden title="How often to re-read the watched chat.log while live. Lower catches short ability cooldowns sooner, at the cost of re-parsing the file more often — each poll only does real work when the file has actually grown, so an idle interval between pulses is cheap either way.">
-        <span class="watch-interval-text">Refresh:</span>
-        <select class="btn" id="watchIntervalSelect"></select>
-      </label>
-      <button class="btn" id="btnStopWatch" hidden>⏹ Stop watching</button>
-      <label class="clear-log-opt" id="clearLogOptWrap" hidden title="When checked, saves a byte-for-byte copy of the log's current contents to a file you name (suggested: chat_YYYYMMDDHHMMSS.log) before clearing it.">
-        <input type="checkbox" id="chkBackupBeforeClear" checked>
-        <span>Save a copy first</span>
-      </label>
-      <button class="btn danger" id="btnClearLog" hidden title="Truncates the actual chat.log file on disk that's being watched — not just this view. If DAoC still has logging on, pause it in-game first so the client isn't fighting the clear.">🗑 Clear log…</button>
-      <button class="btn" id="btnDownloadSnapshot" hidden>⬇ Download snapshot</button>
-      <a class="btn" href="bask/" title="Share live combat numbers with up to 8 groupmates">🐊 Bask with your group</a>
+      <!-- One session control, depending on what's going on: Stop while watching, New session once a file is loaded. -->
+      <button class="btn" id="btnStopWatch" hidden><span>⏹ Stop<span class="hide-phone"> watching</span></span></button>
+      <button class="btn" id="btnLoadAnother" hidden>↺ New session</button>
+      <a class="btn" href="bask/" title="Share live combat numbers with up to 8 groupmates"><span>🐊 Bask<span class="hide-narrow"> with your group</span></span></a>
       <a class="btn support-link" href="https://buymeacoffee.com/theorist" target="_blank" rel="noopener" title="Chat Gator is built by a fellow player. A coffee or a membership helps keep it growing.">☕ Support</a>
-      <button class="btn" id="btnChangelog" title="See what's changed recently">📋 What's new</button>
-      <button class="btn" id="btnIconSkin" title="Switch between the new and classic in-game icon art">🖼 New icons</button>
-      <button class="icon-btn" id="btnTheme" title="Toggle light/dark">🌓</button>
-      <button class="btn" id="btnLoadAnother" hidden>New session</button>
+      <div class="menu-wrap">
+        <button class="btn btn-square" id="btnMenu" aria-haspopup="menu" aria-expanded="false" aria-controls="headerMenu" title="More"><svg class="dots" viewBox="0 0 16 4" width="16" height="4" aria-hidden="true"><circle cx="2" cy="2" r="1.6"/><circle cx="8" cy="2" r="1.6"/><circle cx="14" cy="2" r="1.6"/></svg><span class="menu-dot" id="menuDot" hidden></span></button>
+        <div class="menu" id="headerMenu" role="menu" hidden>
+          <button class="menu-item" role="menuitem" id="btnDownloadSnapshot" hidden>⬇ Download snapshot</button>
+          <button class="menu-item danger" role="menuitem" id="btnClearLog" hidden title="Empties the chat.log file on disk that's being watched, not just this view.">🗑 Clear log file…</button>
+          <div class="menu-sep" id="menuSessionSep" hidden></div>
+          <button class="menu-item" role="menuitem" id="btnChangelog">📋 What's new <span class="menu-new" id="changelogNew" hidden>new</span></button>
+          <button class="menu-item" role="menuitem" id="btnIconSkin">🖼 Icons: New</button>
+        </div>
+      </div>
     </div>
   </header>
+
+  <dialog id="clearLogDialog" class="small-dialog">
+    <h2>Clear your chat.log?</h2>
+    <p>This empties the actual log file on your computer, not just this view. If DAoC still has chat logging on, turn it off in game first (<code>/chatlog</code>) so the game isn't writing to the file while it's cleared.</p>
+    <div class="dialog-actions">
+      <button class="btn" id="clearLogCancel">Cancel</button>
+      <button class="btn danger" id="clearLogNoCopy">Clear without a copy</button>
+      <button class="btn primary" id="clearLogWithCopy">Save a copy, then clear</button>
+    </div>
+  </dialog>
 
   <dialog id="changelogDialog" class="changelog-dialog">
     <div class="changelog-head">
