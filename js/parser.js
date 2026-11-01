@@ -288,6 +288,13 @@ const RULES = [
   // ---- realm points -----------------------------------------------------------
   ['rp_bonus', /^You get an additional (\d+) realm points? due to (.+?)!$/, m => ({ amount: +m[1], reason: m[2] })],
   ['rp_reason', /^You get (\d+) realm points? for (.+?)!$/, m => ({ amount: +m[1], reason: m[2] })],
+  // Activity rewards: "Collection completed. Earned 275 RP and 25 Buff XP."
+  // / "Hold won. Earned 660 RP and 60 Buff XP." -- the activity name is the
+  // reason (Collection, Treasure Guide, Hold, Patrol Hunt, ...). These used
+  // to fall through to the /bg center ticker and never count as RP.
+  ['rp_reason', /^(.+?) (?:completed|won|lost|finished)\. Earned ([\d,]+) RP(?: and [\d,]+ Buff XP)?\.?$/, m => ({ amount: toNum(m[2]), reason: m[1] })],
+  // the progress line that comes with them -- not RP, and not a /bg center call
+  ['flavor', /^\w[\w' ]*: \d+\/\d+ complete for this rotation\.$/, () => ({})],
   ['rp_plain', /^You get (\d+) realm points?!$/, m => ({ amount: +m[1], reason: null })],
   ['war_reward', /^Your war efforts have been rewarded with experience and realm points!$/, () => ({})],
 

@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-11-01',
+    title: 'Fixed: realm points from activities',
+    bullets: [
+      'Rewards like "Collection completed. Earned 275 RP…", "Hold won. Earned 660 RP…", Treasure Guide and Patrol Hunt now count toward your realm points, each listed as its own source',
+      'They (and "Salvage: 3/3 complete for this rotation.") no longer show up in the /bg center ticker',
+    ],
+  },
+  {
+    date: '2026-11-01',
     title: 'Fixed: Bask missing every fight on daylight-saving day',
     bullets: [
       'On the day the clocks change, Bask read every log line as an hour old, treated it as from before you joined, and skipped it, so nothing showed up. The main page\'s cooldown timers were an hour off that day too. Both fixed',
