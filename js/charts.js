@@ -123,7 +123,8 @@ function tooltipHtml(item) {
   if (item.critRate != null) rows.push(`<div class="tt-row"><span>Crit rate</span><span>${item.critRate}%</span></div>`);
   if (item.avg != null) rows.push(`<div class="tt-row"><span>Avg</span><span>${item.avg}</span></div>`);
   if (item.max != null) rows.push(`<div class="tt-row"><span>Max</span><span>${item.max}</span></div>`);
-  return `<div class="tt-title">${esc(item.label)}</div>${rows.join('')}`;
+  const note = item.note ? `<div class="tt-note">${esc(item.note)}</div>` : ''; // optional one-line explanation
+  return `<div class="tt-title">${esc(item.label)}</div>${rows.join('')}${note}`;
 }
 
 // ---------------------------------------------------------------------------

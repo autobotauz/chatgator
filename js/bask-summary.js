@@ -54,7 +54,9 @@ export function wallClockFor(clock, now = Date.now()) {
 
 const norm = (s) => String(s || '').trim().toLowerCase();
 
-function bucketMap() { return { total: 0, hits: 0, crits: 0, by: Object.create(null) }; }
+// othersN: how many names are already folded into an "Others" entry (only
+// non-zero after restoring a capped snapshot).
+function bucketMap() { return { total: 0, hits: 0, crits: 0, by: Object.create(null), othersN: 0 }; }
 function addTo(b, who, amount, isCrit) {
   b.total += amount;
   if (isCrit) b.crits++; else b.hits++;
@@ -71,23 +73,30 @@ function addCritExtra(b, who, amount) {
   const row = b.by[k] || (b.by[k] = [0, 0, 0]);
   row[0] += amount; row[2]++;
 }
-function countMap() { return { total: 0, by: Object.create(null) }; }
+function countMap() { return { total: 0, by: Object.create(null), othersN: 0 }; }
 function addCount(c, who) { c.total++; const k = who || 'Unknown'; c.by[k] = (c.by[k] || 0) + 1; }
 
 // Keep the biggest MAX_KEYS entries; fold the rest into "Others".
-function capBy(by, valueOf, merge) {
-  const entries = Object.entries(by);
-  if (entries.length <= MAX_KEYS) return { ...by };
-  entries.sort((a, b) => valueOf(b[1]) - valueOf(a[1]));
-  const out = Object.fromEntries(entries.slice(0, MAX_KEYS - 1));
-  let rest = null;
-  for (const [, v] of entries.slice(MAX_KEYS - 1)) rest = rest == null ? (Array.isArray(v) ? [...v] : v) : merge(rest, v);
-  out[OTHERS] = rest;
-  return out;
+// Keep the biggest MAX_KEYS - 1 names; fold the rest into "Others", and
+// count how many names that is (so the group view can say "Others (31 more)").
+// An "Others" that came back from a restored snapshot never takes a named
+// slot; it just keeps absorbing, and its earlier count carries over.
+function capBy(by, valueOf, merge, prevN = 0) {
+  let named = Object.entries(by).filter(([k]) => k !== OTHERS);
+  let rest = by[OTHERS] != null ? (Array.isArray(by[OTHERS]) ? [...by[OTHERS]] : by[OTHERS]) : null;
+  let n = rest != null ? prevN : 0;
+  if (named.length > MAX_KEYS - 1) {
+    named.sort((a, b) => valueOf(b[1]) - valueOf(a[1]));
+    for (const [, v] of named.slice(MAX_KEYS - 1)) { rest = rest == null ? (Array.isArray(v) ? [...v] : v) : merge(rest, v); n++; }
+    named = named.slice(0, MAX_KEYS - 1);
+  }
+  const out = Object.fromEntries(named);
+  if (rest != null) out[OTHERS] = rest;
+  return { by: out, othersN: n };
 }
-const capAmount = (b) => ({ total: b.total, hits: b.hits, crits: b.crits,
-  by: capBy(b.by, v => v[0], (a, v) => [a[0] + v[0], a[1] + v[1], a[2] + v[2]]) });
-const capCount = (c) => ({ total: c.total, by: capBy(c.by, v => v, (a, v) => a + v) });
+const capAmount = (b) => { const c = capBy(b.by, v => v[0], (a, v) => [a[0] + v[0], a[1] + v[1], a[2] + v[2]], b.othersN);
+  return { total: b.total, hits: b.hits, crits: b.crits, by: c.by, othersN: c.othersN }; };
+const capCount = (b) => { const c = capBy(b.by, v => v, (a, v) => a + v, b.othersN); return { total: b.total, by: c.by, othersN: c.othersN }; };
 
 // The player's own doings: what decides whether they're playing (sleeping
 // after 5 idle minutes, log reading stops after an hour). The realm-wide kill
@@ -444,8 +453,8 @@ export class GroupSummarizer {
   // already capped, which is fine — "Others" just keeps accumulating.
   restore(snap) {
     if (!snap || snap.v !== SUMMARY_VERSION) return;
-    const amt = (b) => ({ total: +b?.total || 0, hits: +b?.hits || 0, crits: +b?.crits || 0, by: Object.assign(Object.create(null), b?.by || {}) });
-    const cnt = (c) => ({ total: +c?.total || 0, by: Object.assign(Object.create(null), c?.by || {}) });
+    const amt = (b) => ({ total: +b?.total || 0, hits: +b?.hits || 0, crits: +b?.crits || 0, by: Object.assign(Object.create(null), b?.by || {}), othersN: +b?.othersN || 0 });
+    const cnt = (c) => ({ total: +c?.total || 0, by: Object.assign(Object.create(null), c?.by || {}), othersN: +c?.othersN || 0 });
     if (snap.since) this.since = Math.min(this.since, +snap.since);
     this.last = snap.last ?? this.last;
     this.dmgOut = amt(snap.dmgOut); this.dmgIn = amt(snap.dmgIn);

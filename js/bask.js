@@ -88,13 +88,13 @@ function cleanAmt(b) {
   b = obj(b);
   const by = {};
   for (const [k, v] of Object.entries(obj(b.by))) if (Array.isArray(v)) by[str(k)] = [num(v[0]), num(v[1]), num(v[2])];
-  return { total: num(b.total), hits: num(b.hits), crits: num(b.crits), by };
+  return { total: num(b.total), hits: num(b.hits), crits: num(b.crits), by, othersN: num(b.othersN) };
 }
 function cleanCount(c) {
   c = obj(c);
   const by = {};
   for (const [k, v] of Object.entries(obj(c.by))) by[str(k)] = num(v);
-  return { total: num(c.total), by };
+  return { total: num(c.total), by, othersN: num(c.othersN) };
 }
 function cleanTotals(t) {
   t = obj(t);
@@ -716,8 +716,15 @@ function akaTag(p) {
   return aka.length ? ` <span class="aka" title="Character name from their log">${esc(aka[0])}</span>` : '';
 }
 const nameCell = (p) => `${swatch(p)}${esc(p)}${akaTag(p)}${classTag(p)}`;
-const amtItems = (by) => Object.entries(by).map(([label, v]) => ({ label, value: v[0], hits: v[1], crits: v[2] })).filter((x) => x.value > 0);
-const countItems = (by) => Object.entries(by).map(([label, v]) => ({ label, value: v })).filter((x) => x.value > 0);
+// To keep what each player shares small, only their top 24 names per list
+// are sent; the rest arrive folded into one "Others" entry (with a count).
+const OTHERS_NOTE = 'Everyone outside this player\u2019s top 24, combined so the data shared with the group stays small.';
+function othersItem(item, n) {
+  if (item.label !== 'Others') return item;
+  return { ...item, label: n ? `Others (${n} more)` : 'Others', note: OTHERS_NOTE };
+}
+const amtItems = (map) => Object.entries(map.by).map(([label, v]) => othersItem({ label, value: v[0], hits: v[1], crits: v[2] }, map.othersN)).filter((x) => x.value > 0);
+const countItems = (map) => Object.entries(map.by).map(([label, v]) => othersItem({ label, value: v }, map.othersN)).filter((x) => x.value > 0);
 const total = (f) => S.order.reduce((a, p) => a + f(T(p)), 0);
 const playerItems = (f) => S.order.map((p) => ({ label: p, ...f(T(p), p) }));
 const byPlayerColor = (i) => playerColor(i.label);
@@ -897,14 +904,14 @@ function renderDamage(c) {
   const g2 = grid(section(c, 'Who hit each player', 'Everything that damaged each groupmate, by attacker.'), 2);
   for (const p of S.order) {
     const cc = card(g2, `${nameCell(p)} <span class="sub">took ${fmtExact(T(p).dmgIn.total)}</span>`);
-    const items = amtItems(T(p).dmgIn.by);
+    const items = amtItems(T(p).dmgIn);
     if (!items.length) empty(cc, 'No damage taken.'); else barChart(cc, { items, maxItems: 10, colorFn: () => 'var(--series-8)' });
   }
 
   const g3 = grid(section(c, 'Who each player hit'), 2);
   for (const p of S.order) {
     const cc = card(g3, `${nameCell(p)} <span class="sub">dealt ${fmtExact(T(p).dmgOut.total)}</span>`);
-    const items = amtItems(T(p).dmgOut.by);
+    const items = amtItems(T(p).dmgOut);
     if (!items.length) empty(cc, 'No damage dealt.'); else barChart(cc, { items, maxItems: 10, colorFn: () => playerColor(p) });
   }
 
@@ -914,8 +921,8 @@ function renderDamage(c) {
     if (!t.resists.total && !t.interrupts.total) continue;
     const cc = card(g4, `${nameCell(p)} <span class="sub">${t.resists.total} resisted · ${t.interrupts.total} interrupted</span>`);
     const sub = (text) => { const h = document.createElement('div'); h.className = 'sub mini-head'; h.textContent = text; cc.appendChild(h); };
-    if (t.resists.total) { sub('Resisted by'); barChart(cc, { items: countItems(t.resists.by), maxItems: 6, valueFmt: countFmt, colorFn: () => 'var(--series-4)' }); }
-    if (t.interrupts.total) { sub('Interrupted by'); barChart(cc, { items: countItems(t.interrupts.by), maxItems: 6, valueFmt: countFmt, colorFn: () => 'var(--series-2)' }); }
+    if (t.resists.total) { sub('Resisted by'); barChart(cc, { items: countItems(t.resists), maxItems: 6, valueFmt: countFmt, colorFn: () => 'var(--series-4)' }); }
+    if (t.interrupts.total) { sub('Interrupted by'); barChart(cc, { items: countItems(t.interrupts), maxItems: 6, valueFmt: countFmt, colorFn: () => 'var(--series-2)' }); }
   }
   if (!g4.children.length) empty(g4, 'No resists or interrupts yet.');
 }
@@ -943,14 +950,14 @@ function renderHealing(c) {
   for (const r of S.order) {
     const list = hm.fromOutside.get(r);
     if (!list.length) continue;
-    barChart(card(g2, nameCell(r)), { items: list.map(([label, value]) => ({ label, value })), maxItems: 8, colorFn: () => 'var(--series-6)' });
+    barChart(card(g2, nameCell(r)), { items: list.map(([label, value]) => othersItem({ label, value }, T(r).healIn.othersN)), maxItems: 8, colorFn: () => 'var(--series-6)' });
   }
   if (!g2.children.length) empty(g2, 'None yet.');
 
   if (healers.length) {
     const g3 = grid(section(c, 'Who each healer healed'), 2);
     for (const h of healers) {
-      barChart(card(g3, `${nameCell(h)} <span class="sub">healed ${fmtExact(T(h).healOut.total)}</span>`), { items: amtItems(T(h).healOut.by), maxItems: 10, colorFn: () => 'var(--series-3)' });
+      barChart(card(g3, `${nameCell(h)} <span class="sub">healed ${fmtExact(T(h).healOut.total)}</span>`), { items: amtItems(T(h).healOut), maxItems: 10, colorFn: () => 'var(--series-3)' });
     }
   }
   renderSupport(c);

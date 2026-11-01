@@ -12,6 +12,13 @@
 export const CHANGELOG = [
   {
     date: '2026-10-31',
+    title: 'Bask: clearer "Others"',
+    bullets: [
+      'Bask names each player\'s top 24 targets, attackers and so on, and groups the rest to keep shared data small. That group now says how many it holds, like "Others (31 more)", and hovering it explains why',
+    ],
+  },
+  {
+    date: '2026-10-31',
     title: 'Bask: @tag markers',
     bullets: [
       'Type @tag <text> in any chat channel during a bask (say, @tag koth) and a labelled line appears at that moment on the group charts for everyone, showing who tagged it',
