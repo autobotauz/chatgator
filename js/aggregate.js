@@ -1095,6 +1095,7 @@ export function buildStats(events, playerNameHint) {
       total: healInTotal,
       bySource: finalizeSourceMap(healInBySource),
       timeline: bucketTimeline(healInPoints, startClock, endClock),
+      points: healInPoints,
     },
     powerOut: {
       total: powerOutTotal,

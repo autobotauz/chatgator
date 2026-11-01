@@ -176,6 +176,7 @@ export function renderOverview(container, stats, ctx) {
   legend(tlCard, [
     { color: 'var(--series-1)', label: 'Damage done' },
     { color: 'var(--series-3)', label: 'Healing done' },
+    { color: 'var(--series-6)', label: 'Healing received' },
     { color: 'var(--series-8)', label: 'Damage taken' },
     { color: 'var(--series-4)', label: 'Realm points' },
     { color: 'var(--series-7)', label: 'Deathblow' },
@@ -191,6 +192,7 @@ export function renderOverview(container, stats, ctx) {
     series: [
       { name: 'Damage done', color: 'var(--series-1)', raw: stats.damageOut.points },
       { name: 'Healing done', color: 'var(--series-3)', raw: stats.healOut.points },
+      { name: 'Healing received', color: 'var(--series-6)', raw: stats.healIn.points },
       { name: 'Damage taken', color: 'var(--series-8)', raw: stats.damageIn.points },
       { name: 'Realm points', color: 'var(--series-4)', raw: stats.realmPoints.points },
     ],

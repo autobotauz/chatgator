@@ -12,6 +12,13 @@
 export const CHANGELOG = [
   {
     date: '2026-11-01',
+    title: 'Healing received on the Overview chart',
+    bullets: [
+      'The Activity over time chart now has a Healing received line alongside healing done, damage taken and realm points',
+    ],
+  },
+  {
+    date: '2026-11-01',
     title: 'Bask season',
     bullets: [
       'Bask runs on a free plan with a monthly data allowance. The start page and the bask bar now show about how many hours of basking are left this month, and warn when it\'s running low',
