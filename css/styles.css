@@ -540,3 +540,23 @@ table.data-table tbody tr:hover { background: var(--surface-2); }
 .gator-pile > span:nth-child(1) { font-size: .72em; transform: translateY(-.32em); }
 .gator-pile > span:nth-child(2) { font-size: .72em; margin-left: -.42em; transform: translateY(-.5em); }
 .gator-pile > span:nth-child(3) { margin-left: -.55em; }
+
+/* ---------- "started today" strip (both home pages) ---------- */
+.today-strip { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+.today-strip[hidden] { display: none; }
+.today-card {
+  flex: 1 1 220px; display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-1);
+  color: var(--text-primary); text-decoration: none;
+}
+.today-card.is-here {
+  border-color: color-mix(in srgb, var(--series-3) 45%, var(--border));
+  background: color-mix(in srgb, var(--series-3) 7%, var(--surface-1));
+}
+a.today-card:hover { border-color: color-mix(in srgb, var(--series-1) 40%, var(--border)); }
+.today-icon { font-size: 30px; line-height: 1; flex: none; }
+.today-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.today-num { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.is-here .today-num { color: color-mix(in srgb, var(--series-3) 75%, var(--text-primary)); }
+.today-label { font-size: 13px; color: var(--text-secondary); }
+a.today-card .today-num { font-size: 20px; }

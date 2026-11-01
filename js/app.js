@@ -12,6 +12,7 @@ import { startLiveBackground, stopLiveBackground, setColor as setLiveBackgroundC
 import { CHANGELOG } from './changelog.js';
 import { realmColorForClass, realmForRace, REALM_COLORS } from './realm.js';
 import { saveSession, loadSession, clearSession } from './session-store.js';
+import * as usage from './usage.js';
 
 // Champion-level abilities with a known Recast Delay, reshaped into the same
 // { cooldownSeconds, cooldown, icon } shape ABILITY_COOLDOWNS already uses,
@@ -331,6 +332,11 @@ el('btnSample').addEventListener('click', () => loadSampleByKey(el('sampleClassS
 
 el('btnLoadAnother').addEventListener('click', startNewSession);
 
+// "Sessions started today" on the home page.
+(async function showToday() {
+  try { usage.renderToday(el('todayStrip'), await usage.countsToday(), 'solo'); } catch { /* best-effort */ }
+})();
+
 function startNewSession() {
   stopWatching();
   el('appMain').hidden = true;
@@ -370,6 +376,15 @@ async function loadHandle(handle) {
     return;
   }
   await beginWatch(handle);
+  if (state.watcher) noteSessionStart(false);
+}
+
+// One tiny "a session started" note (js/usage.js): only for a log you opened
+// yourself -- not a sample, a snapshot, or resuming after a refresh.
+function noteSessionStart(final) {
+  let name = null, cls = null;
+  try { const st = currentStats(); name = st.meta.playerName || null; cls = st.meta.inferredClass?.name || null; } catch { /* nothing parsed yet */ }
+  usage.sessionStarted({ name, cls, final });
 }
 
 async function loadFiles(files) {
@@ -387,6 +402,7 @@ async function loadFiles(files) {
     texts.push({ name: file.name, text });
   }
   ingestTexts(texts);
+  noteSessionStart(true); // the whole file is parsed: nothing more to learn
 }
 
 // ---------------------------------------------------------------------------
@@ -812,6 +828,7 @@ document.querySelectorAll('.tab').forEach(btn => {
 function renderActiveTab() {
   if (!state.rawEvents.length) return;
   const stats = currentStats();
+  usage.sessionLearned({ name: stats.meta.playerName, cls: stats.meta.inferredClass?.name });
   renderBgTicker();
   renderEnemiesTargeted(stats.meta.playerName);
   renderCooldownTracker();

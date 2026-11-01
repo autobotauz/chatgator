@@ -579,3 +579,101 @@ create extension if not exists pg_cron;
 select cron.unschedule('bask-cleanup') where exists (select 1 from cron.job where jobname = 'bask-cleanup');
 select cron.schedule('bask-cleanup', '7 * * * *',
   $$delete from public.bask_sessions where expires_at < now()$$);
+
+-- ------------------------------------------------------- Chat Gator usage --
+-- Solo session starts + "sessions started today" counts.
+-- Solo Chat Gator records one tiny row when a session starts (character
+-- name, class, realm, time; any of the first three can be unknown). Nothing
+-- from the log itself. Rows are kept 90 days. An hourly tally counts solo
+-- sessions and new baskets, so "today" survives baskets being deleted and
+-- each visitor can ask from their own local midnight.
+
+create table if not exists public.chatgator_sessions (
+  id          bigint generated always as identity primary key,
+  started_at  timestamptz not null default now(),
+  player      text check (player is null or char_length(player) between 1 and 40),
+  class       text check (class is null or char_length(class) between 1 and 30),
+  realm       text check (realm is null or realm in ('Albion', 'Midgard', 'Hibernia'))
+);
+alter table public.chatgator_sessions enable row level security;
+revoke all on public.chatgator_sessions from anon;
+
+create table if not exists public.chatgator_usage_hourly (
+  hour  timestamptz primary key,
+  solo  int not null default 0,
+  bask  int not null default 0
+);
+alter table public.chatgator_usage_hourly enable row level security;
+revoke all on public.chatgator_usage_hourly from anon;
+
+create or replace function public.chatgator_count_add(p_kind text, p_at timestamptz default now()) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  insert into chatgator_usage_hourly (hour, solo, bask)
+    values (date_trunc('hour', p_at), (p_kind = 'solo')::int, (p_kind = 'bask')::int)
+    on conflict (hour) do update set solo = chatgator_usage_hourly.solo + excluded.solo,
+                                      bask = chatgator_usage_hourly.bask + excluded.bask;
+end $$;
+
+create or replace function public.chatgator_count_trigger() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  -- (my own test baskets, TEST*, aren't real use)
+  if tg_argv[0] = 'bask' then
+    if new.code like 'TEST%' then return null; end if;
+  end if;
+  perform chatgator_count_add(tg_argv[0], now());
+  return null;
+end $$;
+drop trigger if exists chatgator_sessions_count on public.chatgator_sessions;
+create trigger chatgator_sessions_count after insert on public.chatgator_sessions
+  for each row execute function public.chatgator_count_trigger('solo');
+drop trigger if exists bask_sessions_count on public.bask_sessions;
+create trigger bask_sessions_count after insert on public.bask_sessions
+  for each row execute function public.chatgator_count_trigger('bask');
+
+-- Called once per solo session. Unknown fields stay null; a realm that
+-- isn't one of the three is dropped rather than rejected.
+create or replace function public.chatgator_session_start(p_player text default null, p_class text default null, p_realm text default null) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  insert into chatgator_sessions (player, class, realm) values (
+    nullif(left(btrim(coalesce(p_player, '')), 40), ''),
+    nullif(left(btrim(coalesce(p_class, '')), 30), ''),
+    case when p_realm in ('Albion', 'Midgard', 'Hibernia') then p_realm end);
+  perform bask_meter_add(bask_req_bytes());
+end $$;
+
+-- Sessions started since the caller's local midnight (clamped to the last
+-- two days): { solo, bask }.
+create or replace function public.chatgator_counts(p_since timestamptz) returns json
+language plpgsql security definer set search_path = public as $$
+declare since timestamptz := greatest(coalesce(p_since, now() - interval '1 day'), now() - interval '2 days');
+        result json;
+begin
+  select json_build_object('solo', coalesce(sum(solo), 0), 'bask', coalesce(sum(bask), 0)) into result
+    from chatgator_usage_hourly where hour >= date_trunc('hour', since);
+  perform bask_meter_add(bask_req_bytes() + length(result::text));
+  return result;
+end $$;
+
+revoke all on function public.chatgator_count_add(text, timestamptz) from public;
+revoke all on function public.chatgator_session_start(text, text, text) from public;
+revoke all on function public.chatgator_counts(timestamptz) from public;
+grant execute on function public.chatgator_session_start(text, text, text) to anon;
+grant execute on function public.chatgator_counts(timestamptz) to anon;
+
+-- Baskets already started today (before this tally existed).
+insert into public.chatgator_usage_hourly (hour, bask)
+  select date_trunc('hour', created_at), count(*) from public.bask_sessions
+  where created_at > now() - interval '2 days' and code not like 'TEST%'
+  group by 1
+  on conflict (hour) do nothing;
+
+-- Daily: drop solo rows older than 90 days and tallies older than ~13 months.
+select cron.unschedule('chatgator-cleanup') where exists (select 1 from cron.job where jobname = 'chatgator-cleanup');
+select cron.schedule('chatgator-cleanup', '23 4 * * *',
+  $$delete from public.chatgator_sessions where started_at < now() - interval '90 days';
+    delete from public.chatgator_usage_hourly where hour < now() - interval '400 days'$$);
+
+notify pgrst, 'reload schema';

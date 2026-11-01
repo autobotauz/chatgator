@@ -14,6 +14,7 @@ import { escHtml, heraldLink } from './ui.js';
 import { iconHtml } from './icons.js';
 import { GroupSummarizer, TICK_MS } from './bask-summary.js';
 import * as net from './bask-net.js';
+import { countsToday, renderToday } from './usage.js';
 import { saveHandle, loadHandle, forgetHandle } from './bask-store.js';
 import { CLASS_REALM, realmColorForClass } from './realm.js';
 
@@ -1367,6 +1368,8 @@ el('btnLeave').addEventListener('click', () => {
     return;
   }
   const code = net.normalizeCode(new URLSearchParams(location.search).get('code'));
+  // "Sessions started today" on the start page (best-effort).
+  countsToday().then((c) => renderToday(el('todayStrip'), c, 'bask')).catch(() => {});
   (async () => {
     // Season first: if it's closed there's no basking to start or resume.
     try { S.quota = await net.quota(); } catch { /* the meter is best-effort */ }

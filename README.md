@@ -14,12 +14,19 @@ It's the spiritual successor to [daoc-chat-gator](https://github.com/autobotauz/
 
 Everything — reading the file, parsing it, computing every stat, drawing
 every chart — happens **inside your browser tab**, in plain JavaScript.
-There is no backend. Your `chat.log` is never uploaded anywhere. (The one opt-in exception is a Bask group session — see below — which shares names and numbers only, never log lines.) You can
-verify this yourself: open your browser's network panel while using the
-site and you'll see zero outgoing requests except, optionally, one to a
-public Eden spell database used only to label spell names with their damage
-type/class (and even that one fails silently and harmlessly if it's blocked
-— see `js/skills.js`).
+Your `chat.log` is never uploaded anywhere. (The one opt-in exception is a
+Bask group session — see below — which shares names and numbers only, never
+log lines.) You can verify this yourself in your browser's network panel. The
+only requests are:
+
+- one small note when you start a session from your own log (not a sample, a
+  snapshot or a refresh): your character's name, class and realm if known,
+  and the time — so we can count how many sessions people start
+  (`js/usage.js`; kept 90 days);
+- the "sessions started today" counts on the home page;
+- optionally, a public Eden spell database used only to label spell names
+  with their damage type/class (it fails silently if blocked — see
+  `js/skills.js`).
 
 ## Using it
 

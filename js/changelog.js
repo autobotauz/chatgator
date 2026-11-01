@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-11-01',
+    title: 'Sessions started today',
+    bullets: [
+      'The Chat Gator and Bask start pages now show how many sessions and baskets people have started today',
+      'To count them, starting a session from your own log now sends one small note: your character\'s name, class and realm (if known) and the time. Your log itself still never leaves your machine. Samples, snapshots and refreshes don\'t count',
+    ],
+  },
+  {
+    date: '2026-11-01',
     title: 'Healing received on the Overview chart',
     bullets: [
       'The Activity over time chart now has a Healing received line alongside healing done, damage taken and realm points',

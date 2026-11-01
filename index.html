@@ -89,6 +89,8 @@
       <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt,.json">
     </div>
 
+    <div class="today-strip" id="todayStrip" hidden></div>
+
     <div class="features-card">
       <h3>What Chat Gator does</h3>
       <ul>
@@ -102,7 +104,7 @@
         <li><strong>Bask with your group</strong> — <a href="bask/">start a live group session</a> for up to 8 players: everyone's damage, healing, resists, interrupts, pets, cooldowns and deathblows in one shared view. Combat numbers only, no chat, gone after 12 hours with no activity.</li>
         <li><strong>Share a session</strong> as a file — a groupmate or BG leader can drop it in and see the same breakdown.</li>
         <li><strong>Your own in-game <code>/stats</code> totals</strong> (RP, deathblows, deaths, kills/death) shown alongside the computed numbers, when available.</li>
-        <li><strong>100% local</strong> — your log is parsed in this browser tab and never leaves your machine.</li>
+        <li><strong>Your log stays local</strong> — it's parsed in this browser tab and never leaves your machine. The only thing sent anywhere is one small note when you start a session (your character's name, class and realm, if known) so we can count how many sessions people start.</li>
       </ul>
     </div>
   </section>
@@ -173,7 +175,7 @@
   </aside>
 
   <p class="footer-note">
-    Chat Gator reads the Dark Age of Camelot <code>chat.log</code> format straight from your browser — drag a file in, nothing leaves your machine.<br>
+    Chat Gator reads the Dark Age of Camelot <code>chat.log</code> format straight from your browser — drag a file in; your log never leaves your machine.<br>
     Built for the DAoC community. Spell/realm-ability names are best-effort matched against a public spell database when your browser can reach it; everything else comes straight from your log.
   </p>
 
