@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-10-31',
+    title: 'Bask: @tag markers',
+    bullets: [
+      'Type @tag <text> in any chat channel during a bask (say, @tag koth) and a labelled line appears at that moment on the group charts for everyone, showing who tagged it',
+      'Only your own tags are shared, and only the tag text, never the rest of your chat',
+    ],
+  },
+  {
+    date: '2026-10-31',
     title: 'Chart filters and a tidier layout',
     bullets: [
       'Click any label in a chart\'s legend (Overview, Realm Points, Pets) to show only that line or marker; click it again to bring everything back',

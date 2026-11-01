@@ -10,6 +10,9 @@
 //   * takeDirtyTicks(): the 15-second time buckets that changed since the last
 //     call, for the group time-series chart.
 //
+// The one exception to "no chat": your own "@tag <text>" lines (typed on
+// purpose to mark a moment, same as the main page), as the tag text only.
+//
 // What is deliberately NOT in here, ever: chat or raw log lines, spell/style
 // names (except names of abilities with a tracked cooldown, for the cooldown
 // view), realm points, /stats output. Only names of the people involved and
@@ -99,6 +102,7 @@ const ACTIVITY = new Set([
   'you_died', 'target', 'item_use', 'resurrected_by',
 ]);
 const MAX_SUPPORT = 150;      // resurrect / cure mezz lists
+const MAX_TAGS = 100;         // @tag markers
 const KILL_MEMORY = 5000;     // recent kill-feed lines kept in memory (never sent)
 
 const EMPTY_TICK = () => ({ do: 0, di: 0, ho: 0, hi: 0, pd: 0, rs: 0, ir: 0, db: 0, dd: 0 });
@@ -151,6 +155,7 @@ export class GroupSummarizer {
     this.lastTarget = null;
     this.rezzes = [];                    // { at, by, on } -- our casts, and rezzes we received
     this.cures = [];                     // { at, by, on, spell } -- our Cure Mezz casts
+    this.tags = [];                      // { at, text } -- our own "@tag <text>" chat lines
     this.lastActive = null;              // epoch ms of this player's last own activity
     this.paused = null;                  // epoch ms when the page stopped reading the log (idle 1h)
   }
@@ -315,6 +320,19 @@ export class GroupSummarizer {
       case 'target':
         this.lastTarget = e.target || null;
         break;
+      case 'user_tag': {
+        // Only our own: "You say" / no speaker / our name. A groupmate's tag
+        // in party chat is theirs to share.
+        const sp = e.speaker && norm(e.speaker);
+        if (sp && sp !== 'you' && !this.names.has(sp)) break;
+        const text = String(e.text || '').trim().slice(0, 40);
+        if (!text) break;
+        this.tags.push({ at, text });
+        if (this.tags.length > MAX_TAGS) this.tags.shift();
+        this._tick(at); // make sure the chart's time range reaches it
+        if (this.lastActive == null || at > this.lastActive) this.lastActive = at;
+        break;
+      }
       case 'resurrected_by':
         this._support(this.rezzes, { at, by: e.healer, on: this.player });
         break;
@@ -415,6 +433,7 @@ export class GroupSummarizer {
       nameOk: this.nameOk,
       rezzes: this.rezzes.slice(),
       cures: this.cures.slice(),
+      tags: this.tags.slice(),
       paused: this.paused,
       cooldowns: Object.fromEntries(Object.entries(this.cdUsed).map(([n, at]) => [n, [at, this.cooldowns[n]?.cooldownSeconds ?? null]])),
     };
@@ -442,6 +461,7 @@ export class GroupSummarizer {
     if (snap.nameOk) this.nameOk = true;
     if (Array.isArray(snap.rezzes)) this.rezzes = snap.rezzes.slice(-MAX_SUPPORT);
     if (Array.isArray(snap.cures)) this.cures = snap.cures.slice(-MAX_SUPPORT);
+    if (Array.isArray(snap.tags)) this.tags = snap.tags.slice(-MAX_TAGS);
     // (snap.paused is deliberately not restored: picking the log again resumes.)
     if (snap.cls && typeof snap.cls.name === 'string') this.cls = { name: snap.cls.name, confidence: +snap.cls.confidence || 0 };
   }

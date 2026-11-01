@@ -114,6 +114,7 @@ function cleanTotals(t) {
     aka: Array.isArray(t.aka) ? t.aka.slice(0, 4).map((n) => str(n, 40)).filter(Boolean) : [],
     nameOk: !!t.nameOk,
     rezzes: list(t.rezzes, (x) => ({ at: num(obj(x).at), by: obj(x).by ? str(obj(x).by, 40) : null, on: obj(x).on ? str(obj(x).on, 40) : null })),
+    tags: list(t.tags, (x) => ({ at: num(obj(x).at), text: str(obj(x).text, 40) })).filter((x) => x.at && x.text),
     cures: list(t.cures, (x) => ({ at: num(obj(x).at), by: obj(x).by ? str(obj(x).by, 40) : null, on: obj(x).on ? str(obj(x).on, 40) : null, spell: obj(x).spell ? str(obj(x).spell, 60) : null })),
     paused: num(t.paused) || null,
     cls: t.cls && CLASS_REALM[t.cls.name] !== undefined ? String(t.cls.name) : null,
@@ -139,6 +140,7 @@ function mergeMembers(rows) {
     }
     const t = S.members.get(player).totals;
     if (t.paused) pushFeed(`stop:${player}:${t.paused}`, t.paused, `⚠️ <strong>${esc(player)}</strong> was idle for an hour; their chat.log needs picking again`);
+    for (const g of t.tags) pushFeed(`tag:${player}:${g.at}:${g.text}`, g.at, `🏷️ <strong>${esc(player)}</strong> tagged <strong>${esc(g.text)}</strong>`);
     for (const d of t.deathblows) pushFeed(`db:${player}:${d.at}:${d.victim}`, d.at, `⚔️ <strong>${esc(player)}</strong> took down ${heraldLink(d.victim)}`);
     for (const d of t.deaths) pushFeed(`dd:${player}:${d.at}`, d.at, `💀 <strong>${esc(player)}</strong> died${d.killer ? ` to ${heraldLink(d.killer)}` : ''}`);
     if (r.updated_at && (!S.memberCursor || r.updated_at > S.memberCursor)) S.memberCursor = r.updated_at;
@@ -665,6 +667,16 @@ function tickDomain() {
 const fmtTime = (t) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 const fmtTimeSec = (t) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
+// Everyone's own "@tag <text>" lines: a labelled line on every group chart,
+// with who tagged it. Legend entries are one per distinct tag text (same as
+// the main page), so clicking one shows just that tag.
+function tagMarkers() {
+  const out = [];
+  for (const p of S.order) for (const t of T(p).tags || []) out.push({ t: t.at, color: 'var(--user-tag)', label: t.text, text: `${t.text} · ${p}` });
+  return out;
+}
+const tagLegend = () => [...new Set(tagMarkers().map((m) => m.label))].map((label) => ({ color: 'var(--user-tag)', label }));
+
 function killMarkers() {
   const out = [];
   for (const p of S.order) {
@@ -831,9 +843,10 @@ function renderOverview(c) {
     { color: 'var(--series-1)', label: 'Damage out' }, { color: 'var(--series-8)', label: 'Damage in' },
     { color: 'var(--series-3)', label: 'Heals out' }, { color: 'var(--series-6)', label: 'Heals in' },
     { color: 'var(--series-7)', label: 'Deathblow' }, { color: 'var(--status-critical)', label: 'Death' },
-  ]);
+    ...tagLegend(),
+  ], { chartId: 'bask-group' });
   timelineChart(c1, {
-    id: 'bask-group', domain: dom, timeFmt: fmtTime, markers: killMarkers(),
+    id: 'bask-group', domain: dom, timeFmt: fmtTime, markers: [...killMarkers(), ...tagMarkers()],
     series: [
       { name: 'Damage out', color: 'var(--series-1)', raw: all('do') },
       { name: 'Damage in', color: 'var(--series-8)', raw: all('di') },
@@ -842,9 +855,9 @@ function renderOverview(c) {
     ],
   });
   const c1b = card(section(c));
-  legend(c1b, [{ color: 'var(--series-4)', label: 'Resisted' }, { color: 'var(--series-2)', label: 'Interrupted' }]);
+  legend(c1b, [{ color: 'var(--series-4)', label: 'Resisted' }, { color: 'var(--series-2)', label: 'Interrupted' }, ...tagLegend()], { chartId: 'bask-group-ri' });
   timelineChart(c1b, {
-    id: 'bask-group-ri', domain: dom, timeFmt: fmtTime, height: 150, valueFmt: countFmt,
+    id: 'bask-group-ri', domain: dom, timeFmt: fmtTime, height: 150, valueFmt: countFmt, markers: tagMarkers(),
     series: [
       { name: 'Resisted', color: 'var(--series-4)', raw: all('rs') },
       { name: 'Interrupted', color: 'var(--series-2)', raw: all('ir') },
@@ -857,9 +870,9 @@ function renderOverview(c) {
   chips.innerHTML = metrics.map(([k, l]) => `<button class="chip${S.metric === k ? ' active' : ''}" data-metric="${k}">${l}</button>`).join('');
   chips.addEventListener('click', (ev) => { const b = ev.target.closest('[data-metric]'); if (!b) return; S.metric = b.dataset.metric; renderOverview(c); });
   c2.appendChild(chips);
-  legend(c2, S.order.map((p) => ({ color: playerColor(p), label: p })));
+  legend(c2, [...S.order.map((p) => ({ color: playerColor(p), label: p })), ...tagLegend()], { chartId: 'bask-players' });
   timelineChart(c2, {
-    id: 'bask-players', domain: dom, timeFmt: fmtTime, markers: killMarkers(),
+    id: 'bask-players', domain: dom, timeFmt: fmtTime, markers: [...killMarkers(), ...tagMarkers()],
     valueFmt: S.metric === 'rs' || S.metric === 'ir' ? countFmt : fmtNum,
     series: tickSeries(S.metric),
   });

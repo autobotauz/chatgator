@@ -83,8 +83,11 @@ What's shared is deliberately small: each player's browser parses their own
 log locally and sends only names and numbers — damage and healing in and out
 (and who it went to or came from), resists, interrupts, pets, cooldown
 last-use times, deathblows and deaths, plus 15-second time buckets for the
-charts. Never chat, raw log lines, per-ability breakdowns or realm points.
-Only lines written *after* a player joins are counted.
+charts. Never chat, raw log lines, per-ability breakdowns or realm points,
+with one opt-in exception: like the main page, `@tag <text>` typed in chat
+marks a moment, and each player's own tags (the tag text only) are drawn as
+labelled lines on the group charts with who tagged them. Only lines written
+*after* a player joins are counted.
 
 - `js/bask-summary.js` — events → the shared summary (pure, unit-testable:
   `node tools/test-bask-summary.mjs`).
