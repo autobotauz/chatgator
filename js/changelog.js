@@ -11,6 +11,14 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-11-01',
+    title: 'Bask season',
+    bullets: [
+      'Bask runs on a free plan with a monthly data allowance. The start page and the bask bar now show about how many hours of basking are left this month, and warn when it\'s running low',
+      'If the month\'s allowance runs out, the bask season closes until it resets: you\'ll see a clear notice, new baskets can\'t start, and a running bask switches to solo. Your own numbers keep updating, and you can still download the group\'s numbers',
+    ],
+  },
+  {
     date: '2026-10-31',
     title: 'Bask: clearer "Others"',
     bullets: [

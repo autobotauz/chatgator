@@ -148,6 +148,17 @@ export async function poll(code, membersSince, ticksSince, viewerId) {
 }
 export const POLL_TICK_LIMIT = 3000;
 
+// ---- bask season ---------------------------------------------------------------
+// The shared monthly data allowance (see bask_quota in supabase/bask.sql):
+// { used, limit, closed, resets_at, hours_left }.
+export async function quota() {
+  return rest('rpc/bask_quota', { method: 'POST', body: {} });
+}
+// The server refuses writes with this once the season is closed.
+export function isSeasonClosed(err) {
+  return /BASK_SEASON_CLOSED/.test(String(err && err.message));
+}
+
 // "Still here" for a player whose numbers haven't changed. false = booted.
 export async function ping(code, me, key) {
   return (await rest('rpc/bask_ping', { method: 'POST', body: { p_code: code, p_me: me, p_key: key } })) === true;

@@ -33,9 +33,23 @@
 
   <!-- ===================== lobby ===================== -->
   <section id="lobby">
+    <div class="season-closed" id="seasonClosedLobby" role="alert" hidden>
+      <span class="season-moon" aria-hidden="true">🌙</span>
+      <div>
+        <h2>Bask season's over for this month</h2>
+        <p>The group has used this month's shared data, so new baskets can't start and running ones have switched to solo. Group basking returns on <strong id="seasonClosedDate">the next reset</strong>.</p>
+        <p>You can still track your own numbers live: <a class="btn primary" href="../">Open Chat Gator solo</a></p>
+      </div>
+    </div>
+
     <div class="bask-hero">
       <h2>Gather your gators</h2>
       <p>A <strong>bask</strong> is a shared view for up to 8 players. Each player's Chat Gator reads their own <code>chat.log</code> live and shares only combat numbers: damage and healing in and out (and who it went to or came from), resists, interrupts, pets, cooldowns and deathblows. No chat, no raw log lines, no ability breakdowns, no realm points. Type <code>@tag &lt;text&gt;</code> in any chat channel (say, <code>@tag koth</code>) to mark a moment on the group charts; only that tag text is shared. A bask and everything in it is deleted after 12 hours with no activity.</p>
+    </div>
+
+    <div class="season-meter" id="seasonMeter" hidden title="Bask runs on a free database plan with a monthly data allowance. This is an estimate from this month's use so far.">
+      <span class="season-meter-label" id="seasonMeterLabel"></span>
+      <span class="season-meter-bar"><span class="season-meter-fill" id="seasonMeterFill"></span></span>
     </div>
 
     <div class="card recent-box" id="recentBox" hidden>
@@ -116,11 +130,24 @@
       <div class="bask-bar-code">
         <span class="sub">Bask</span> <strong id="barCode">——————</strong>
         <button class="icon-btn" id="btnBarCopy" title="Copy invite link">🔗</button>
+        <span class="pill season-pill" id="barSeason" hidden></span>
         <span class="pill" id="barWatching" hidden title="Browsers watching this bask without sharing a log (including yours, if you're just watching)."></span>
         <span class="pill" id="barExpires"></span>
         <span class="pill" id="barOffline" hidden>📦 Saved bask</span>
       </div>
       <div class="bask-bar-me sub" id="barMe"></div>
+    </div>
+
+    <div class="season-closed in-bask" id="seasonBanner" role="alert" hidden>
+      <span class="season-moon" aria-hidden="true">🌙</span>
+      <div>
+        <h2 id="seasonBannerTitle">Bask season's over: you're in solo mode</h2>
+        <p id="seasonBannerText"></p>
+        <div class="season-actions">
+          <button class="btn" id="seasonDownload">⬇ Download the group's numbers</button>
+          <a class="btn" href="../">Open Chat Gator solo</a>
+        </div>
+      </div>
     </div>
 
     <div class="resume-banner" id="resumeBanner" hidden>
@@ -160,6 +187,16 @@
     <span class="support-cup" aria-hidden="true">☕</span>
     <p>Chat Gator and Bask are built by a fellow player and independent developer in their spare time. If it's helped you or your group, consider <a href="https://buymeacoffee.com/theorist" target="_blank" rel="noopener">buying me a coffee</a> once, or becoming a member. Every bit goes into making it better.</p>
   </aside>
+
+  <dialog id="seasonDialog" class="small-dialog season-dialog">
+    <div class="season-dialog-moon" aria-hidden="true">🌙</div>
+    <h2>Bask season's over for this month</h2>
+    <p id="seasonDialogText"></p>
+    <div class="dialog-actions">
+      <button class="btn" id="seasonDialogDownload">⬇ Download the group's numbers</button>
+      <button class="btn primary" id="seasonDialogOk">Continue solo</button>
+    </div>
+  </dialog>
 
   <p class="footer-note">
     Bask shares names and combat numbers only, through a small database that deletes every bask after 12 hours with no activity.<br>

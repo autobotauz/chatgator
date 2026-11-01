@@ -342,6 +342,159 @@ grant execute on function public.bask_kick(text, text, text, text, boolean) to a
 grant execute on function public.bask_unban(text, text, text, text) to anon;
 grant execute on function public.bask_leave(text, text, text) to anon;
 
+-- ------------------------------------------------ bask season (quota) --
+-- Bask can't read Supabase's own usage numbers, so the database meters
+-- itself: every response Bask's database sends (plus a per-request header
+-- allowance) is added to a running total for the billing month (the 29th to
+-- the 29th, matching the free plan's cycle). At 4.5 GB of the plan's 5 GB the
+-- season closes: no new baskets, no more shared data, pages switch to solo.
+-- The owner can also close it by hand (update bask_meter set closed = true)
+-- or correct the total from the usage page (update bask_meter set bytes = ...).
+-- The insert below seeds the very first period only; re-running is harmless.
+create table if not exists public.bask_meter (
+  id            int primary key default 1 check (id = 1),
+  period_start  timestamptz not null,
+  bytes         bigint not null default 0,      -- estimated data sent this period
+  bask_seconds  bigint not null default 0,      -- time baskets were active (15s buckets)
+  limit_bytes   bigint not null default 4500000000,
+  closed        boolean not null default false  -- manual switch; resets each period
+);
+alter table public.bask_meter enable row level security;
+revoke all on public.bask_meter from anon;
+
+-- The billing cycle starts on the 29th (or the month's last day if shorter).
+create or replace function public.bask_period_start(at timestamptz) returns timestamptz
+language plpgsql immutable as $$
+declare
+  m date := date_trunc('month', at at time zone 'UTC')::date;
+  anchor date := m + (least(29, extract(day from (m + interval '1 month - 1 day'))::int) - 1);
+begin
+  if (at at time zone 'UTC')::date < anchor then
+    m := (m - interval '1 month')::date;
+    anchor := m + (least(29, extract(day from (m + interval '1 month - 1 day'))::int) - 1);
+  end if;
+  return anchor::timestamp at time zone 'UTC';
+end $$;
+create or replace function public.bask_next_reset(start timestamptz) returns timestamptz
+language sql immutable as $$ select public.bask_period_start(start + interval '32 days') $$;
+
+insert into public.bask_meter (id, period_start, bytes)
+  values (1, public.bask_period_start(now()), 98000000)
+  on conflict (id) do nothing;
+
+-- New billing period: start over.
+create or replace function public.bask_meter_roll() returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  update bask_meter set period_start = bask_period_start(now()), bytes = 0, bask_seconds = 0, closed = false
+  where id = 1 and now() >= bask_next_reset(period_start);
+end $$;
+
+create or replace function public.bask_meter_add(p_bytes bigint, p_seconds int default 0) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  perform bask_meter_roll();
+  update bask_meter set bytes = bytes + greatest(p_bytes, 0), bask_seconds = bask_seconds + greatest(p_seconds, 0) where id = 1;
+end $$;
+
+create or replace function public.bask_season_closed() returns boolean
+language sql stable security definer set search_path = public as $$
+  select coalesce((select closed or bytes >= limit_bytes from bask_meter where id = 1
+                   and now() < bask_next_reset(period_start)), false);
+$$;
+
+-- What pages show: how much is left, roughly how many hours of basking that
+-- is at this month's measured rate (20 MB/h until there's an hour of data),
+-- and when it resets.
+create or replace function public.bask_quota_json() returns json
+language plpgsql security definer set search_path = public as $$
+declare m bask_meter; rate double precision; remaining bigint;
+begin
+  perform bask_meter_roll();
+  select * into m from bask_meter where id = 1;
+  remaining := greatest(m.limit_bytes - m.bytes, 0);
+  rate := case when m.bask_seconds >= 3600 then m.bytes::double precision / (m.bask_seconds / 3600.0) else 20000000 end;
+  return json_build_object(
+    'used', m.bytes, 'limit', m.limit_bytes,
+    'closed', m.closed or m.bytes >= m.limit_bytes,
+    'resets_at', bask_next_reset(m.period_start),
+    'hours_left', round((remaining / greatest(rate, 1))::numeric, 1));
+end $$;
+
+-- Header allowance per request (response headers etc.), counted generously.
+create or replace function public.bask_req_bytes() returns int language sql immutable as $$ select 900 $$;
+
+-- Public: the lobby's meter.
+create or replace function public.bask_quota() returns json
+language plpgsql security definer set search_path = public as $$
+declare q json;
+begin
+  q := bask_quota_json();
+  perform bask_meter_add(bask_req_bytes() + length(q::text));
+  return q;
+end $$;
+
+-- Writes count too: one header allowance per member write and per tick batch;
+-- each brand-new 15s bucket for a bask adds 15s of "bask time".
+create or replace function public.bask_meter_member() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  perform bask_meter_add(bask_req_bytes() + 80);
+  return null;
+end $$;
+drop trigger if exists bask_members_meter on public.bask_members;
+create trigger bask_members_meter after insert or update on public.bask_members
+  for each row execute function public.bask_meter_member();
+
+create or replace function public.bask_meter_ticks_stmt() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  perform bask_meter_add(bask_req_bytes());
+  return null;
+end $$;
+drop trigger if exists bask_ticks_meter_stmt on public.bask_ticks;
+create trigger bask_ticks_meter_stmt after insert or update on public.bask_ticks
+  for each statement execute function public.bask_meter_ticks_stmt();
+
+create or replace function public.bask_meter_ticks_row() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if not exists (select 1 from bask_ticks k where k.code = new.code and k.t = new.t and k.player <> new.player) then
+    perform bask_meter_add(0, 15);
+  end if;
+  return null;
+end $$;
+drop trigger if exists bask_ticks_meter_row on public.bask_ticks;
+create trigger bask_ticks_meter_row after insert on public.bask_ticks
+  for each row execute function public.bask_meter_ticks_row();
+
+-- Closed season: no new baskets, no member or tick writes.
+create or replace function public.bask_season_guard() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if bask_season_closed() then
+    raise exception 'BASK_SEASON_CLOSED: basking returns %',
+      to_char((select bask_next_reset(period_start) from bask_meter where id = 1), 'YYYY-MM-DD') using errcode = 'P0001';
+  end if;
+  return new;
+end $$;
+drop trigger if exists bask_sessions_season on public.bask_sessions;
+create trigger bask_sessions_season before insert on public.bask_sessions
+  for each row execute function public.bask_season_guard();
+drop trigger if exists bask_members_season on public.bask_members;
+create trigger bask_members_season before insert or update on public.bask_members
+  for each row execute function public.bask_season_guard();
+drop trigger if exists bask_ticks_season on public.bask_ticks;
+create trigger bask_ticks_season before insert or update on public.bask_ticks
+  for each row execute function public.bask_season_guard();
+
+revoke all on function public.bask_quota() from public;
+grant execute on function public.bask_quota() to anon;
+revoke all on function public.bask_meter_add(bigint, int) from public;
+revoke all on function public.bask_quota_json() from public;
+revoke all on function public.bask_meter_roll() from public;
+revoke all on function public.bask_season_closed() from public;
+
 -- ------------------------------------------------- polling, spectators --
 -- Spectators: one row per watching browser, refreshed by bask_poll.
 create table if not exists public.bask_viewers (
@@ -366,15 +519,26 @@ end $$;
 -- Everything a page needs in one round trip, to keep data transfer (the
 -- free plan's tightest limit) down: the session, banned names, who's here,
 -- only the members and time buckets that changed since the caller's
--- cursors, and how many are watching. p_viewer: a just-watching browser's
--- id, which also counts it as a spectator.
+-- cursors, how many are watching, and the bask-season quota. p_viewer: a
+-- just-watching browser's id, which also counts it as a spectator. When the
+-- season is closed it answers only { closed, quota }. Its own response size
+-- is metered.
 create or replace function public.bask_poll(p_code text, p_members_since timestamptz default null,
     p_ticks_since timestamptz default null, p_viewer text default null) returns json
 language plpgsql security definer set search_path = public as $$
-declare s bask_sessions;
+declare s bask_sessions; result json;
 begin
+  if bask_season_closed() then
+    result := json_build_object('closed', true, 'quota', bask_quota_json());
+    perform bask_meter_add(bask_req_bytes() + length(result::text));
+    return result;
+  end if;
   select * into s from bask_sessions where code = p_code and expires_at > now();
-  if not found then return json_build_object('session', null); end if;
+  if not found then
+    result := json_build_object('session', null);
+    perform bask_meter_add(bask_req_bytes() + length(result::text));
+    return result;
+  end if;
   if p_viewer ~ '^[0-9a-f]{16,64}$' then
     if exists (select 1 from bask_viewers v where v.code = p_code and v.viewer = p_viewer)
        or (select count(*) from bask_viewers v where v.code = p_code) < 200 then
@@ -383,7 +547,7 @@ begin
     end if;
   end if;
   delete from bask_viewers v where v.code = p_code and v.seen_at < now() - interval '10 minutes';
-  return json_build_object(
+  result := json_build_object(
     'session', json_build_object('code', s.code, 'created_at', s.created_at, 'expires_at', s.expires_at, 'leader', s.leader),
     'banned', coalesce((select json_agg(b.player order by b.banned_at) from bask_banned b where b.code = p_code), '[]'::json),
     'presence', coalesce((select json_agg(json_build_object('player', m.player, 'seen_at', m.seen_at, 'left_at', m.left_at) order by m.joined_at)
@@ -394,7 +558,10 @@ begin
     'ticks', coalesce((select json_agg(json_build_object('player', k.player, 't', k.t, 'updated_at', k.updated_at, 'data', k.data) order by k.updated_at)
         from (select * from bask_ticks k where k.code = p_code and (p_ticks_since is null or k.updated_at > p_ticks_since)
               order by k.updated_at limit 3000) k), '[]'::json),
-    'watching', (select count(*) from bask_viewers v where v.code = p_code and v.seen_at > now() - interval '3 minutes'));
+    'watching', (select count(*) from bask_viewers v where v.code = p_code and v.seen_at > now() - interval '3 minutes'),
+    'quota', bask_quota_json());
+  perform bask_meter_add(bask_req_bytes() + length(result::text));
+  return result;
 end $$;
 
 revoke all on function public.bask_ping(text, text, text) from public;

@@ -131,6 +131,20 @@ cursors (plus presence, banned names and the spectator count). Players send
 totals at most every 30 seconds and only when they changed, with a tiny
 `bask_ping` otherwise; background tabs refresh once a minute.
 
+**Bask season.** Supabase's free plan allows 5 GB of data transfer a month,
+and Bask can't read Supabase's own usage numbers, so the database meters
+itself (`bask_meter`, see `supabase/bask.sql`): every response it sends, plus
+a per-request header allowance, is added up for the billing month (the 29th
+to the 29th). Pages show a rough "hours of basking left" estimate from this
+month's measured rate. At **4.5 GB** (leaving a buffer for estimate error)
+the season closes until the reset: the start page says so and won't create or
+join baskets (the database refuses too), and running baskets switch to solo:
+players keep seeing their own numbers live from their log, nothing is shared,
+and the group as it was can still be downloaded. To close it by hand, or
+correct the meter from the Supabase usage page, run
+`update bask_meter set closed = true` or `update bask_meter set bytes = <n>`
+in the SQL editor; both reset with the new billing period.
+
 Everything is ephemeral: a bask closes 12 hours after its last activity (a
 player joining or new combat numbers; an idle open page doesn't count), is
 hidden the moment it expires, and is deleted by an hourly `pg_cron` job.

@@ -71,12 +71,15 @@ const S = {
   banned: [],            // names the leader banned
   lastLeader: undefined,
   booted: false,
+  quota: null,           // bask season: { used, limit, closed, resets_at, hours_left }
+  solo: null,            // season closed mid-bask: { at, resetsAt }
+  frozen: null,          // the group as it was when solo began (for Download)
   handle: null,          // the chat.log being read
   resume: null,          // { player, handle } while a refreshed page waits to resume sharing
   loopGen: 0,
 };
 
-const now = () => (S.mode === 'offline' ? S.exportedAt : Date.now());
+const now = () => (S.mode === 'offline' ? S.exportedAt : S.solo && S.mode !== 'live' ? S.solo.at : Date.now());
 
 // ---------------------------------------------------------------------------
 // defensive readers for rows anyone holding the code could have written
@@ -171,6 +174,98 @@ function pushFeed(key, at, html) {
 }
 
 const cursorMinus = (iso) => (iso ? new Date(Date.parse(iso) - CURSOR_OVERLAP_MS).toISOString() : null);
+
+// ---------------------------------------------------------------------------
+// bask season: the shared monthly data allowance
+// ---------------------------------------------------------------------------
+// Bask runs on a free database plan. The database meters how much data it
+// has sent this month (supabase/bask.sql, bask_quota); at 4.5 of the plan's
+// 5 GB the "season" closes until the plan resets: no new baskets, and running
+// ones switch to solo (your own numbers keep updating, nothing is shared).
+const SEASON_LOW_HOURS = 10;
+// The plan resets on a date (the billing page shows e.g. "29 Nov"); show that
+// date as-is rather than converting a guessed hour into local time.
+function fmtReset(iso) {
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return 'when the month resets';
+  return `on ${d.toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' })}`;
+}
+function seasonText(q) {
+  const h = Math.max(0, +q.hours_left || 0);
+  const hours = h >= 10 ? Math.round(h) : Math.max(0, Math.round(h * 10) / 10);
+  return `about ${hours} hour${hours === 1 ? '' : 's'} of basking left this month`;
+}
+function renderSeasonMeter() {
+  const q = S.quota;
+  const meter = el('seasonMeter');
+  if (!q || q.closed) { meter.hidden = true; return; }
+  meter.hidden = false;
+  const low = +q.hours_left < SEASON_LOW_HOURS;
+  meter.classList.toggle('low', low);
+  el('seasonMeterLabel').textContent = `🌡️ Bask season: ${seasonText(q)} · resets ${fmtReset(q.resets_at)}`;
+  el('seasonMeterFill').style.width = `${Math.min(100, Math.max(2, 100 - (q.used / q.limit) * 100)).toFixed(1)}%`;
+}
+function renderSeasonPill() {
+  const pill = el('barSeason');
+  const q = S.quota;
+  if (!q || S.mode === 'offline' || S.solo) { pill.hidden = true; return; }
+  pill.hidden = false;
+  const low = +q.hours_left < SEASON_LOW_HOURS;
+  pill.classList.toggle('low', low);
+  pill.textContent = low ? `⚠️ Bask season ending: ~${Math.max(0, Math.round(+q.hours_left * 10) / 10)}h left` : `🌡️ ~${Math.round(+q.hours_left)}h of basking left`;
+  pill.title = `Bask season: ${seasonText(q)}. The shared allowance resets ${fmtReset(q.resets_at)}. Estimated from this month's use so far.`;
+}
+
+// Start page when the season is closed: say so loudly and don't let anyone
+// start or join a bask.
+function showSeasonClosedLobby(resetsAt) {
+  S.quota = { ...(S.quota || {}), closed: true, resets_at: resetsAt || S.quota?.resets_at };
+  el('seasonClosedDate').textContent = fmtReset(S.quota.resets_at).replace(/^on /, '');
+  show('seasonClosedLobby', true);
+  show('seasonMeter', false);
+  show('recentBox', false);
+  show('joinStep', false); show('baskMain', false); show('lobby', true);
+  el('btnCreate').disabled = true;
+  el('joinForm').querySelector('button').disabled = true;
+  el('joinCode').disabled = true;
+  setError('lobbyError', '');
+}
+
+// Mid-bask: stop sharing and fetching, keep the player's own numbers live.
+function enterSolo(quota) {
+  if (S.solo) return;
+  if (quota) S.quota = quota;
+  const resetsAt = S.quota?.resets_at || null;
+  S.solo = { at: Date.now(), resetsAt };
+  S.frozen = {
+    order: S.order.slice(),
+    members: new Map([...S.members].map(([k, v]) => [k, { ...v }])),
+    ticks: new Map([...S.ticks].map(([k, v]) => [k, new Map(v)])),
+  };
+  clearTimeout(S.syncTimer);
+  const when = fmtReset(resetsAt);
+  let text;
+  if (S.mode === 'live' && S.summarizer) {
+    // Just you from here on, straight from your log.
+    S.order = [S.player];
+    for (const k of [...S.members.keys()]) if (k !== S.player) S.members.delete(k);
+    for (const k of [...S.ticks.keys()]) if (k !== S.player) S.ticks.delete(k);
+    text = `This month's shared data for Bask is used up, so the group view has stopped. You're in solo mode: your own numbers keep updating here from your chat.log, and nothing is shared with the group. Group basking returns ${when}.`;
+  } else {
+    text = `This month's shared data for Bask is used up, so the group view has stopped and is frozen as of ${new Date(S.solo.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. Group basking returns ${when}. You can still save the group's numbers.`;
+  }
+  el('seasonBannerTitle').textContent = S.mode === 'live' ? 'Bask season\u2019s over: you\u2019re in solo mode' : 'Bask season\u2019s over: the group view is frozen';
+  el('seasonBannerText').textContent = text;
+  el('seasonDialogText').textContent = text;
+  el('seasonDialogOk').textContent = S.mode === 'live' ? 'Continue solo' : 'OK';
+  show('seasonBanner', true);
+  show('watchStatus', S.mode === 'live');
+  el('watchLabel').textContent = 'Solo · not shared';
+  S.syncError = null;
+  renderAll();
+  try { el('seasonDialog').showModal(); } catch { /* already open */ }
+  S.syncTimer = setTimeout(syncLoop, SYNC_MS);
+}
 
 // ---------------------------------------------------------------------------
 // lobby / join
@@ -363,6 +458,7 @@ async function upload() {
   } catch (err) {
     sum.changed = true;
     sum.requeueTicks(ticks);
+    if (net.isSeasonClosed(err)) { enterSolo(); return; }
     S.syncError = /expired|does not exist/i.test(err.message) ? 'This bask has expired — download it now if you want to keep it.' : `Couldn't send your numbers: ${err.message}`;
   }
 }
@@ -396,6 +492,8 @@ async function poll() {
     let res, rounds = 0;
     do {
       res = await net.poll(S.code, cursorMinus(S.memberCursor), cursorMinus(S.tickCursor), S.mode === 'spectate' && !S.resume ? viewerId() : null); // a player waiting to resume isn't a spectator
+      if (res && res.closed) { enterSolo(res.quota); return; }
+      if (res && res.quota) S.quota = res.quota;
       if (!res || !res.session) { S.syncError = 'This bask has expired — download it now if you want to keep it.'; return; }
       mergeMembers(res.members);
       mergeTicks(res.ticks);
@@ -445,6 +543,11 @@ function onBooted() {
 async function syncLoop() {
   clearTimeout(S.syncTimer);
   const gen = ++S.loopGen;
+  if (S.solo) { // season closed: nothing goes to or comes from the server
+    renderAll();
+    S.syncTimer = setTimeout(syncLoop, SYNC_MS);
+    return;
+  }
   if (S.mode === 'live') await upload();
   const due = !document.hidden || Date.now() - S.lastPoll >= HIDDEN_POLL_MS;
   if ((S.mode === 'live' || S.mode === 'spectate') && due) await poll();
@@ -542,16 +645,18 @@ async function resumeSharing() {
 // download / open a saved bask
 // ---------------------------------------------------------------------------
 function exportBask() {
+  // In solo mode, save the group as it was when sharing stopped.
+  const src = S.frozen || { order: S.order, members: S.members, ticks: S.ticks };
   const ticks = [];
-  for (const [player, m] of S.ticks) for (const [t, data] of m) ticks.push({ player, t: new Date(t).toISOString(), data });
+  for (const [player, m] of src.ticks) for (const [t, data] of m) ticks.push({ player, t: new Date(t).toISOString(), data });
   ticks.sort((a, b) => a.t.localeCompare(b.t));
   const doc = {
     tool: 'chatgator-bask', format: 1,
     code: S.code,
     createdAt: S.session?.created_at ?? null,
     expiresAt: S.session?.expires_at ?? null,
-    exportedAt: new Date(now()).toISOString(),
-    members: S.order.map((p) => { const m = S.members.get(p); return { player: p, joined_at: m.joined_at, updated_at: m.updated_at, totals: m.totals }; }),
+    exportedAt: new Date(S.frozen ? S.solo.at : now()).toISOString(),
+    members: src.order.map((p) => { const m = src.members.get(p); return { player: p, joined_at: m.joined_at, updated_at: m.updated_at, totals: m.totals }; }),
     ticks,
   };
   const blob = new Blob([JSON.stringify(doc)], { type: 'application/json' });
@@ -592,12 +697,12 @@ function memberStatus(p) {
   const t = m.totals;
   if (t.paused) return 'stopped';
   const at = now();
-  if (S.mode !== 'offline' && at - Date.parse(m.seen_at || m.updated_at) > PAGE_GONE_MS) return 'sleeping';
+  if (S.mode !== 'offline' && !S.solo && at - Date.parse(m.seen_at || m.updated_at) > PAGE_GONE_MS) return 'sleeping';
   const lastActive = t.lastActive || t.last || t.since || Date.parse(m.joined_at);
   return at - lastActive > SLEEP_MS ? 'sleeping' : 'active';
 }
 
-const isLeader = () => S.mode === 'live' && !S.booted && !!S.player && S.session?.leader === S.player;
+const isLeader = () => !S.solo && S.mode === 'live' && !S.booted && !!S.player && S.session?.leader === S.player;
 const isActive = (p) => !S.members.get(p)?.left_at;
 
 // ---------------------------------------------------------------------------
@@ -755,11 +860,18 @@ function ago(ms) {
 
 function renderBar() {
   const w = el('barWatching');
-  w.hidden = S.mode === 'offline' || S.watching == null;
+  w.hidden = S.mode === 'offline' || !!S.solo || S.watching == null;
   if (!w.hidden) w.textContent = `👀 ${S.watching} watching`;
   if (S.mode === 'offline') el('barExpires').textContent = `saved ${new Date(S.exportedAt).toLocaleString()}`;
+  else if (S.solo) el('barExpires').textContent = `🌙 basking returns ${fmtReset(S.solo.resetsAt)}`;
   else if (S.session) el('barExpires').textContent = fmtExpires(S.session.expires_at);
   const me = el('barMe');
+  if (S.solo) {
+    me.textContent = S.mode === 'live'
+      ? `Solo: your own numbers, not shared · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)}`
+      : `Group view frozen as of ${new Date(S.solo.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+    return;
+  }
   if (S.booted) {
     me.innerHTML = `<span class="bask-error">🥾 You were booted from this bask, so your numbers aren't being shared.</span> <a class="btn" href="?code=${encodeURIComponent(S.code)}">Rejoin</a>`;
     return;
@@ -794,7 +906,7 @@ function renderRoster() {
     }[st];
     return `<li class="roster-chip st-${st}" title="${title}">
       <span class="roster-dot" style="background:${playerColor(p)}"></span>
-      <span class="roster-name">${p === leader && !left && S.mode !== 'offline' ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${akaTag(p)}${classTag(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}${!m.totals.nameOk && S.mode !== 'offline' ? ' <span class="name-check" title="Character name not confirmed from their log yet, so their deathblows and deaths may be missing. They can type /stats in game once to fix it.">❔ name</span>' : ''}</span>
+      <span class="roster-name">${p === leader && !left && S.mode !== 'offline' && !S.solo ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${akaTag(p)}${classTag(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}${!m.totals.nameOk && S.mode !== 'offline' ? ' <span class="name-check" title="Character name not confirmed from their log yet, so their deathblows and deaths may be missing. They can type /stats in game once to fix it.">❔ name</span>' : ''}</span>
       <span class="roster-stats">⚔ ${fmtNum(t.dmgOut.total)} · ✚ ${fmtNum(t.healOut.total)}</span>
       ${{ left: '<span class="roster-quiet">left</span>',
           sleeping: '<span class="roster-zzz" aria-label="sleeping">💤 Z<span>z</span>Z<span>z</span>Z<span>z</span></span>',
@@ -805,7 +917,7 @@ function renderRoster() {
         <button class="roster-act" data-ban="${esc(p)}" title="Ban ${esc(p)}: removes them and keeps that name out of this bask.">⛔</button>
       </span>` : ''}
     </li>`;
-  }).join('') + (S.mode !== 'offline' && open > 0 ? `<li class="roster-chip empty-slot">${open} open spot${open === 1 ? '' : 's'}</li>` : '');
+  }).join('') +  (S.mode !== 'offline' && !S.solo && open > 0 ? `<li class="roster-chip empty-slot">${open} open spot${open === 1 ? '' : 's'}</li>` : '');
   renderBanned();
   el('feed').innerHTML = S.feed.map((f) => `<li><span class="feed-time">${fmtTimeSec(f.at)}</span> ${f.html}</li>`).join('');
 }
@@ -1081,10 +1193,17 @@ const RENDER = { overview: renderOverview, damage: renderDamage, healing: render
 function applyOwnTotals() {
   if (S.mode !== 'live' || !S.summarizer || !S.members.has(S.player)) return;
   S.members.get(S.player).totals = cleanTotals(S.summarizer.snapshot());
+  // Solo: the server isn't storing chart buckets any more; draw ours from the page.
+  if (S.solo) {
+    const mine = S.ticks.get(S.player) || new Map();
+    for (const [t, d] of S.summarizer.ticks) mine.set(t, cleanTick(d));
+    S.ticks.set(S.player, mine);
+  }
 }
 
 function renderAll() {
   applyOwnTotals();
+  renderSeasonPill();
   renderBar();
   renderRoster();
   RENDER[S.tab](el(`panel-${S.tab}`));
@@ -1110,7 +1229,10 @@ document.querySelector('.tabbar').addEventListener('click', (ev) => {
 el('btnCreate').addEventListener('click', async (ev) => {
   const btn = ev.currentTarget; btn.disabled = true;
   try { const s = await net.createSession(); await goJoinStep(s.code, { fresh: s }); }
-  catch (err) { setError('lobbyError', `Couldn't create a bask: ${err.message}`); }
+  catch (err) {
+    if (net.isSeasonClosed(err)) showSeasonClosedLobby();
+    else setError('lobbyError', `Couldn't create a bask: ${err.message}`);
+  }
   finally { btn.disabled = false; }
 });
 
@@ -1151,7 +1273,10 @@ el('nameForm').addEventListener('submit', async (ev) => {
   } catch { return; } // picker cancelled
   el('btnPickLog').disabled = true;
   try { await startLive(handle, name); }
-  catch (err) { setError('joinError', err.message || String(err)); }
+  catch (err) {
+    if (net.isSeasonClosed(err)) showSeasonClosedLobby();
+    else setError('joinError', err.message || String(err));
+  }
   finally { el('btnPickLog').disabled = false; }
 });
 
@@ -1220,7 +1345,11 @@ el('banForm').addEventListener('submit', async (ev) => {
 });
 
 el('btnDownload').addEventListener('click', exportBask);
+el('seasonDownload').addEventListener('click', exportBask);
+el('seasonDialogDownload').addEventListener('click', exportBask);
+el('seasonDialogOk').addEventListener('click', () => el('seasonDialog').close?.());
 el('btnLeave').addEventListener('click', () => {
+  if (S.solo) { leave(); return; }
   if (S.mode === 'live' && !S.booted) {
     const extra = isLeader() ? ' The next player in line becomes the leader.' : '';
     if (!confirm(`Stop sharing and leave this bask? Your numbers so far stay in it, and your spot opens up.${extra}`)) return;
@@ -1238,10 +1367,14 @@ el('btnLeave').addEventListener('click', () => {
     return;
   }
   const code = net.normalizeCode(new URLSearchParams(location.search).get('code'));
-  if (!net.CODE_RE.test(code)) { renderRecent(); return; }
-  el('joinCode').value = code;
-  const saved = loadSaved();
   (async () => {
+    // Season first: if it's closed there's no basking to start or resume.
+    try { S.quota = await net.quota(); } catch { /* the meter is best-effort */ }
+    if (S.quota && S.quota.closed) { showSeasonClosedLobby(S.quota.resets_at); return; }
+    renderSeasonMeter();
+    if (!net.CODE_RE.test(code)) { renderRecent(); return; }
+    el('joinCode').value = code;
+    const saved = loadSaved();
     if (saved && saved.code === code && saved.mode && await resumeSaved(saved)) return;
     await goJoinStep(code);
     if (!el('lobby').hidden) renderRecent(); // code was dead: show what's still alive

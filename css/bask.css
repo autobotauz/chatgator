@@ -168,3 +168,30 @@
 .aka::before { content: '('; } .aka::after { content: ')'; }
 .name-check { font-size: 11px; color: color-mix(in srgb, var(--status-warning) 70%, var(--text-primary)); font-weight: 600; white-space: nowrap; }
 .bask-warn code { font-size: 12px; }
+
+/* ---------- bask season (shared monthly data allowance) ---------- */
+.season-meter { display: flex; align-items: center; gap: 10px; margin: -6px 0 18px; font-size: 13px; color: var(--text-secondary); flex-wrap: wrap; }
+.season-meter-bar { width: 160px; height: 6px; border-radius: 999px; background: var(--grid); overflow: hidden; }
+.season-meter-fill { display: block; height: 100%; width: 0; background: var(--series-3); border-radius: 999px; }
+.season-meter.low .season-meter-fill { background: var(--status-warning); }
+.season-meter.low .season-meter-label { color: color-mix(in srgb, var(--status-warning) 70%, var(--text-primary)); font-weight: 600; }
+.season-pill.low { background: color-mix(in srgb, var(--status-warning) 22%, var(--surface-2)); color: color-mix(in srgb, var(--status-warning) 70%, var(--text-primary)); font-weight: 600; }
+
+.season-closed {
+  display: flex; gap: 16px; align-items: flex-start; margin: 0 0 22px; padding: 18px 20px;
+  border-radius: var(--radius); color: var(--text-primary);
+  border: 2px solid color-mix(in srgb, var(--series-7) 70%, var(--border));
+  background: color-mix(in srgb, var(--series-7) 10%, var(--surface-1));
+}
+.season-closed h2 { margin: 0 0 6px; font-size: 20px; }
+.season-closed p { margin: 0 0 10px; line-height: 1.55; color: var(--text-secondary); }
+.season-closed p:last-child { margin-bottom: 0; }
+.season-closed .btn { text-decoration: none; }
+.season-moon { font-size: 40px; line-height: 1; flex: none; }
+.season-closed.in-bask h2 { font-size: 17px; }
+.season-closed.in-bask .season-moon { font-size: 30px; }
+.season-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.season-dialog { text-align: center; width: min(480px, 92vw); }
+.season-dialog-moon { font-size: 48px; line-height: 1; margin: 4px 0 10px; }
+.season-dialog .dialog-actions { justify-content: center; }
