@@ -48,8 +48,15 @@
     </div>
 
     <div class="season-meter" id="seasonMeter" hidden title="Bask runs on a free database plan with a monthly data allowance. This is an estimate from this month's use so far.">
-      <span class="season-meter-label" id="seasonMeterLabel"></span>
-      <span class="season-meter-bar"><span class="season-meter-fill" id="seasonMeterFill"></span></span>
+      <span class="season-meter-icon" aria-hidden="true">🌡️</span>
+      <div class="season-meter-body">
+        <div class="season-meter-top">
+          <span class="season-meter-title">Bask season</span>
+          <span class="season-meter-reset" id="seasonMeterReset"></span>
+        </div>
+        <div class="season-meter-label" id="seasonMeterLabel"></div>
+        <span class="season-meter-bar"><span class="season-meter-fill" id="seasonMeterFill"></span></span>
+      </div>
     </div>
 
     <div class="today-strip" id="todayStrip" hidden></div>

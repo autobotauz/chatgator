@@ -203,7 +203,10 @@ function renderSeasonMeter() {
   meter.hidden = false;
   const low = +q.hours_left < SEASON_LOW_HOURS;
   meter.classList.toggle('low', low);
-  el('seasonMeterLabel').textContent = `🌡️ Bask season: ${seasonText(q)} · resets ${fmtReset(q.resets_at)}`;
+  // "about 220 hours" big, the rest of the sentence normal.
+  const m = seasonText(q).match(/^(about [\d.]+ hours?)(.*)$/);
+  el('seasonMeterLabel').innerHTML = m ? `<strong>${esc(m[1])}</strong>${esc(m[2])}` : esc(seasonText(q));
+  el('seasonMeterReset').textContent = `resets ${fmtReset(q.resets_at)}`;
   el('seasonMeterFill').style.width = `${Math.min(100, Math.max(2, 100 - (q.used / q.limit) * 100)).toFixed(1)}%`;
 }
 function renderSeasonPill() {
