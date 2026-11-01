@@ -35,6 +35,7 @@ const TOTALS_EVERY_MS = 30000;
 const PING_EVERY_MS = 60000;
 const HIDDEN_POLL_MS = 60000;
 const VIEWER_KEY = 'chatgator:bask-viewer'; // this browser's spectator id
+const MINE_KEY = 'chatgator:bask-mine:';    // + `${code}|${player}`: my numbers, kept in this browser
 const SLEEP_MS = 5 * 60000;     // no activity of their own for this long = 💤 sleeping
 const STOP_MS = 60 * 60000;     // ...this long = stop reading their log until they pick it again
 const PAGE_GONE_MS = 3 * 60000; // no write from their page (heartbeat is 1/min) = page closed
@@ -73,6 +74,9 @@ const S = {
   banned: [],            // names the leader banned
   lastLeader: undefined,
   booted: false,
+  sharing: false,        // live player: numbers are being sent (someone else is here)
+  everShared: false,     // ...at some point since joining (then going quiet keeps them up)
+  lastMiniKey: null,
   quota: null,           // bask season: { used, limit, closed, resets_at, hours_left }
   solo: null,            // season closed mid-bask: { at, resetsAt }
   frozen: null,          // the group as it was when solo began (for Download)
@@ -116,6 +120,7 @@ function cleanTotals(t) {
     deaths: list(t.deaths, (d) => ({ at: num(obj(d).at), killer: obj(d).killer ? str(obj(d).killer) : null })),
     cooldowns,
     lastActive: num(t.lastActive) || null,
+    solo: !!t.solo,
     aka: Array.isArray(t.aka) ? t.aka.slice(0, 4).map((n) => str(n, 40)).filter(Boolean) : [],
     nameOk: !!t.nameOk,
     rezzes: list(t.rezzes, (x) => ({ at: num(obj(x).at), by: obj(x).by ? str(obj(x).by, 40) : null, on: obj(x).on ? str(obj(x).on, 40) : null })),
@@ -375,6 +380,43 @@ function flash(btn, text) {
 // ---------------------------------------------------------------------------
 // live: tail the log and share
 // ---------------------------------------------------------------------------
+// ---- my numbers, kept in this browser -------------------------------------------
+// While you're alone in a bask nothing but the basics reaches the database,
+// so the page keeps its own copy of your numbers and chart to survive a
+// refresh.
+const mineKey = (code, player) => `${MINE_KEY}${code}|${String(player).toLowerCase()}`;
+function saveMine() {
+  const sum = S.summarizer;
+  if (!sum || !S.code || !S.player) return;
+  try { localStorage.setItem(mineKey(S.code, S.player), JSON.stringify({ at: Date.now(), snap: sum.snapshot(), ticks: sum.exportTicks() })); } catch { /* full or blocked */ }
+}
+function loadMine(code, player) {
+  try { const v = JSON.parse(localStorage.getItem(mineKey(code, player)) || 'null'); return v && v.snap ? v : null; } catch { return null; }
+}
+// Copies older than two days belong to baskets long gone.
+function pruneMine() {
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (!k || !k.startsWith(MINE_KEY)) continue;
+      const v = JSON.parse(localStorage.getItem(k) || 'null');
+      if (!v || !v.at || Date.now() - v.at > 2 * 86400000) localStorage.removeItem(k);
+    }
+  } catch { /* ignore */ }
+}
+
+// Is anyone else here to see my numbers: another player whose page is open,
+// or someone watching? Until the first poll answers, assume not.
+function othersHere() {
+  if (S.watching > 0) return true;
+  const t = Date.now();
+  return S.order.some((p) => {
+    if (p === S.player) return false;
+    const m = S.members.get(p);
+    return m && !m.left_at && t - Date.parse(m.seen_at || m.updated_at) < PAGE_GONE_MS;
+  });
+}
+
 async function startLive(handle, player) {
   const since = Date.now();
   const watcher = new LogWatcher({
@@ -408,9 +450,21 @@ async function startLive(handle, player) {
   const memberKey = memberKeyFor(S.code, player);
   try {
     const existing = await net.fetchMember(S.code, player);
-    if (existing) summarizer.restore(existing.totals);
+    // Carry on from the fuller of: what the group was last sent, and this
+    // browser's own copy (which has everything from while you were alone).
+    const mine = loadMine(S.code, player);
+    const serverFull = existing && existing.totals && !existing.totals.solo ? existing.totals : null;
+    if (mine && (!serverFull || (+mine.snap.last || 0) >= (+serverFull.last || 0))) {
+      summarizer.restore(mine.snap);
+      summarizer.importTicks(mine.ticks);
+    } else if (serverFull) {
+      summarizer.restore(serverFull);
+    } else if (existing) {
+      summarizer.restore(existing.totals); // just the basics (name, class...)
+    }
     summarizer.markActive(); // picking the log = here now (also clears an hour-idle stop)
-    await net.upsertMember(S.code, player, summarizer.snapshot(), memberKey);
+    // Join with the basics only; the numbers follow once someone else is here.
+    await net.upsertMember(S.code, player, summarizer.minimalSnapshot(), memberKey);
   } catch (err) {
     watcher.stop();
     throw err;
@@ -421,6 +475,7 @@ async function startLive(handle, player) {
   S.watcher = watcher;
   S.handle = handle;
   S.lastSent = S.lastTotalsSent = S.lastSeenSent = Date.now(); summarizer.changed = false;
+  S.sharing = false; S.everShared = false; S.lastMiniKey = JSON.stringify(summarizer.minimalSnapshot());
   S.resume = null; S.booted = false;
   save({ code: S.code, player, mode: 'live' });
   rememberRecent(S.code, { player });
@@ -447,6 +502,40 @@ async function upload() {
   const sum = S.summarizer;
   if (!sum) return;
   stopReadingIfIdle();
+  saveMine();
+  const t0 = Date.now();
+  if (!othersHere()) {
+    // Alone: numbers stay on this page; only the basics, at most every 30s
+    // and only when they change, else the usual "still here" ping.
+    S.sharing = false;
+    try {
+      const mini = sum.minimalSnapshot();
+      const key = JSON.stringify(mini);
+      // Once the numbers have been shared, leave them up (a viewer whose
+      // check-in is a little late shouldn't see them vanish); just stay present.
+      if (!S.everShared && key !== S.lastMiniKey && t0 - S.lastTotalsSent >= TOTALS_EVERY_MS) {
+        if (!(await net.updateMember(S.code, S.player, mini))) { onBooted(); return; }
+        S.lastMiniKey = key;
+        S.lastTotalsSent = S.lastSeenSent = t0;
+      } else if (t0 - S.lastSeenSent >= PING_EVERY_MS) {
+        if (!(await net.ping(S.code, S.player, S.memberKey))) { onBooted(); return; }
+        S.lastSeenSent = t0;
+      }
+      S.syncError = null;
+    } catch (err) {
+      if (net.isSeasonClosed(err)) { enterSolo(); return; }
+      S.syncError = /expired|does not exist/i.test(err.message) ? 'This bask has expired — download it now if you want to keep it.' : `Couldn't reach the bask: ${err.message}`;
+    }
+    return;
+  }
+  if (!S.sharing) {
+    // Someone just showed up: send everything held back, right now.
+    S.sharing = true;
+    S.everShared = true;
+    sum.changed = true;
+    sum.requeueAllTicks();
+    S.lastTotalsSent = 0;
+  }
   const ticks = sum.takeDirtyTicks();
   try {
     const t = Date.now();
@@ -885,9 +974,11 @@ function renderBar() {
   if (S.mode === 'live' && S.summarizer?.paused) {
     me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}<span class="bask-warn">⚠️ Not reading your chat.log (idle an hour)</span>`;
   } else if (S.mode === 'live' && S.summarizer && !S.summarizer.nameOk) {
-    me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · <span class="bask-warn">❔ Type <code>/stats</code> in game once so Bask can confirm your character name. Deathblows and deaths need the exact name.</span>`;
+    me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}${S.sharing ? 'Sharing as' : 'In the bask as'} <strong>${esc(S.player)}</strong> · <span class="bask-warn">❔ Type <code>/stats</code> in game once so Bask can confirm your character name. Deathblows and deaths need the exact name.</span>`;
   } else if (S.mode === 'live') {
-    me.innerHTML = `${isLeader() ? '👑 You lead this bask · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)} · sent ${ago(S.lastSent)}`;
+    me.innerHTML = S.sharing
+      ? `${isLeader() ? '👑 You lead this bask · ' : ''}Sharing as <strong>${esc(S.player)}</strong> · log checked ${ago(S.lastChecked)} · new lines ${ago(S.lastNewLines)} · sent ${ago(S.lastSent)}`
+      : `${isLeader() ? '👑 You lead this bask · ' : ''}In the bask as <strong>${esc(S.player)}</strong> · just you so far, so your numbers stay on this page until someone joins · log checked ${ago(S.lastChecked)}`;
   } else if (S.mode === 'spectate') {
     me.textContent = `Just watching · updates every 10 seconds${S.session?.leader ? ` · 👑 ${S.session.leader} leads` : ''}`;
   } else {
@@ -913,6 +1004,7 @@ function renderRoster() {
       <span class="roster-dot" style="background:${playerColor(p)}"></span>
       <span class="roster-name">${p === leader && !left && S.mode !== 'offline' && !S.solo ? '<span title="Bask leader">👑</span> ' : ''}${esc(p)}${akaTag(p)}${classTag(p)}${p === S.player ? ' <span class="pill">you</span>' : ''}${!m.totals.nameOk && S.mode !== 'offline' ? ' <span class="name-check" title="Character name not confirmed from their log yet, so their deathblows and deaths may be missing. They can type /stats in game once to fix it.">❔ name</span>' : ''}</span>
       <span class="roster-stats">⚔ ${fmtNum(t.dmgOut.total)} · ✚ ${fmtNum(t.healOut.total)}</span>
+      ${!left && m.totals.solo && p !== S.player && S.mode !== 'offline' ? '<span class="roster-quiet" title="This player was alone in the bask, so their numbers stayed on their page. They\u2019re on the way now.">numbers on the way…</span>' : ''}
       ${{ left: '<span class="roster-quiet">left</span>',
           sleeping: '<span class="roster-zzz" aria-label="sleeping">💤 Z<span>z</span>Z<span>z</span>Z<span>z</span></span>',
           stopped: `<span class="roster-stopped">⚠️ ${p === S.player ? 'pick your chat.log again' : 'needs to reselect chat.log'}</span>`,
@@ -1198,12 +1290,11 @@ const RENDER = { overview: renderOverview, damage: renderDamage, healing: render
 function applyOwnTotals() {
   if (S.mode !== 'live' || !S.summarizer || !S.members.has(S.player)) return;
   S.members.get(S.player).totals = cleanTotals(S.summarizer.snapshot());
-  // Solo: the server isn't storing chart buckets any more; draw ours from the page.
-  if (S.solo) {
-    const mine = S.ticks.get(S.player) || new Map();
-    for (const [t, d] of S.summarizer.ticks) mine.set(t, cleanTick(d));
-    S.ticks.set(S.player, mine);
-  }
+  // Our own chart straight from the page too (alone in a bask, or once the
+  // season is out, the server doesn't have it).
+  const mine = S.ticks.get(S.player) || new Map();
+  for (const [t, d] of S.summarizer.ticks) mine.set(t, cleanTick(d));
+  S.ticks.set(S.player, mine);
 }
 
 function renderAll() {
@@ -1372,6 +1463,7 @@ el('btnLeave').addEventListener('click', () => {
     return;
   }
   const code = net.normalizeCode(new URLSearchParams(location.search).get('code'));
+  pruneMine();
   // "Sessions started today" on the start page (best-effort).
   countsToday().then((c) => renderToday(el('todayStrip'), c, 'bask')).catch(() => {});
   (async () => {

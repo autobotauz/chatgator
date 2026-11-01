@@ -43,12 +43,19 @@ export const OTHERS = 'Others';
 // "now-ish" -- i.e. a file being tailed live, which is the only way Bask reads
 // one. A time-of-day more than an hour in the future is yesterday's line seen
 // just after midnight.
-export function wallClockFor(clock, now = Date.now()) {
+//
+// Built from the date plus the printed hours/minutes/seconds, not "midnight
+// + elapsed ms": on a daylight-saving change day (23 or 25 hours long) the
+// latter is an hour off, which once made every line look like old backlog.
+export function atLocalTime(tod, now = Date.now(), dayShift = 0) {
   const d = new Date(now);
-  const midnight = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const h = Math.floor(tod / 3600000), m = Math.floor(tod / 60000) % 60, sec = Math.floor(tod / 1000) % 60, ms = tod % 1000;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + dayShift, h, m, sec, ms).getTime();
+}
+export function wallClockFor(clock, now = Date.now()) {
   const tod = ((clock % DAY_MS) + DAY_MS) % DAY_MS;
-  let at = midnight + tod;
-  if (at - now > 3600000) at -= DAY_MS;
+  let at = atLocalTime(tod, now);
+  if (at - now > 3600000) at = atLocalTime(tod, now, -1);
   return at;
 }
 
@@ -420,6 +427,38 @@ export class GroupSummarizer {
     if (this.deaths.length > MAX_LOG) this.deaths.shift();
     this._tick(at).dd++;
   }
+
+  // While a player is alone in a bask, only this goes to the database: who
+  // they are and whether they're around (for leadership, expiry and the
+  // roster), never their numbers. lastActive is rounded to the minute so it
+  // changes at most once a minute.
+  minimalSnapshot() {
+    return {
+      v: SUMMARY_VERSION,
+      player: this.player,
+      since: this.since,
+      solo: true,
+      lastActive: this.lastActive == null ? null : Math.floor(this.lastActive / 60000) * 60000,
+      paused: this.paused,
+      cls: this.cls ? { ...this.cls } : null,
+      aka: this.aka.slice(),
+      nameOk: this.nameOk,
+    };
+  }
+
+  // Chart buckets as [[bucketStart, data]] -- for keeping a copy in the
+  // browser (bask.js) while nothing is shared.
+  exportTicks() { return [...this.ticks].map(([t, d]) => [t, { ...d }]); }
+  // Put saved buckets back; all of them count as not yet sent.
+  importTicks(list) {
+    for (const [t, d] of Array.isArray(list) ? list : []) {
+      if (!Number.isFinite(+t)) continue;
+      this.ticks.set(+t, { ...EMPTY_TICK(), ...d });
+      this.dirty.add(+t);
+    }
+  }
+  // Everything goes out on the next upload (catching the group up).
+  requeueAllTicks() { for (const k of this.ticks.keys()) this.dirty.add(k); }
 
   snapshot() {
     return {

@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-11-01',
+    title: 'Fixed: Bask missing every fight on daylight-saving day',
+    bullets: [
+      'On the day the clocks change, Bask read every log line as an hour old, treated it as from before you joined, and skipped it, so nothing showed up. The main page\'s cooldown timers were an hour off that day too. Both fixed',
+      'Alone in a bask? Your numbers now stay on your page until someone else joins or starts watching, then everything catches up at once. It saves the shared monthly data for when a group is actually looking',
+    ],
+  },
+  {
+    date: '2026-11-01',
     title: 'Live watching keeps up in the background',
     bullets: [
       'Chrome slows down tabs that have been in the background for 5 minutes, so while you were in the game window your log was only being checked about once a minute (in Bask, numbers reached the group up to a minute late)',

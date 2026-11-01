@@ -1193,9 +1193,11 @@ function estimateInitialAnchor(newestClock) {
   const now = Date.now();
   if (newestClock == null) return { clock: newestClock, wallTime: now };
   const d = new Date(now);
-  const todayMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const timeOfDayMs = ((newestClock % DAY_MS) + DAY_MS) % DAY_MS; // guard a stray negative before parser.js ever produces one
-  const derivedMoment = todayMidnight + timeOfDayMs;
+  // Today's date at the printed HH:MM:SS -- not "midnight + elapsed ms",
+  // which is an hour off on a daylight-saving change day.
+  const derivedMoment = new Date(d.getFullYear(), d.getMonth(), d.getDate(),
+    Math.floor(timeOfDayMs / 3600000), Math.floor(timeOfDayMs / 60000) % 60, Math.floor(timeOfDayMs / 1000) % 60, timeOfDayMs % 1000).getTime();
   const wallTime = Math.abs(now - derivedMoment) <= ANCHOR_PLAUSIBLE_WINDOW_MS ? derivedMoment : now;
   // Pairing wallTime with newestClock itself (not some other clock
   // value) means eventWallClockMs(newestClock) reduces to exactly

@@ -132,6 +132,13 @@ log (the realm kill feed doesn't count), or when their page has closed.
 After an hour idle their page stops reading `chat.log`; their card pulses
 yellow for everyone until they pick the file again.
 
+A player who is **alone in a bask** (no other player's page open, nobody
+watching) shares only the basics: name, class, last-active time and idle
+state, so leadership, expiry and the roster still work. Their damage, heals,
+kills and chart data stay on their page (with a copy in the browser so a
+refresh doesn't lose them). The moment someone else turns up, everything held
+back is sent and sharing carries on as normal.
+
 To stay inside the free plan's data-transfer allowance, every page refresh
 is one `bask_poll` call that returns only what changed since the page's
 cursors (plus presence, banned names and the spectator count). Players send
