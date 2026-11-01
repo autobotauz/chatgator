@@ -31,6 +31,8 @@
 //      caller is expected to throw away any carried parser/UI state and
 //      start over, exactly like loading a brand new file.
 
+import { setBgTimeout, clearBgTimeout } from './bg-timer.js';
+
 export function isWatchSupported() {
   return typeof window !== 'undefined' && 'showOpenFilePicker' in window;
 }
@@ -124,7 +126,9 @@ export class LogWatcher {
 
   _poll() {
     if (this.stopped) return;
-    this.timer = setTimeout(async () => {
+    // A worker-backed timer: keeps its pace while this tab is behind the game
+    // window (see bg-timer.js); a plain setTimeout slows to ~1/min there.
+    this.timer = setBgTimeout(async () => {
       try {
         const file = await this.handle.getFile();
         if (this.onPoll) this.onPoll({ size: file.size });
@@ -163,7 +167,7 @@ export class LogWatcher {
 
   stop() {
     this.stopped = true;
-    if (this.timer) clearTimeout(this.timer);
+    if (this.timer) clearBgTimeout(this.timer);
   }
 
   // Change how often we poll while already watching. Takes effect for the
@@ -176,7 +180,7 @@ export class LogWatcher {
   setPollMs(ms) {
     this.pollMs = ms;
     if (this.stopped) return;
-    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    if (this.timer) { clearBgTimeout(this.timer); this.timer = null; }
     this._poll();
   }
 }

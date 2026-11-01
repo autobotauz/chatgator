@@ -12,6 +12,14 @@
 export const CHANGELOG = [
   {
     date: '2026-11-01',
+    title: 'Live watching keeps up in the background',
+    bullets: [
+      'Chrome slows down tabs that have been in the background for 5 minutes, so while you were in the game window your log was only being checked about once a minute (in Bask, numbers reached the group up to a minute late)',
+      'Chat Gator and Bask now keep their regular pace in a background tab: your log is checked every few seconds and Bask sends your numbers on time',
+    ],
+  },
+  {
+    date: '2026-11-01',
     title: 'Sessions started today',
     bullets: [
       'The Chat Gator and Bask start pages now show how many sessions and baskets people have started today',

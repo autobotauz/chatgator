@@ -15,6 +15,7 @@ import { iconHtml } from './icons.js';
 import { GroupSummarizer, TICK_MS } from './bask-summary.js';
 import * as net from './bask-net.js';
 import { countsToday, renderToday } from './usage.js';
+import { setBgTimeout, clearBgTimeout } from './bg-timer.js';
 import { saveHandle, loadHandle, forgetHandle } from './bask-store.js';
 import { CLASS_REALM, realmColorForClass } from './realm.js';
 
@@ -25,7 +26,7 @@ const CL_COOLDOWNS = Object.fromEntries(
 );
 const ALL_COOLDOWNS = { ...CL_COOLDOWNS, ...ABILITY_COOLDOWNS };
 
-const SYNC_MS = 10000;          // upload + poll cadence
+const SYNC_MS = 10000;          // upload + poll cadence (worker-backed, so it holds while the tab is in the background)
 // Data transfer is the free plan's tightest limit, so: totals (the big
 // part) go out at most every 30s and only when they changed; otherwise a
 // tiny "still here" ping once a minute. A tab nobody is looking at
@@ -246,7 +247,7 @@ function enterSolo(quota) {
     members: new Map([...S.members].map(([k, v]) => [k, { ...v }])),
     ticks: new Map([...S.ticks].map(([k, v]) => [k, new Map(v)])),
   };
-  clearTimeout(S.syncTimer);
+  clearBgTimeout(S.syncTimer);
   const when = fmtReset(resetsAt);
   let text;
   if (S.mode === 'live' && S.summarizer) {
@@ -268,7 +269,7 @@ function enterSolo(quota) {
   S.syncError = null;
   renderAll();
   try { el('seasonDialog').showModal(); } catch { /* already open */ }
-  S.syncTimer = setTimeout(syncLoop, SYNC_MS);
+  S.syncTimer = setBgTimeout(syncLoop, SYNC_MS);
 }
 
 // ---------------------------------------------------------------------------
@@ -532,24 +533,24 @@ function onBooted() {
   S.booted = true;
   if (S.watcher) S.watcher.stop();
   S.watcher = null; S.summarizer = null;
-  clearTimeout(S.syncTimer);
+  clearBgTimeout(S.syncTimer);
   S.mode = 'spectate'; // keep showing the group, just stop sharing
   show('watchStatus', false);
   S.syncError = null;
   save({ code: S.code, mode: 'spectate' });
   forgetHandle(S.code);
   renderAll();
-  S.syncTimer = setTimeout(syncLoop, SYNC_MS);
+  S.syncTimer = setBgTimeout(syncLoop, SYNC_MS);
 }
 
 // Only the newest loop keeps running (resuming sharing restarts it while a
 // poll from the old one may still be in flight).
 async function syncLoop() {
-  clearTimeout(S.syncTimer);
+  clearBgTimeout(S.syncTimer);
   const gen = ++S.loopGen;
   if (S.solo) { // season closed: nothing goes to or comes from the server
     renderAll();
-    S.syncTimer = setTimeout(syncLoop, SYNC_MS);
+    S.syncTimer = setBgTimeout(syncLoop, SYNC_MS);
     return;
   }
   if (S.mode === 'live') await upload();
@@ -557,7 +558,7 @@ async function syncLoop() {
   if ((S.mode === 'live' || S.mode === 'spectate') && due) await poll();
   if (gen !== S.loopGen) return;
   renderAll();
-  if (S.mode === 'live' || S.mode === 'spectate') S.syncTimer = setTimeout(syncLoop, SYNC_MS);
+  if (S.mode === 'live' || S.mode === 'spectate') S.syncTimer = setBgTimeout(syncLoop, SYNC_MS);
 }
 
 function enterBask() {
@@ -577,7 +578,7 @@ function enterBask() {
 
 async function leave() {
   if (S.watcher) S.watcher.stop();
-  clearTimeout(S.syncTimer); clearInterval(S.clockTimer);
+  clearBgTimeout(S.syncTimer); clearInterval(S.clockTimer);
   try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ }
   if (S.code) await forgetHandle(S.code);
   location.href = location.pathname;
