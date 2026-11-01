@@ -183,7 +183,7 @@ export function renderOverview(container, stats, ctx) {
     { color: 'var(--text-primary)', label: 'Checkpoint' },
     // one entry per distinct tag, named by the tag itself ("koth"), not "@tag"
     ...[...new Set((stats.meta.userTags || []).map(t => t.text))].map(text => ({ color: 'var(--user-tag)', label: text })),
-  ]);
+  ], { chartId: 'overview-activity' });
   timelineChart(tlCard, {
     id: 'overview-activity',
     domain: [stats.meta.startClock, stats.meta.endClock],
@@ -340,10 +340,6 @@ function renderSupport(container, stats) {
 
   const sr = section(container);
   h3(sr, `Resurrections (${sup.rezzes.length})`);
-  const pr = document.createElement('p');
-  pr.className = 'sub';
-  pr.textContent = 'Rezzes you cast and rezzes you received. The log doesn\'t say who your rez landed on, so that side shows your target when you cast it.';
-  sr.appendChild(pr);
   if (sup.rezzes.length) {
     const g = grid(sr, 2);
     const c1 = card(g); h3(c1, 'Rezzed by'); barChart(c1, { items: countBy(sup.rezzes, x => x.by), valueFmt: countFmt, colorFn: () => 'var(--series-3)' });
@@ -472,7 +468,7 @@ export function renderPets(container, stats, ctx) {
     const tlSec = section(container);
     h3(tlSec, 'Pet damage over time');
     const tlCard = card(tlSec);
-    legend(tlCard, names.map((n, i) => ({ color: seriesColor(i + 4), label: n })));
+    legend(tlCard, names.map((n, i) => ({ color: seriesColor(i + 4), label: n })), { chartId: 'pets-damage' });
     timelineChart(tlCard, {
       id: 'pets-damage',
       markers: tagMarkers(stats),
@@ -558,7 +554,7 @@ export function renderRealm(container, stats, ctx) {
   const tlSec = section(container);
   h3(tlSec, 'Realm points by source over time');
   const tlCard = card(tlSec);
-  legend(tlCard, reasonEntries.map(([label]) => ({ color: colorForReason.get(label), label })));
+  legend(tlCard, reasonEntries.map(([label]) => ({ color: colorForReason.get(label), label })), { chartId: 'rp-by-source' });
   timelineChart(tlCard, {
     id: 'rp-by-source',
     markers: tagMarkers(stats),
@@ -816,29 +812,70 @@ const CAST_COLUMNS = [
 // each was used; capped so a huge kit doesn't make the chart a wall.
 const ABILITY_TIMELINE_MAX_ROWS = 30;
 const EFFECT_WORDS = { immobilize: 'rooted', rooted: 'rooted', stunned: 'stunned', mesmerized: 'mezzed', mesmerize: 'mezzed', snare: 'snared', debuff: 'weakened' };
+// Filter for the abilities timeline -- kept across re-renders (tab switches,
+// live polls), like the charts' zoom.
+let abilityTimelineFilter = 'all';
+const ABILITY_TIMELINE_FILTERS = [
+  { key: 'all', label: 'All', test: () => true },
+  { key: 'crits', label: 'Crits only', test: d => !!d.crit },
+  { key: 'deathblows', label: 'Deathblows only', test: d => !!d.deathblow },
+];
+
 function renderAbilityTimeline(container, stats, inferredClass) {
   const all = (stats.abilityTimeline || []).filter(d => !isAbilityGhost(d.name, inferredClass));
   if (!all.length) return;
-  const counts = new Map();
-  for (const d of all) counts.set(d.name, (counts.get(d.name) || 0) + 1);
-  const names = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a));
-  const shown = names.slice(0, ABILITY_TIMELINE_MAX_ROWS);
-  const rows = shown.map((name, i) => ({ name, color: seriesColor(i) }));
-  const shownSet = new Set(shown);
+  // Colours are fixed by each ability's place in the full, unfiltered
+  // ranking, so filtering doesn't repaint every row a different colour.
+  const totalCounts = new Map();
+  for (const d of all) totalCounts.set(d.name, (totalCounts.get(d.name) || 0) + 1);
+  const ranked = [...totalCounts.keys()].sort((a, b) => totalCounts.get(b) - totalCounts.get(a));
+  const colorOf = new Map(ranked.map((n, i) => [n, seriesColor(i)]));
 
   const s = section(container);
   h3(s, 'Abilities & styles over time');
   const p = document.createElement('p');
   p.className = 'sub';
-  p.textContent = 'One dot each time an ability or style landed — a hit, a heal, a confirmed CC/debuff, or (for spells that land silently) a cast that wasn\'t resisted and didn\'t fail, shown faded. Ringed dots are crits; a red ring marks the hit that landed a deathblow. Hover a dot for the target, when the log names one.'
-    + (names.length > shown.length ? ` Showing your ${shown.length} most-used of ${names.length}.` : '');
   s.appendChild(p);
+
+  // filter buttons (a filter with nothing to show is disabled)
+  const bar = document.createElement('div');
+  bar.className = 'chart-filter';
+  s.appendChild(bar);
   const c = card(s);
+
+  const draw = () => {
+    const f = ABILITY_TIMELINE_FILTERS.find(x => x.key === abilityTimelineFilter) || ABILITY_TIMELINE_FILTERS[0];
+    const list = all.filter(f.test);
+    const counts = new Map();
+    for (const d of list) counts.set(d.name, (counts.get(d.name) || 0) + 1);
+    const names = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a));
+    const shown = names.slice(0, ABILITY_TIMELINE_MAX_ROWS);
+    const shownSet = new Set(shown);
+    p.textContent = 'One dot each time an ability or style landed — a hit, a heal, a confirmed CC/debuff, or (for spells that land silently) a cast that wasn\'t resisted and didn\'t fail, shown faded. Ringed dots are crits; a red ring marks the hit that landed a deathblow. Hover a dot for the target, when the log names one.'
+      + (names.length > shown.length ? ` Showing your ${shown.length} most-used of ${names.length}.` : '');
+    bar.innerHTML = '';
+    for (const opt of ABILITY_TIMELINE_FILTERS) {
+      const n = all.filter(opt.test).length;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chart-filter-btn' + (opt.key === f.key ? ' active' : '');
+      b.textContent = opt.key === 'all' ? opt.label : `${opt.label} (${n})`;
+      b.disabled = !n;
+      b.addEventListener('click', () => { abilityTimelineFilter = opt.key; draw(); });
+      bar.appendChild(b);
+    }
+    c.innerHTML = '';
+    renderAbilityDots(c, stats, shown.map(name => ({ name, color: colorOf.get(name) })), list.filter(d => shownSet.has(d.name)));
+  };
+  draw();
+}
+
+function renderAbilityDots(c, stats, rows, dots) {
   dotTimelineChart(c, {
     id: 'spells-ability-timeline',
     markers: tagMarkers(stats),
     rows,
-    dots: all.filter(d => shownSet.has(d.name)),
+    dots,
     domain: [stats.meta.startClock, stats.meta.endClock],
     idleGaps: stats.meta.idleGaps,
     dotTooltip: (list) => {
@@ -1020,10 +1057,6 @@ export function renderSpells(container, stats, ctx) {
   if (noDamageRows.length) {
     const s2 = section(container);
     h3(s2, 'No damage/heal logged (buffs, debuffs, cures, CC, pet summons…)');
-    const p2 = document.createElement('p');
-    p2.className = 'sub';
-    p2.textContent = 'Everything else cast in this view — the rest of the kit a damage/heal number alone would hide. Shows how many times each one lands, gets resisted, or (for a pure buff with no trackable result at all) was simply cast. Attempted = started casting (plus instant casts); Casted = the cast went off; Interrupted = cut off by moving or being hit; Failed = went off but the target already had the effect, was immune, or was out of range (not counted toward Resist %). Many debuffs print nothing when they land, so a cast that wasn\'t resisted and didn\'t fail counts as landed.';
-    s2.appendChild(p2);
     const c2 = card(s2);
     dataTable(c2, {
       columns: [
@@ -1039,25 +1072,6 @@ export function renderSpells(container, stats, ctx) {
   }
 }
 
-// ===========================================================================
-export function renderDebug(container, stats, ctx) {
-  clear(container);
-  const s = section(container);
-  const c = card(s);
-  c.innerHTML = `
-    <p>This view is here to build trust in the numbers above: it shows what the parser recognized and what it skipped.</p>
-    <div class="grid cols-3" style="margin:14px 0">
-      ${tile('Events parsed (this view)', fmtExact(ctx.eventCount || 0))}
-      ${tile('Unrecognized lines (whole file)', fmtExact((ctx.unmatched || []).length) + (ctx.unmatchedTruncated ? '+' : ''))}
-      ${tile('Pets detected', stats.meta.petNames.length)}
-    </div>
-    <details class="debug" ${(ctx.unmatched || []).length ? '' : 'hidden'}>
-      <summary>Show a sample of unrecognized lines (${(ctx.unmatched || []).length})</summary>
-      <pre>${(ctx.unmatched || []).slice(0, 300).map(escHtml).join('\n')}</pre>
-      <p class="sub">If you see lines in here that look like they should count toward damage, healing, or RP, that's useful to report — the parser is pattern-based and Eden/live wording can vary.</p>
-    </details>
-  `;
-}
 // Escapes for both HTML text content AND a double-quoted HTML attribute —
 // renderDamage's heraldLink() above uses this inside a title="..." attribute,
 // where a bare `"` in the name (nothing stops a shared/crafted log or
@@ -1065,7 +1079,7 @@ export function renderDebug(container, stats, ctx) {
 // otherwise close the attribute early and let the rest of the name's text
 // be parsed as more attributes on that element. escHtml used to only cover
 // &/</>, which is enough for the plain text content it was originally
-// written for (renderDebug's unmatched-lines dump below) but not for an
+// written for (the old Raw / Debug tab's unmatched-lines dump) but not for an
 // attribute value, so this now escapes quotes too — a strict superset, so
 // every other existing use of this function is unaffected.
 export function escHtml(s) {
@@ -1080,5 +1094,4 @@ export const renderers = {
   defense: renderDefense,
   realm: renderRealm,
   spells: renderSpells,
-  debug: renderDebug,
 };

@@ -36,8 +36,7 @@ type/class (and even that one fails silently and harmlessly if it's blocked
    parser automatically splits the log into fights separated by ~45s of
    quiet) or **All combined** for session totals.
 5. Click through the tabs: Overview, Punched, Healing, Pets, Defense, Realm
-   Points, Spells & Styles, and Raw/Debug (which shows exactly which lines
-   the parser didn't recognize, for transparency/troubleshooting).
+   Points, and Spells & Styles.
 6. Click **What's new** in the header any time to see a short changelog of
    recent fixes and features (see `js/changelog.js`).
 
@@ -145,8 +144,8 @@ accented names). It turns matched lines into typed events (`melee_weapon`,
 `ability_crit`, `pet_self_heal`, `rp_bonus`, …) and quietly discards
 cosmetic noise (zone text, buff-fade spam, third-party combat you're not
 involved in, item-tooltip dumps). Anything it doesn't recognize is kept in
-an `unmatched` list you can inspect on the **Raw/Debug** tab — nothing is
-ever silently miscounted into the wrong bucket.
+an `unmatched` list (see `parseLogText`'s return value) rather than being
+miscounted into the wrong bucket.
 
 `js/aggregate.js` takes that event list and:
 
@@ -171,7 +170,7 @@ Colors follow a validated, colorblind-safe palette.
 
 The log format varies a bit between Eden, other freeshards, and live
 servers. If you find lines that *should* count toward a stat but show up
-on the Raw/Debug tab's "unrecognized lines" list, that's exactly the kind
+in the parser's `unmatched` list, that's exactly the kind
 of thing to add a new rule for in the `RULES` array near the top of
 `js/parser.js` — each rule is just `[eventType, regex, mapFunction]`.
 

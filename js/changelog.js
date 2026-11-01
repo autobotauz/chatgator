@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-10-31',
+    title: 'Chart filters and a tidier layout',
+    bullets: [
+      'Click any label in a chart\'s legend (Overview, Realm Points, Pets) to show only that line or marker; click it again to bring everything back',
+      'The abilities timeline on Spells & Styles has Crits only / Deathblows only filters',
+      'Removed the Raw / Debug tab and a couple of long explanation paragraphs',
+    ],
+  },
+  {
+    date: '2026-10-31',
     title: 'See which ability got the deathblow',
     bullets: [
       'On the Spells & Styles timeline, the hit that landed each deathblow gets a red ring (and a 💀 in its tooltip), so you can see which ability or style finished them off',

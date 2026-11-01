@@ -129,11 +129,41 @@ function tooltipHtml(item) {
 // ---------------------------------------------------------------------------
 // Legend
 // ---------------------------------------------------------------------------
-export function legend(container, entries) {
+// Charts by id (set by timeFrame) and the label each one is isolated to,
+// if any -- both kept across re-renders, like the zoom window.
+const chartById = new Map();
+const isolateById = new Map();
+// The legend label a marker answers to (checkpoint seams have no label).
+const markerLabel = (m) => m.label || (m.solid ? 'Checkpoint' : 'Event');
+
+// With `chartId`, each legend entry is clickable: click one to show only
+// that series/marker in the chart, click it again to show everything.
+export function legend(container, entries, { chartId } = {}) {
   const div = document.createElement('div');
-  div.className = 'legend';
-  div.innerHTML = entries.map(e => `<span class="item"><span class="swatch" style="background:${e.color}"></span>${esc(e.label)}</span>`).join('');
+  div.className = 'legend' + (chartId ? ' legend-clickable' : '');
+  div.innerHTML = entries.map(e => `<span class="item" data-label="${esc(e.label)}"${chartId ? ' role="button" tabindex="0" title="Click to show only this; click again to show all"' : ''}><span class="swatch" style="background:${e.color}"></span>${esc(e.label)}</span>`).join('');
   container.appendChild(div);
+  if (chartId) {
+    const paint = () => {
+      let iso = isolateById.get(chartId);
+      // isolated label gone from this view (e.g. different encounter) -> show all
+      if (iso && ![...div.querySelectorAll('.item')].some(it => it.dataset.label === iso)) { isolateById.delete(chartId); iso = null; }
+      div.querySelectorAll('.item').forEach(it => {
+        it.classList.toggle('active', it.dataset.label === iso);
+        it.classList.toggle('dim', !!iso && it.dataset.label !== iso);
+      });
+    };
+    const pick = (label) => {
+      if (isolateById.get(chartId) === label) isolateById.delete(chartId); else isolateById.set(chartId, label);
+      paint();
+      chartById.get(chartId)?.redraw?.();
+    };
+    div.querySelectorAll('.item').forEach(it => {
+      it.addEventListener('click', () => pick(it.dataset.label));
+      it.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(it.dataset.label); } });
+    });
+    paint();
+  }
   return div;
 }
 
@@ -350,6 +380,8 @@ function timeFrame(container, { domain, idleGaps = [], id, width, height, pad, t
   };
 
   draw();
+  wrap.redraw = draw;
+  if (id) chartById.set(id, wrap);
   return wrap;
 }
 
@@ -409,9 +441,15 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
     domain: dom, idleGaps, id, width, height, timeFmt,
     pad: { top: 18, right: 16, bottom: 26, left: 48 },
     render: ({ svg, el, X, c, cinv, lo, hi, cLo, cHi, cSpan, zoomed, innerW, innerH, pad, fmtT }) => {
+      // Legend click isolates one label (see legend() / isolateById): only
+      // that series, or only that kind of marker, is drawn.
+      const iso = id ? isolateById.get(id) : null;
+      const isoValid = iso && (series.some(s => s.name === iso) || markers.some(m => markerLabel(m) === iso));
+      const shownSeries = isoValid ? series.filter(s => s.name === iso) : series;
+      const shownMarkers = isoValid ? markers.filter(m => markerLabel(m) === iso) : markers;
       const size = Math.max(1000, cSpan / BUCKETS);
       const nB = Math.max(1, Math.ceil(cSpan / size));
-      const bucketed = series.map(s => {
+      const bucketed = shownSeries.map(s => {
         const vals = new Array(nB).fill(0);
         for (const p of (s.raw || [])) {
           const t = Math.min(dataMax, Math.max(dataMin, p.clock));
@@ -445,7 +483,7 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
 
       if (stacked) {
         const cum = new Array(nB).fill(0);
-        series.forEach((s, si) => {
+        shownSeries.forEach((s, si) => {
           const bottom = cum.slice();
           bucketed[si].forEach((v, i) => { cum[i] += v; });
           let d = `M ${X(centers[0])} ${Y(bottom[0])}`;
@@ -454,7 +492,7 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
           svg.appendChild(el('path', { d: d + ' Z', fill: s.color, 'fill-opacity': 0.75 }));
         });
       } else {
-        series.forEach((s, si) => {
+        shownSeries.forEach((s, si) => {
           let d = '';
           bucketed[si].forEach((v, i) => { d += `${i ? ' L' : 'M'} ${X(centers[i])} ${Y(v)}`; });
           svg.appendChild(el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
@@ -462,7 +500,7 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
       }
       svg.appendChild(el('line', { x1: pad.left, x2: pad.left + innerW, y1: Y(0), y2: Y(0), stroke: 'var(--baseline)', 'stroke-width': 1 }));
 
-      drawMarkers(svg, el, markers, { X, lo, hi, zoomed, top: pad.top, bottom: pad.top + innerH });
+      drawMarkers(svg, el, shownMarkers, { X, lo, hi, zoomed, top: pad.top, bottom: pad.top + innerH });
 
       const crosshair = el('line', { y1: pad.top, y2: pad.top + innerH, stroke: 'var(--baseline)', 'stroke-width': 1 });
       crosshair.style.display = 'none';
@@ -475,10 +513,10 @@ export function timelineChart(container, { series, domain, idleGaps = [], id, wi
           const px = X(centers[i]);
           crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px);
           crosshair.style.display = 'block';
-          const rows = series.map((s, si) => `<div class="tt-row"><span>${swatch(s.color)}${esc(s.name)}</span><span>${fmtExact(bucketed[si][i])}</span></div>`).join('');
+          const rows = shownSeries.map((s, si) => `<div class="tt-row"><span>${swatch(s.color)}${esc(s.name)}</span><span>${fmtExact(bucketed[si][i])}</span></div>`).join('');
           const bStart = cinv(cLo + i * size), bEnd = cinv(Math.min(cHi, cLo + (i + 1) * size));
           const counts = [];
-          for (const m of markers) {
+          for (const m of shownMarkers) {
             if (m.excludeFromTooltip || m.t < bStart || m.t > bEnd) continue;
             const r = counts.find(x => x.label === (m.label || 'Event'));
             if (r) r.count++; else counts.push({ label: m.label || 'Event', color: m.color, count: 1 });
