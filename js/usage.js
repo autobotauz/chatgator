@@ -65,18 +65,34 @@ export async function countsToday() {
 
 // The "started today" strip on both home pages: two small stat cards, the
 // page's own kind first; the other one links across to its page.
+// Call it with counts = null first (straight away on page load) to draw the
+// cards with a "–" placeholder, then again with the counts once they arrive:
+// the numbers are filled into the cards already on screen, so nothing pops
+// in or shifts. If the counts never arrive, the "–" just stays.
 const PILE = '<span class="gator-pile" aria-hidden="true"><span>🐊</span><span>🐊</span><span>🐊</span></span>';
+const LABEL = {
+  solo: (one) => `Chat Gator session${one ? '' : 's'} started today`,
+  bask: (one) => `bask${one ? '' : 's'} started today`,
+};
 export function renderToday(box, counts, page = 'solo') {
-  if (!box || !counts) return;
-  const n = (x) => Math.max(0, Math.round(+x || 0));
-  const card = (kind) => {
-    const count = n(counts[kind]);
-    const inner = kind === 'solo'
-      ? `<span class="today-icon" aria-hidden="true">🐊</span><span class="today-text"><span class="today-num">${count.toLocaleString()}</span><span class="today-label">Chat Gator session${count === 1 ? '' : 's'} started today</span></span>`
-      : `<span class="today-icon">${PILE}</span><span class="today-text"><span class="today-num">${count.toLocaleString()}</span><span class="today-label">bask${count === 1 ? '' : 's'} started today</span></span>`;
-    if (kind === page) return `<div class="today-card is-here">${inner}</div>`;
-    return `<a class="today-card" href="${kind === 'solo' ? '../' : 'bask/'}">${inner}</a>`;
-  };
-  box.innerHTML = page === 'bask' ? card('bask') + card('solo') : card('solo') + card('bask');
+  if (!box) return;
+  if (box.dataset.page !== page) {
+    const card = (kind) => {
+      const inner = `<span class="today-icon"${kind === 'solo' ? ' aria-hidden="true"' : ''}>${kind === 'solo' ? '🐊' : PILE}</span>`
+        + `<span class="today-text"><span class="today-num" data-kind="${kind}">–</span><span class="today-label" data-kind="${kind}">${LABEL[kind](false)}</span></span>`;
+      if (kind === page) return `<div class="today-card is-here">${inner}</div>`;
+      return `<a class="today-card" href="${kind === 'solo' ? '../' : 'bask/'}">${inner}</a>`;
+    };
+    box.innerHTML = page === 'bask' ? card('bask') + card('solo') : card('solo') + card('bask');
+    box.dataset.page = page;
+  }
   box.hidden = false;
+  if (!counts) return;
+  for (const kind of ['solo', 'bask']) {
+    const count = Math.max(0, Math.round(+counts[kind] || 0));
+    const num = box.querySelector(`.today-num[data-kind="${kind}"]`);
+    const label = box.querySelector(`.today-label[data-kind="${kind}"]`);
+    if (num) num.textContent = count.toLocaleString();
+    if (label) label.textContent = LABEL[kind](count === 1);
+  }
 }

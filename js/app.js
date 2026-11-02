@@ -333,7 +333,10 @@ el('btnSample').addEventListener('click', () => loadSampleByKey(el('sampleClassS
 el('btnLoadAnother').addEventListener('click', startNewSession);
 
 // "Sessions started today" on the home page.
+// Drawn straight away with a "–" placeholder; the numbers fill in when the
+// counts arrive (and the "–" stays if they never do).
 (async function showToday() {
+  usage.renderToday(el('todayStrip'), null, 'solo');
   try { usage.renderToday(el('todayStrip'), await usage.countsToday(), 'solo'); } catch { /* best-effort */ }
 })();
 

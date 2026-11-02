@@ -1465,6 +1465,8 @@ el('btnLeave').addEventListener('click', () => {
   const code = net.normalizeCode(new URLSearchParams(location.search).get('code'));
   pruneMine();
   // "Sessions started today" on the start page (best-effort).
+  // Drawn now with a "–" placeholder; numbers fill in when they arrive.
+  renderToday(el('todayStrip'), null, 'bask');
   countsToday().then((c) => renderToday(el('todayStrip'), c, 'bask')).catch(() => {});
   (async () => {
     // Season first: if it's closed there's no basking to start or resume.
