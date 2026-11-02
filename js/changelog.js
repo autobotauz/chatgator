@@ -12,6 +12,13 @@
 export const CHANGELOG = [
   {
     date: '2026-11-02',
+    title: 'Fixed: placement realm points',
+    bullets: [
+      '"You have taken First Place and are awarded with 2000 Realm Points!" (and second, third, etc.) now counts toward your realm points, listed as its own source',
+    ],
+  },
+  {
+    date: '2026-11-02',
     title: 'Bask: crit heals no longer counted twice',
     bullets: [
       'Same fix as the main page got earlier: a crit heal\'s "criticals for an extra N" line is mostly overheal and is already included in the heal itself, so Bask no longer adds it on top. Healing totals in a bask now match Chat Gator',

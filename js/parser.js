@@ -288,6 +288,10 @@ const RULES = [
   // ---- realm points -----------------------------------------------------------
   ['rp_bonus', /^You get an additional (\d+) realm points? due to (.+?)!$/, m => ({ amount: +m[1], reason: m[2] })],
   ['rp_reason', /^You get (\d+) realm points? for (.+?)!$/, m => ({ amount: +m[1], reason: m[2] })],
+  // Placement reward: "You have taken First Place and are awarded with 2000
+  // Realm Points!" (any place word -- First/Second/Third...). Standalone, no
+  // "You get N realm points!" total follows it.
+  ['rp_reason', /^You have taken (\w+) Place and are awarded with ([\d,]+) Realm Points?!$/i, m => ({ amount: toNum(m[2]), reason: `${m[1][0].toUpperCase()}${m[1].slice(1).toLowerCase()} Place` })],
   // Activity rewards: "Collection completed. Earned 275 RP and 25 Buff XP."
   // / "Hold won. Earned 660 RP and 60 Buff XP." -- the activity name is the
   // reason (Collection, Treasure Guide, Hold, Patrol Hunt, ...). These used
