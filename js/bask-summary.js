@@ -80,6 +80,12 @@ function addCritExtra(b, who, amount) {
   const row = b.by[k] || (b.by[k] = [0, 0, 0]);
   row[0] += amount; row[2]++;
 }
+// A heal crit: marks the heal just before it as a crit, adds no amount.
+function addCritFlag(b, who) {
+  b.crits++;
+  const row = b.by[who || 'Unknown'];
+  if (row) row[2]++;
+}
 function countMap() { return { total: 0, by: Object.create(null), othersN: 0 }; }
 function addCount(c, who) { c.total++; const k = who || 'Unknown'; c.by[k] = (c.by[k] || 0) + 1; }
 
@@ -279,12 +285,21 @@ export class GroupSummarizer {
         // "You heal yourself" -- label it with our own name so groupmates
         // see who it was, not "You".
         this._lastHealTarget = /^(you|yourself)$/i.test(String(e.target).trim()) ? this.player : e.target;
+        this._lastHealAt = at;
         addTo(this.healOut, this._lastHealTarget, e.amount, false);
         this._tick(at).ho += e.amount;
         break;
       case 'heal_out_crit':
-        addCritExtra(this.healOut, this._lastHealTarget, e.amount);
-        this._tick(at).ho += e.amount;
+        // Unlike a damage crit, a heal crit is NOT extra on top of the heal
+        // line before it: "You heal X for N" already reports what landed,
+        // crit included (capped at missing health); the crit line is the raw
+        // bonus, mostly overheal. So it only counts as a crit -- no amount.
+        // A spreadheal crit with no heal line in the same second is ignored.
+        // Same rule as the main page (aggregate.js healOut).
+        if (this._lastHealAt != null && at - this._lastHealAt <= 1000) {
+          addCritFlag(this.healOut, this._lastHealTarget);
+          this._lastHealAt = null; // one crit per heal
+        }
         break;
       case 'heal_in':
         addTo(this.healIn, e.healer, e.amount, false);
