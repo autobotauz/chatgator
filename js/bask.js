@@ -9,7 +9,7 @@ import { parseLogText } from './parser.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { ABILITY_COOLDOWNS } from './ability-cooldowns.js';
 import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
-import { statTile, barChart, legend, timelineChart, seriesColor, fmtNum, fmtExact } from './charts.js';
+import { statTile, barChart, legend, timelineChart, seriesColor, fmtNum, fmtExact, setPageWindow } from './charts.js';
 import { escHtml, heraldLink } from './ui.js';
 import { iconHtml } from './icons.js';
 import { GroupSummarizer, TICK_MS } from './bask-summary.js';
@@ -61,6 +61,9 @@ const S = {
   members: new Map(),    // player -> { player, joined_at, updated_at, totals }
   order: [],             // players in join order (drives colors)
   ticks: new Map(),      // player -> Map(bucketStartMs -> data)
+  // Time window picked by dragging across any chart ({ lo, hi } epoch ms, or
+  // null): totals, lists and charts on every tab follow it -- see T().
+  timeWindow: null,
   memberCursor: null, tickCursor: null,
   openedAt: Date.now(),
   exportedAt: null,      // offline: the moment the file was saved
@@ -651,6 +654,7 @@ async function syncLoop() {
 }
 
 function enterBask() {
+  S.timeWindow = null;
   show('lobby', false); show('joinStep', false); show('baskMain', true);
   show('btnDownload', true); show('btnLeave', S.mode !== 'offline');
   show('watchStatus', S.mode === 'live');
@@ -803,7 +807,57 @@ const isActive = (p) => !S.members.get(p)?.left_at;
 // derived group numbers
 // ---------------------------------------------------------------------------
 const playerColor = (p) => seriesColor(Math.max(0, S.order.indexOf(p)));
-const T = (p) => S.members.get(p).totals;
+// A member's totals -- for the selected time window when there is one.
+// Only what's time-stamped can follow a window: the per-15s chart buckets
+// give damage/heals in+out, resists and interrupts; deathblows, deaths,
+// rezzes, cures and tags carry their own times. The per-target breakdowns
+// (`by` maps, pets, hits/crits) aren't time-stamped, so they stay whole-
+// session -- sections that show them use TS() and say so (see WHOLE).
+const TS = (p) => S.members.get(p).totals;
+const T = (p) => (S.timeWindow ? windowedTotals(p) : TS(p));
+function windowedTotals(p) {
+  const t = TS(p), w = S.timeWindow;
+  const s = { do: 0, di: 0, ho: 0, hi: 0, pd: 0, rs: 0, ir: 0 };
+  for (const [at, d] of S.ticks.get(p) || []) {
+    if (at + TICK_MS <= w.lo || at >= w.hi) continue;
+    for (const k in s) s[k] += d[k] || 0;
+  }
+  const inW = (x) => x.at >= w.lo && x.at <= w.hi;
+  const since = t.since ? Math.max(t.since, w.lo) : null, last = t.last ? Math.min(t.last, w.hi) : null;
+  return {
+    ...t, since, last: since && last && last > since ? last : since,
+    dmgOut: { ...t.dmgOut, total: s.do }, dmgIn: { ...t.dmgIn, total: s.di },
+    healOut: { ...t.healOut, total: s.ho }, healIn: { ...t.healIn, total: s.hi },
+    resists: { ...t.resists, total: s.rs }, interrupts: { ...t.interrupts, total: s.ir },
+    deathblows: t.deathblows.filter(inW), deaths: t.deaths.filter(inW),
+    rezzes: t.rezzes.filter(inW), cures: t.cures.filter(inW), tags: t.tags.filter(inW),
+  };
+}
+// Note for sections that can't follow the window.
+const WHOLE_NOTE = 'Whole session: this breakdown isn’t time-stamped, so it doesn’t follow the selected time window.';
+const WHOLE = (note = '') => (S.timeWindow ? (note ? `${note} ${WHOLE_NOTE}` : WHOLE_NOTE) : note);
+
+// Set / clear the window (chart drag, double-click, Clear) and redraw.
+function setTimeWindow(w) {
+  S.timeWindow = w && w.hi > w.lo ? { lo: w.lo, hi: w.hi } : null;
+  renderTimeWindowBanner();
+  RENDER[S.tab](el(`panel-${S.tab}`));
+}
+function renderTimeWindowBanner() {
+  setPageWindow({ active: S.timeWindow, onChange: setTimeWindow });
+  const b = el('timeWindowBanner');
+  if (!b) return;
+  const w = S.timeWindow;
+  b.hidden = !w;
+  if (!w) { b.innerHTML = ''; return; }
+  const secs = Math.round((w.hi - w.lo) / 1000);
+  const dur = secs >= 3600 ? `${Math.floor(secs / 3600)}h ${Math.floor(secs % 3600 / 60)}m` : secs >= 60 ? `${Math.floor(secs / 60)}m ${secs % 60}s` : `${secs}s`;
+  b.innerHTML = `<span>🔍 Showing <strong>${fmtTimeSec(w.lo)} – ${fmtTimeSec(w.hi)}</strong> (${dur}) on every tab</span>`;
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'chart-reset'; btn.textContent = 'Clear';
+  btn.addEventListener('click', () => setTimeWindow(null));
+  b.appendChild(btn);
+}
 const norm = (s) => String(s || '').trim().toLowerCase();
 
 function memberKeyMap() {
@@ -816,7 +870,7 @@ function memberKeyMap() {
 }
 
 function activeSeconds(t) {
-  if (!t.since || !t.last) return 0;
+  if (!t.since || !t.last || t.last <= t.since) return 0;
   return Math.max(1, (t.last - t.since) / 1000);
 }
 
@@ -854,11 +908,19 @@ function tickSeries(metric, players = S.order) {
   return players.map((p) => {
     const m = S.ticks.get(p) || new Map();
     const raw = [];
-    for (const [t, d] of m) if (d[metric]) raw.push({ clock: t + TICK_MS / 2, amount: d[metric] });
+    const w = S.timeWindow;
+    for (const [t, d] of m) {
+      if (!d[metric]) continue;
+      // with a time window, only buckets inside it -- the chart would
+      // otherwise pin everything outside onto its edges
+      if (w && (t + TICK_MS <= w.lo || t >= w.hi)) continue;
+      raw.push({ clock: Math.min(Math.max(t + TICK_MS / 2, w ? w.lo : -Infinity), w ? w.hi : Infinity), amount: d[metric] });
+    }
     return { name: p, color: playerColor(p), raw };
   });
 }
 function tickDomain() {
+  if (S.timeWindow) return [S.timeWindow.lo, S.timeWindow.hi]; // charts span exactly the picked window
   let lo = Infinity, hi = -Infinity;
   for (const m of S.ticks.values()) for (const t of m.keys()) { if (t < lo) lo = t; if (t + TICK_MS > hi) hi = t + TICK_MS; }
   return Number.isFinite(lo) ? [lo, hi] : null;
@@ -925,6 +987,10 @@ function othersItem(item, n) {
 const amtItems = (map) => Object.entries(map.by).map(([label, v]) => othersItem({ label, value: v[0], hits: v[1], crits: v[2] }, map.othersN)).filter((x) => x.value > 0);
 const countItems = (map) => Object.entries(map.by).map(([label, v]) => othersItem({ label, value: v }, map.othersN)).filter((x) => x.value > 0);
 const total = (f) => S.order.reduce((a, p) => a + f(T(p)), 0);
+// Healing a member received: the de-duplicated who-healed-whom figure for
+// the whole session; with a time window, their own timed "heals in" buckets
+// (the who-healed-whom detail isn't time-stamped).
+const healsIn = (p, hm) => (S.timeWindow ? T(p).healIn.total : (hm.received.get(p) || 0));
 const playerItems = (f) => S.order.map((p) => ({ label: p, ...f(T(p), p) }));
 const byPlayerColor = (i) => playerColor(i.label);
 
@@ -1045,7 +1111,7 @@ function renderOverview(c) {
   statTile(g, { label: 'Damage out', value: fmtNum(total((t) => t.dmgOut.total)), colorVar: '--series-1' });
   statTile(g, { label: 'Damage in', value: fmtNum(total((t) => t.dmgIn.total)), colorVar: '--series-8' });
   statTile(g, { label: 'Heals out', value: fmtNum(total((t) => t.healOut.total)), colorVar: '--series-3' });
-  statTile(g, { label: 'Heals in', value: fmtNum([...hm.received.values()].reduce((a, b) => a + b, 0)), colorVar: '--series-6', title: 'Healing the group received. Heals between members are counted once, from the healer’s side.' });
+  statTile(g, { label: 'Heals in', value: fmtNum(S.order.reduce((a, p) => a + healsIn(p, hm), 0)), colorVar: '--series-6', title: 'Healing the group received. Heals between members are counted once, from the healer’s side.' });
   const g2 = grid(section(c), 4);
   statTile(g2, { label: 'Resisted', value: fmtExact(total((t) => t.resists.total)), sub: 'spells resisted by targets', colorVar: '--series-4' });
   statTile(g2, { label: 'Interrupted', value: fmtExact(total((t) => t.interrupts.total)), sub: 'casts interrupted', colorVar: '--series-2' });
@@ -1054,7 +1120,7 @@ function renderOverview(c) {
 
   const dom = tickDomain();
   const all = (metric) => tickSeries(metric).flatMap((s) => s.raw);
-  const c1 = card(section(c, 'Group activity over time', 'Drag across a chart to zoom into one fight; double-click to zoom back out.'));
+  const c1 = card(section(c, 'Group activity over time', 'Drag across a chart to focus every tab on that time; double-click or Clear to go back.'));
   legend(c1, [
     { color: 'var(--series-1)', label: 'Damage out' }, { color: 'var(--series-8)', label: 'Damage in' },
     { color: 'var(--series-3)', label: 'Heals out' }, { color: 'var(--series-6)', label: 'Heals in' },
@@ -1098,7 +1164,7 @@ function renderOverview(c) {
     S.order.map((p) => {
       const t = T(p), secs = activeSeconds(t);
       return [nameCell(p), fmtExact(t.dmgOut.total), secs ? fmtNum(t.dmgOut.total / secs) : '—', fmtExact(t.dmgIn.total),
-        fmtExact(t.healOut.total), secs ? fmtNum(t.healOut.total / secs) : '—', fmtExact(hm.received.get(p) || 0),
+        fmtExact(t.healOut.total), secs ? fmtNum(t.healOut.total / secs) : '—', fmtExact(healsIn(p, hm)),
         fmtExact(t.resists.total), fmtExact(t.interrupts.total), fmtExact(t.deathblows.length), fmtExact(t.deaths.length)];
     }));
 }
@@ -1110,23 +1176,23 @@ function renderDamage(c) {
   barChart(card(g, 'Damage dealt'), { items: playerItems((t) => ({ value: t.dmgOut.total, hits: t.dmgOut.hits, crits: t.dmgOut.crits })), colorFn: byPlayerColor });
   barChart(card(g, 'Damage taken'), { items: playerItems((t) => ({ value: t.dmgIn.total, hits: t.dmgIn.hits, crits: t.dmgIn.crits })), colorFn: byPlayerColor });
 
-  const g2 = grid(section(c, 'Who hit each player', 'Everything that damaged each groupmate, by attacker.'), 2);
+  const g2 = grid(section(c, 'Who hit each player', WHOLE('Everything that damaged each groupmate, by attacker.')), 2);
   for (const p of S.order) {
-    const cc = card(g2, `${nameCell(p)} <span class="sub">took ${fmtExact(T(p).dmgIn.total)}</span>`);
-    const items = amtItems(T(p).dmgIn);
+    const cc = card(g2, `${nameCell(p)} <span class="sub">took ${fmtExact(TS(p).dmgIn.total)}</span>`);
+    const items = amtItems(TS(p).dmgIn);
     if (!items.length) empty(cc, 'No damage taken.'); else barChart(cc, { items, maxItems: 10, colorFn: () => 'var(--series-8)' });
   }
 
-  const g3 = grid(section(c, 'Who each player hit'), 2);
+  const g3 = grid(section(c, 'Who each player hit', WHOLE()), 2);
   for (const p of S.order) {
-    const cc = card(g3, `${nameCell(p)} <span class="sub">dealt ${fmtExact(T(p).dmgOut.total)}</span>`);
-    const items = amtItems(T(p).dmgOut);
+    const cc = card(g3, `${nameCell(p)} <span class="sub">dealt ${fmtExact(TS(p).dmgOut.total)}</span>`);
+    const items = amtItems(TS(p).dmgOut);
     if (!items.length) empty(cc, 'No damage dealt.'); else barChart(cc, { items, maxItems: 10, colorFn: () => playerColor(p) });
   }
 
-  const g4 = grid(section(c, 'Resists & interrupts', 'Resisted: targets that resisted a player’s spells. Interrupted: what broke a player’s casts.'), 2);
+  const g4 = grid(section(c, 'Resists & interrupts', WHOLE('Resisted: targets that resisted a player’s spells. Interrupted: what broke a player’s casts.')), 2);
   for (const p of S.order) {
-    const t = T(p);
+    const t = TS(p);
     if (!t.resists.total && !t.interrupts.total) continue;
     const cc = card(g4, `${nameCell(p)} <span class="sub">${t.resists.total} resisted · ${t.interrupts.total} interrupted</span>`);
     const sub = (text) => { const h = document.createElement('div'); h.className = 'sub mini-head'; h.textContent = text; cc.appendChild(h); };
@@ -1142,20 +1208,20 @@ function renderHealing(c) {
   const hm = healingMatrix();
   const g = grid(section(c), 2);
   barChart(card(g, 'Healing done'), { items: playerItems((t) => ({ value: t.healOut.total, hits: t.healOut.hits, crits: t.healOut.crits })), colorFn: byPlayerColor });
-  barChart(card(g, 'Healing received'), { items: playerItems((t, p) => ({ value: hm.received.get(p) || 0 })), colorFn: byPlayerColor });
+  barChart(card(g, 'Healing received'), { items: playerItems((t, p) => ({ value: healsIn(p, hm) })), colorFn: byPlayerColor });
 
-  const healers = S.order.filter((h) => T(h).healOut.total > 0);
-  const s = section(c, 'Who healed whom', 'Rows are healers, columns are who they healed. Heals between groupmates are counted once, from the healer’s own log.');
+  const healers = S.order.filter((h) => TS(h).healOut.total > 0);
+  const s = section(c, 'Who healed whom', WHOLE('Rows are healers, columns are who they healed. Heals between groupmates are counted once, from the healer’s own log.'));
   if (!healers.length) empty(card(s), 'No healing done yet.');
   else {
     const max = Math.max(1, ...hm.cell.values());
     table(s, ['Healer → target', ...S.order.map((p) => nameCell(p)), 'Outside group', 'Total'],
       healers.map((h) => [nameCell(h),
         ...S.order.map((r) => { const v = hm.cell.get(`${h}\u0000${r}`) || 0; return v ? `<span class="heat" style="--heat:${(v / max).toFixed(3)}">${fmtExact(v)}</span>` : '<span class="sub">·</span>'; }),
-        fmtExact(hm.outside.get(h) || 0), `<strong>${fmtExact(T(h).healOut.total)}</strong>`]));
+        fmtExact(hm.outside.get(h) || 0), `<strong>${fmtExact(TS(h).healOut.total)}</strong>`]));
   }
 
-  const g2 = grid(section(c, 'Heals from outside the group', 'Healers who aren’t in this bask, as seen in each receiver’s own log.'), 2);
+  const g2 = grid(section(c, 'Heals from outside the group', WHOLE('Healers who aren’t in this bask, as seen in each receiver’s own log.')), 2);
   for (const r of S.order) {
     const list = hm.fromOutside.get(r);
     if (!list.length) continue;
@@ -1164,9 +1230,9 @@ function renderHealing(c) {
   if (!g2.children.length) empty(g2, 'None yet.');
 
   if (healers.length) {
-    const g3 = grid(section(c, 'Who each healer healed'), 2);
+    const g3 = grid(section(c, 'Who each healer healed', WHOLE()), 2);
     for (const h of healers) {
-      barChart(card(g3, `${nameCell(h)} <span class="sub">healed ${fmtExact(T(h).healOut.total)}</span>`), { items: amtItems(T(h).healOut), maxItems: 10, colorFn: () => 'var(--series-3)' });
+      barChart(card(g3, `${nameCell(h)} <span class="sub">healed ${fmtExact(TS(h).healOut.total)}</span>`), { items: amtItems(TS(h).healOut), maxItems: 10, colorFn: () => 'var(--series-3)' });
     }
   }
   renderSupport(c);
@@ -1223,7 +1289,7 @@ function renderPets(c) {
   if (!S.order.length) return noMembers(c);
   const rows = [], items = [];
   for (const p of S.order) {
-    const t = T(p);
+    const t = TS(p); // per-pet numbers aren't time-stamped: whole session
     for (const [pet, v] of Object.entries(t.pets)) {
       const share = t.dmgOut.total ? `${Math.round((v.dmg / t.dmgOut.total) * 100)}%` : '—';
       rows.push([nameCell(p), esc(pet), fmtExact(v.dmg), share, fmtExact(v.hits), fmtExact(v.crits), fmtExact(v.heal)]);
@@ -1231,7 +1297,7 @@ function renderPets(c) {
     }
   }
   if (!rows.length) { empty(card(section(c)), 'No pets seen yet. Pet damage shows up here once a groupmate’s pet hits something.'); return; }
-  barChart(card(section(c, 'Pet damage')), { items, colorFn: (i) => playerColor(i.owner) });
+  barChart(card(section(c, 'Pet damage', WHOLE())), { items, colorFn: (i) => playerColor(i.owner) });
   table(section(c), ['Owner', 'Pet', 'Damage', 'Share of owner', 'Hits', 'Crits', 'Self-heals'], rows, { numericFrom: 2 });
 }
 
@@ -1299,6 +1365,7 @@ function applyOwnTotals() {
 
 function renderAll() {
   applyOwnTotals();
+  renderTimeWindowBanner();
   renderSeasonPill();
   renderBar();
   renderRoster();

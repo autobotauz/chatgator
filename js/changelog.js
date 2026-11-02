@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-11-02',
+    title: 'Pick a time window and every tab follows',
+    bullets: [
+      'Drag across any chart to focus the whole page on that stretch of time: every tile, table and chart on every tab is recalculated for just that window, so you can see exactly what you did and used then. A banner shows the window; Clear (or double-click a chart) goes back',
+      'DPS, HPS and RP/hour use only the fighting time inside the window',
+      'Works in Bask too: totals, deathblows, deaths, rezzes and charts follow the window. Per-target breakdowns (who hit whom, who healed whom, pets) aren\'t time-stamped in a bask, so they stay whole-session and say so',
+    ],
+  },
+  {
+    date: '2026-11-02',
     title: 'Log backups named after your character',
     bullets: [
       'The copy saved when you clear your log is now named chat_<character>_<date and time>.log -- the character you have selected, on a log with several',

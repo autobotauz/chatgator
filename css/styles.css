@@ -560,3 +560,10 @@ a.today-card:hover { border-color: color-mix(in srgb, var(--series-1) 40%, var(-
 .is-here .today-num { color: color-mix(in srgb, var(--series-3) 75%, var(--text-primary)); }
 .today-label { font-size: 13px; color: var(--text-secondary); }
 a.today-card .today-num { font-size: 20px; }
+
+/* Page-wide time window picked from a chart (Chat Gator + Bask) */
+.time-window-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin: 16px 0 0; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 13px;
+  border: 1px solid color-mix(in srgb, var(--series-1) 45%, var(--border));
+  background: color-mix(in srgb, var(--series-1) 8%, var(--surface-1)); color: var(--text-primary); }
+.time-window-banner[hidden] { display: none; }

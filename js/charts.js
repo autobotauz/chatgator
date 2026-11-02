@@ -190,6 +190,16 @@ export function legend(container, entries, { chartId } = {}) {
 // (remembered in localStorage).
 // ---------------------------------------------------------------------------
 const zoomById = new Map();
+// Page-wide time window (Chat Gator / Bask): when a page registers a
+// handler with setPageWindow(), dragging across ANY chart doesn't just zoom
+// that chart -- it hands the window to the page, which recomputes every tile,
+// table and chart for it (and passes it back in as `active`). Reset /
+// double-click clear it. Without a handler, charts zoom on their own as
+// before.
+let pageWindow = { active: null, onChange: null };
+export function setPageWindow({ active = null, onChange = null } = {}) {
+  pageWindow = { active, onChange };
+}
 const HIDE_IDLE_KEY = 'chatgator:hideIdleTime';
 function getHideIdle() {
   try { return localStorage.getItem(HIDE_IDLE_KEY) !== '0'; } catch { return true; }
@@ -252,7 +262,7 @@ function timeFrame(container, { domain, idleGaps = [], id, width, height, pad, t
     };
 
     // View window (real time), from the remembered zoom if it still overlaps.
-    let z = id ? zoomById.get(id) : null;
+    let z = (id && !pageWindow.onChange) ? zoomById.get(id) : null;
     if (z && (z.hi <= dataMin || z.lo >= dataMax)) { zoomById.delete(id); z = null; }
     const lo = z ? Math.max(z.lo, dataMin) : dataMin;
     const hi = z ? Math.min(z.hi, dataMax) : dataMax;
@@ -263,7 +273,9 @@ function timeFrame(container, { domain, idleGaps = [], id, width, height, pad, t
     controls.className = 'chart-controls';
     const hint = document.createElement('span');
     hint.className = 'chart-hint';
-    hint.textContent = z ? `Zoomed: ${fmtClock(lo, true)} – ${fmtClock(hi, true)}` : 'Drag across the chart to zoom in';
+    hint.textContent = pageWindow.onChange
+      ? (pageWindow.active ? 'Drag again to narrow it down; double-click or Clear to go back' : 'Drag across the chart to focus every tab on that time')
+      : (z ? `Zoomed: ${fmtClock(lo, true)} – ${fmtClock(hi, true)}` : 'Drag across the chart to zoom in');
     controls.appendChild(hint);
     if (gaps.length) {
       const lbl = document.createElement('label');
@@ -276,12 +288,15 @@ function timeFrame(container, { domain, idleGaps = [], id, width, height, pad, t
       lbl.append(cb, ` Hide idle time (${gaps.length} gap${gaps.length > 1 ? 's' : ''} of 1h+)`);
       controls.appendChild(lbl);
     }
-    if (z) {
+    if (z || (pageWindow.onChange && pageWindow.active)) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'chart-reset';
-      btn.textContent = 'Reset zoom';
-      btn.addEventListener('click', () => { zoomById.delete(id); draw(); });
+      btn.textContent = pageWindow.onChange ? 'Clear time window' : 'Reset zoom';
+      btn.addEventListener('click', () => {
+        if (pageWindow.onChange) { pageWindow.onChange(null); return; }
+        zoomById.delete(id); draw();
+      });
       controls.appendChild(btn);
     }
     wrap.appendChild(controls);
@@ -367,14 +382,19 @@ function timeFrame(container, { domain, idleGaps = [], id, width, height, pad, t
       const a = Math.min(dragFrom, sx), b = Math.max(dragFrom, sx);
       dragFrom = null;
       sel.style.display = 'none';
-      if (b - a < 6 || !id) return; // a click, not a drag
+      if (b - a < 6) return; // a click, not a drag
       const zLo = fromSvgX(a), zHi = fromSvgX(b);
       if (zHi - zLo < 5000) return; // don't zoom below ~5 seconds
+      if (pageWindow.onChange) { hideTooltip(); pageWindow.onChange({ lo: zLo, hi: zHi }); return; }
+      if (!id) return;
       zoomById.set(id, { lo: zLo, hi: zHi });
       draw();
     });
     overlay.addEventListener('pointercancel', () => { dragFrom = null; sel.style.display = 'none'; });
-    overlay.addEventListener('dblclick', () => { if (id && zoomById.has(id)) { zoomById.delete(id); draw(); } });
+    overlay.addEventListener('dblclick', () => {
+      if (pageWindow.onChange) { if (pageWindow.active) pageWindow.onChange(null); return; }
+      if (id && zoomById.has(id)) { zoomById.delete(id); draw(); }
+    });
     overlay.addEventListener('mouseleave', () => { if (dragFrom == null) { hideTooltip(); if (hooks.onLeave) hooks.onLeave(); } });
 
     wrap.appendChild(svg);

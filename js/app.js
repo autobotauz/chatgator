@@ -4,7 +4,7 @@ import { renderers, heraldLink, escHtml } from './ui.js';
 import { loadSkillIndex } from './skills.js';
 import { isWatchSupported, LogWatcher } from './filewatch.js';
 import { SAMPLE_LOGS } from './sample-data.js';
-import { fmtClock } from './charts.js';
+import { fmtClock, setPageWindow } from './charts.js';
 import { ABILITY_COOLDOWNS } from './ability-cooldowns.js';
 import { iconImg, getIconSkin, setIconSkin } from './icons.js';
 import { CL_ABILITY_DATABASE } from './cl-ability-database.js';
@@ -57,6 +57,11 @@ const state = {
   scopedEvents: [],
   encounters: [],       // from segmentEncounters(scopedEvents) — see above
   scope: 'all',          // 'all' or encounter id, WITHIN the current player+checkpoint scope
+  // A time window picked by dragging across any chart ({ lo, hi } in parser
+  // clock ms, or null): every tab's stats are computed from just the events
+  // inside it -- see currentStats(). Cleared when player/checkpoint/fight
+  // changes or a new log is loaded.
+  timeWindow: null,
   activeTab: 'overview',
   skillMap: {},
   watcher: null,
@@ -358,6 +363,7 @@ function startNewSession() {
   state.rawEvents = []; state.unmatched = [];
   state.checkpoints = []; state.playerScope = null; state.checkpointScope = 'all'; state.scopedEvents = [];
   state.encounters = []; state.scope = 'all'; state.isSnapshot = false;
+  state.timeWindow = null;
   state.liveSync = null;
   state.parseResumeState = null;
   state.lastUpdatedAt = null;
@@ -683,6 +689,7 @@ function buildPlayerSelect() {
   // did before this feature existed.
   wrap.hidden = players.length <= 1;
   sel.onchange = () => {
+    state.timeWindow = null;
     state.playerScope = sel.value === '__unknown__' ? null : sel.value;
     state.checkpointScope = 'all';
     refreshScopedEncounters();
@@ -715,6 +722,7 @@ function buildCheckpointSelect() {
   // simple as it always was.
   wrap.hidden = cps.length <= 1;
   sel.onchange = () => {
+    state.timeWindow = null;
     state.checkpointScope = sel.value;
     refreshScopedEncounters();
     buildEncounterSelect();
@@ -746,7 +754,7 @@ function buildEncounterSelect() {
   // continue-where-you-left-off reasoning as refreshScopedEncounters above.
   sel.value = state.encounters.some(e => String(e.id) === String(state.scope)) ? String(state.scope) : 'all';
   if (sel.value === 'all') state.scope = 'all';
-  sel.onchange = () => { state.scope = sel.value; renderActiveTab(); };
+  sel.onchange = () => { state.scope = sel.value; state.timeWindow = null; renderActiveTab(); };
 }
 
 function durationLabel(ms) {
@@ -794,24 +802,59 @@ function playedDurationMs(events) {
 // aggregate.js's buildStats for why that first-wins default is wrong once a
 // file can contain more than one name.
 function currentStats() {
-  if (state.scope === 'all') {
-    const stats = buildStats(state.scopedEvents, state.playerScope);
+  const enc = state.scope === 'all' ? null : state.encounters.find(e => String(e.id) === String(state.scope));
+  const win = state.timeWindow;
+  let events = enc ? enc.events : state.scopedEvents;
+  if (win) events = events.filter(e => e.clock == null || (e.clock >= win.lo && e.clock <= win.hi));
+  const stats = buildStats(events, state.playerScope);
+  if (state.scope === 'all' || !enc || win) {
     // DPS/HPS over the *full* scoped span (which can include multi-day idle
     // gaps between sessions) is meaningless, so recompute those rates
-    // against the sum of actual encounter time instead.
-    const activeMs = state.encounters.reduce((a, e) => a + e.durationMs, 0) || stats.meta.durationMs;
+    // against the sum of actual encounter time instead -- with a time
+    // window, only the part of each fight that falls inside it.
+    const encs = enc ? [enc] : state.encounters;
+    const activeMs = (win
+      ? encs.reduce((a, e) => a + Math.max(0, Math.min(e.end, win.hi) - Math.max(e.start, win.lo)), 0)
+      : encs.reduce((a, e) => a + e.durationMs, 0)) || stats.meta.durationMs;
     const activeSec = Math.max(1, activeMs / 1000);
     stats.damageOut.dps = +(stats.damageOut.total / activeSec).toFixed(1);
     stats.damageIn.dtps = +(stats.damageIn.total / activeSec).toFixed(1);
     stats.healOut.hps = +(stats.healOut.total / activeSec).toFixed(1);
     stats.meta.activeDurationMs = activeMs;
-    const playedSec = playedDurationMs(state.scopedEvents) / 1000;
+    const playedSec = playedDurationMs(events) / 1000;
     stats.realmPoints.perHour = +(stats.realmPoints.total / (playedSec / 3600)).toFixed(0);
-    return stats;
   }
-  const enc = state.encounters.find(e => String(e.id) === String(state.scope));
-  if (!enc) return buildStats(state.scopedEvents, state.playerScope);
-  return buildStats(enc.events, state.playerScope);
+  if (win) {
+    // charts span exactly the window you picked, even where it's quiet
+    stats.meta.startClock = win.lo;
+    stats.meta.endClock = win.hi;
+    stats.meta.timeWindow = win;
+  }
+  return stats;
+}
+
+// Set / clear the page-wide time window (from a chart drag, the banner's
+// Clear, or a chart's double-click) and redraw.
+function setTimeWindow(w) {
+  state.timeWindow = w && w.hi > w.lo ? { lo: w.lo, hi: w.hi } : null;
+  renderActiveTab();
+}
+
+function renderTimeWindowBanner() {
+  const b = el('timeWindowBanner');
+  if (!b) return;
+  const w = state.timeWindow;
+  b.hidden = !w;
+  if (!w) { b.innerHTML = ''; return; }
+  const secs = Math.round((w.hi - w.lo) / 1000);
+  const dur = secs >= 3600 ? `${Math.floor(secs / 3600)}h ${Math.floor(secs % 3600 / 60)}m` : secs >= 60 ? `${Math.floor(secs / 60)}m ${secs % 60}s` : `${secs}s`;
+  b.innerHTML = `<span>🔍 Showing <strong>${fmtClock(w.lo, true)} – ${fmtClock(w.hi, true)}</strong> (${dur}) on every tab</span>`;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'chart-reset';
+  btn.textContent = 'Clear';
+  btn.addEventListener('click', () => setTimeWindow(null));
+  b.appendChild(btn);
 }
 
 // ---------------------------------------------------------------------------
@@ -830,6 +873,8 @@ document.querySelectorAll('.tab').forEach(btn => {
 
 function renderActiveTab() {
   if (!state.rawEvents.length) return;
+  setPageWindow({ active: state.timeWindow, onChange: setTimeWindow });
+  renderTimeWindowBanner();
   const stats = currentStats();
   usage.sessionLearned({ name: stats.meta.playerName, cls: stats.meta.inferredClass?.name });
   renderBgTicker();
@@ -861,7 +906,8 @@ function renderActiveTab() {
   // scoping is actually narrowing the view, say so instead of overclaiming.
   const isFullFile = state.checkpointScope === 'all' &&
     new Set(state.checkpoints.map(cp => cp.player)).size <= 1;
-  const totalsLabel = isFullFile ? 'Totals across the whole file' : 'Totals for this selection';
+  const totalsLabel = state.timeWindow ? 'Totals for the selected time window'
+    : isFullFile ? 'Totals across the whole file' : 'Totals for this selection';
   const encLabel = state.scope === 'all'
     ? `${totalsLabel} · DPS/HPS use ${durationLabel(stats.meta.activeDurationMs || stats.meta.durationMs)} of active time`
     : `Single encounter · ${durationLabel(stats.meta.durationMs)}`;
