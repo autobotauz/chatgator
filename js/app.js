@@ -1684,7 +1684,7 @@ async function doClearLog(saveCopy) {
     if (saveCopy) {
       const snapshot = await state.watcher.snapshotFile();
       const saveHandle = await window.showSaveFilePicker({
-        suggestedName: `chat_${backupTimestamp()}.log`,
+        suggestedName: backupFileName(),
         types: [{ description: 'DAoC chat log backup', accept: { 'text/plain': ['.log'] } }],
       });
       const writable = await saveHandle.createWritable();
@@ -1707,6 +1707,16 @@ el('clearLogWithCopy').addEventListener('click', () => doClearLog(true));
 el('clearLogNoCopy').addEventListener('click', () => doClearLog(false));
 el('clearLogCancel').addEventListener('click', () => el('clearLogDialog').close());
 el('clearLogDialog').addEventListener('click', (e) => { if (e.target === el('clearLogDialog')) el('clearLogDialog').close(); });
+
+// chat_<player>_yyyymmddhhmmss.log -- <player> is the character currently
+// selected in the player picker (on a log with several characters, the one
+// you're viewing), else whatever name the log itself gives, else left out.
+function backupFileName() {
+  let name = state.playerScope || null;
+  if (!name) { try { name = currentStats().meta.playerName || null; } catch { name = null; } }
+  const safe = name ? String(name).replace(/[^\p{L}\p{N}_-]+/gu, '_').replace(/^_+|_+$/g, '') : '';
+  return safe ? `chat_${safe}_${backupTimestamp()}.log` : `chat_${backupTimestamp()}.log`;
+}
 
 function backupTimestamp() {
   const d = new Date();

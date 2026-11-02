@@ -11,6 +11,13 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-11-02',
+    title: 'Log backups named after your character',
+    bullets: [
+      'The copy saved when you clear your log is now named chat_<character>_<date and time>.log -- the character you have selected, on a log with several',
+    ],
+  },
+  {
     date: '2026-11-01',
     title: 'Fixed: realm points from activities',
     bullets: [
