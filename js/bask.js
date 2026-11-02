@@ -841,6 +841,7 @@ const WHOLE = (note = '') => (S.timeWindow ? (note ? `${note} ${WHOLE_NOTE}` : W
 function setTimeWindow(w) {
   S.timeWindow = w && w.hi > w.lo ? { lo: w.lo, hi: w.hi } : null;
   renderTimeWindowBanner();
+  renderRoster();
   RENDER[S.tab](el(`panel-${S.tab}`));
 }
 function renderTimeWindowBanner() {
@@ -1059,7 +1060,7 @@ function renderRoster() {
     const m = S.members.get(p);
     const st = memberStatus(p);
     const left = st === 'left';
-    const t = m.totals;
+    const t = T(p); // follows the selected time window, like the tiles below
     const title = {
       left: 'Left the bask. Their numbers so far stay in the group view.',
       stopped: 'Idle for an hour, so their page stopped reading their chat.log. They need to pick it again to keep sharing.',
