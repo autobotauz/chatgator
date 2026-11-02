@@ -524,7 +524,13 @@ const RULES = [
   ['flavor', /^Your (strength|agility|health|movement|intelligence) returns to normal\.$/, () => ({})],
   ['flavor', /^You gain \d+ campaign points!$/, () => ({})],
   ['flavor', /^You have died\.\s+Type \/release to return to your last bindpoint\.$/, () => ({})],
-  ['flavor', /^You begin playing .+?!$/, () => ({})], // bard song announcements
+  // Songs/chants (Minstrel, Bard, Skald...): "You begin playing Commanding
+  // Cadence!" is the only line a song start gets -- no "You cast a ...
+  // spell!" -- so it counts as a cast of that ability (an instant one, see
+  // the 'cast' handling in the main loop). That puts songs in the Spells &
+  // Styles tables, the abilities timeline and the cooldown tracker, and
+  // lets a mez song's landings/resists be credited to it.
+  ['cast', /^You begin playing (.+?)!$/, m => ({ name: m[1].trim(), song: true })],
   ['flavor', /^The damage was lessened by your equipment!$/, () => ({})],
   ['flavor', /^.+?'s skin hardens\.$/, () => ({})],
   ['flavor', /^Bark falls from .+?'s skin\.$/, () => ({})],

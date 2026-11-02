@@ -12,6 +12,13 @@
 export const CHANGELOG = [
   {
     date: '2026-11-02',
+    title: 'Songs now count as abilities used',
+    bullets: [
+      'Songs and chants ("You begin playing Commanding Cadence!") now show up on Spells & Styles -- in the tables and on the abilities timeline -- and a mez song\'s landings and resists are credited to it',
+    ],
+  },
+  {
+    date: '2026-11-02',
     title: 'Fixed: placement realm points',
     bullets: [
       '"You have taken First Place and are awarded with 2000 Realm Points!" (and second, third, etc.) now counts toward your realm points, listed as its own source',
