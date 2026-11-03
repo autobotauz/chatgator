@@ -286,7 +286,7 @@ el('fileInput').addEventListener('change', (e) => {
 // Loads one SAMPLE_LOGS entry by key — shared by the "Try a sample log"
 // button below and the ?demo=<key> auto-load at the bottom of this file
 // (and, via a tiny redirect stub, the pretty /demo/<Name>/ links people
-// actually share — see demo/Dexii/index.html and demo/Whispra/index.html).
+// actually share — see demo/Hebstrel/index.html and demo/Whispra/index.html).
 // Keeping this as the one place that knows how to turn a SAMPLE_LOGS key
 // into a loaded session means a shared link and the manual picker can
 // never drift apart.
@@ -320,8 +320,8 @@ async function loadSampleByKey(key) {
 
 el('btnSample').addEventListener('click', () => loadSampleByKey(el('sampleClassSelect').value));
 
-// A shared link for a specific sample — https://.../chatgator/?demo=dexii,
-// or the prettier /demo/Dexii/ path that redirects here with this same
+// A shared link for a specific sample — https://.../chatgator/?demo=hebstrel,
+// or the prettier /demo/Hebstrel/ path that redirects here with this same
 // query string — loads that sample immediately instead of making whoever
 // clicked the link pick it from the dropdown themselves. Keeps the select
 // box in sync too, so it doesn't silently disagree with what's on screen

@@ -21,9 +21,9 @@ export const SAMPLE_LOGS = {
     kind: 'snapshot',
     url: 'sample-logs/bainshee.json',
   },
-  dexii: {
-    label: 'Cleric (real session — Dexii)',
+  hebstrel: {
+    label: 'Minstrel (real session — Hebstrel)',
     kind: 'snapshot',
-    url: 'sample-logs/dexii.json',
+    url: 'sample-logs/hebstrel.json',
   },
 };

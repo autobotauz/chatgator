@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 const { GroupSummarizer } = await import(new URL('../js/bask-summary.js', import.meta.url));
-for (const f of ['dexii','bainshee']) {
+for (const f of ['hebstrel','bainshee']) {
   const d = JSON.parse(readFileSync(new URL(`../sample-logs/${f}.json`, import.meta.url)));
   const s = new GroupSummarizer({ player: d.player, toWall: c => c, since: 0, cooldowns: {'Frigid Torment':{cooldownSeconds:30}} });
   s.primePets(d.events); s.ingest(d.events);

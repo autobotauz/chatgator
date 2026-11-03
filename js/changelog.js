@@ -11,6 +11,13 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-11-03',
+    title: 'New sample: Hebstrel the Minstrel',
+    bullets: [
+      'A real Minstrel session (Hebstrel) is now in the sample picker, with songs, mezzes and pets -- replacing the Cleric (Dexii) sample',
+    ],
+  },
+  {
     date: '2026-11-02',
     title: 'Songs now count as abilities used',
     bullets: [
