@@ -6,12 +6,35 @@
 .bask-word { color: var(--series-3); }
 
 /* ---------- lobby ---------- */
-.bask-hero { margin: 8px 0 22px; max-width: 760px; }
-.bask-hero h2 { font-size: 26px; margin: 0 0 8px; letter-spacing: -0.01em; }
-.bask-hero p { color: var(--text-secondary); line-height: 1.6; margin: 0; }
-.lobby-card { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-.lobby-card h3 { margin: 0; font-size: 16px; }
-.lobby-card .sub { margin: 0; flex: 1; }
+/* Bask's hero: same panel as the home page, violet glow and a group-meter motif instead of a bar chart. */
+.hero-bask {
+  margin: 8px 0 16px;
+  background:
+    radial-gradient(60% 90% at 88% 0%, rgba(98,80,214,.34), transparent 70%),
+    radial-gradient(55% 80% at 0% 100%, rgba(27,175,122,.20), transparent 70%),
+    #141614;
+}
+.hero-bask .hero-title .gator-pile { font-size: .8em; }
+.hero-meter { flex: none; width: 190px; display: grid; gap: 7px; align-self: center; }
+.hero-meter i { display: block; height: 13px; border-radius: 3px; transform-origin: left; animation: meter-fill .7s cubic-bezier(.2,.8,.2,1) both; }
+.hero-meter i:nth-child(1) { width: 100%; background: #e34948; animation-delay: .05s; }
+.hero-meter i:nth-child(2) { width: 84%; background: #2a78d6; animation-delay: .11s; }
+.hero-meter i:nth-child(3) { width: 71%; background: #1baf7a; animation-delay: .17s; }
+.hero-meter i:nth-child(4) { width: 58%; background: #eda100; animation-delay: .23s; }
+.hero-meter i:nth-child(5) { width: 43%; background: #6250d6; animation-delay: .29s; }
+.hero-meter i:nth-child(6) { width: 27%; background: #e87ba4; animation-delay: .35s; }
+@keyframes meter-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .hero-meter i { animation: none; } }
+@media (max-width: 760px) { .hero-meter { width: 120px; gap: 5px; } .hero-meter i { height: 9px; } }
+@media (max-width: 520px) { .hero-meter { display: none; } }
+
+.modes + .lobby-error { margin-top: 10px; }
+.lobby-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.lobby-step { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; padding: 16px; border-radius: var(--radius); background: var(--surface-0); border: 1px solid var(--border); }
+.lobby-step h3 { margin: 0; font-size: 15px; }
+.lobby-step .sub { margin: 0; flex: 1; }
+@media (max-width: 560px) { .lobby-pair { grid-template-columns: 1fr; } }
+.mode-points code { font-size: .92em; }
 .inline-form { display: flex; gap: 8px; width: 100%; }
 .code-input, #playerName {
   font: inherit; font-size: 18px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600;

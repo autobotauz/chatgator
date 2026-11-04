@@ -16,6 +16,7 @@ export const CHANGELOG = [
     bullets: [
       'The home page now opens with the Chat Gator banner and shows Chat Gator (your full breakdown) and Bask (your group at a glance) side by side',
       'Sample sessions are still one click away, under the drop area',
+      'Bask gets the same look: a Bask banner, start or join in one card, and what the group sees next to it',
       'Got a question or found a bug? Message @autobotauz on Discord (Heb / Theorist); this is now on the home page, the FAQ and Bask',
     ],
   },

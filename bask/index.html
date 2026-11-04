@@ -52,10 +52,66 @@
       </div>
     </div>
 
-    <div class="bask-hero">
-      <h2>Gather your gators</h2>
-      <p>A <strong>bask</strong> is a shared view for up to 8 players. Each player's Chat Gator reads their own <code>chat.log</code> live and shares only combat numbers: damage and healing in and out (and who it went to or came from), resists, interrupts, pets, cooldowns and deathblows. No chat, no raw log lines, no ability breakdowns, no realm points. Type <code>@tag &lt;text&gt;</code> in any chat channel (say, <code>@tag koth</code>) to mark a moment on the group charts; only that tag text is shared. A bask and everything in it is deleted after 12 hours with no activity.</p>
+    <div class="hero hero-bask">
+      <div class="hero-text">
+        <p class="hero-title"><span class="gator-pile hero-gator" aria-hidden="true"><span>🐊</span><span>🐊</span><span>🐊</span></span> Bask</p>
+        <p class="hero-tagline">A live group meter for Dark Age of Camelot. Everyone's damage, healing, resists and cooldowns side by side, straight from each player's chat.log.</p>
+        <ul class="hero-chips" aria-label="About Bask">
+          <li>Up to 8 players</li><li>Live while you play</li><li>Combat numbers only</li><li>Gone after 12 idle hours</li>
+        </ul>
+      </div>
+      <div class="hero-meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </div>
+
+    <div class="card recent-box" id="recentBox" hidden>
+      <h3>🕘 Your recent baskets</h3>
+      <ul class="recent-list" id="recentList"></ul>
+      <p class="sub">Remembered by this browser. Baskets that have closed drop off the list.</p>
+    </div>
+
+    <div class="modes">
+      <div class="mode mode-group">
+        <div class="mode-head">
+          <h2>Start or join a bask</h2>
+          <p class="mode-sub">One player makes a code, everyone else joins with it</p>
+        </div>
+        <div class="lobby-pair">
+          <div class="lobby-step">
+            <h3>Start a bask</h3>
+            <p class="sub">Get an invite code to send to your group.</p>
+            <button class="btn primary" id="btnCreate">Create invite code</button>
+          </div>
+          <div class="lobby-step">
+            <h3>Join a bask</h3>
+            <p class="sub">Got a code from your group leader?</p>
+            <form id="joinForm" class="inline-form">
+              <input id="joinCode" class="code-input" maxlength="6" autocomplete="off" spellcheck="false" placeholder="ABC234" aria-label="Invite code">
+              <button class="btn primary" type="submit">Join</button>
+            </form>
+          </div>
+        </div>
+        <div class="sample-row">
+          <span>Have a bask someone downloaded? It opens right here, nothing is uploaded.</span>
+          <button class="btn" id="btnOpenFile">Choose bask file…</button>
+          <input type="file" id="fileInput" class="file-input-hidden" accept=".json,application/json">
+        </div>
+      </div>
+
+      <div class="mode mode-solo">
+        <div class="mode-head">
+          <h2>What the group sees</h2>
+          <p class="mode-sub">Less detail than Chat Gator, all of you at once</p>
+        </div>
+        <ul class="mode-points">
+          <li>Damage and healing in and out, and who it went to or came from</li>
+          <li>Resists, interrupts, pets, cooldowns and deathblows</li>
+          <li>Type <code>@tag koth</code> in any chat channel to mark a moment on the group charts</li>
+          <li>No chat, no log lines, no spell breakdowns, no realm points</li>
+        </ul>
+        <a class="btn mode-cta" href="../">Want every detail? Open Chat Gator</a>
+      </div>
+    </div>
+    <p class="lobby-error" id="lobbyError" hidden></p>
 
     <div class="season-meter" id="seasonMeter" hidden title="Bask runs on a free database plan with a monthly data allowance. This is an estimate from this month's use so far.">
       <span class="season-meter-icon" aria-hidden="true">🌡️</span>
@@ -70,35 +126,6 @@
     </div>
 
     <div class="today-strip" id="todayStrip"></div>
-
-    <div class="card recent-box" id="recentBox" hidden>
-      <h3>🕘 Your recent baskets</h3>
-      <ul class="recent-list" id="recentList"></ul>
-      <p class="sub">Remembered by this browser. Baskets that have closed drop off the list.</p>
-    </div>
-
-    <div class="grid cols-3 lobby-cards">
-      <div class="card lobby-card">
-        <h3>🥚 Start a bask</h3>
-        <p class="sub">Get an invite code to send to your group.</p>
-        <button class="btn primary" id="btnCreate">Create invite code</button>
-      </div>
-      <div class="card lobby-card">
-        <h3><span class="gator-pile" aria-hidden="true"><span>🐊</span><span>🐊</span><span>🐊</span></span> Join a bask</h3>
-        <p class="sub">Got a code from your group leader?</p>
-        <form id="joinForm" class="inline-form">
-          <input id="joinCode" class="code-input" maxlength="6" autocomplete="off" spellcheck="false" placeholder="ABC234" aria-label="Invite code">
-          <button class="btn primary" type="submit">Join</button>
-        </form>
-      </div>
-      <div class="card lobby-card">
-        <h3>📂 Open a saved bask</h3>
-        <p class="sub">A file someone downloaded earlier. Opens right here, nothing is uploaded.</p>
-        <button class="btn" id="btnOpenFile">Choose bask file…</button>
-        <input type="file" id="fileInput" class="file-input-hidden" accept=".json,application/json">
-      </div>
-    </div>
-    <p class="lobby-error" id="lobbyError" hidden></p>
 
     <div class="card tip-card">
       <h3>🧼 Tip: start with a clean chat.log</h3>
