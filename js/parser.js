@@ -95,6 +95,18 @@ const RULES = [
   ['cast_begin', /^You begin (?:casting|quick-casting) an?\s+(.+?)\s+spell!$/, m => ({ name: m[1] })],
   ['cast', /^You cast an?\s+(.+?)\s+spell!$/, m => ({ name: m[1] })],
 
+  // ---- heal over time -------------------------------------------------
+  // Every Heal Over Time spell (Friar's Encouragements, Shaman/Warden/
+  // Mentalist regens, potions...) prints the same tick and end lines, with
+  // no amount: "You feel calm and healthy." each tick on you, "<Name>
+  // seems calm and healthy." on someone else, and "Your meditative state
+  // fades." / "<Name>'s meditative state fades." when it runs out. Used
+  // for the HoT uptime gauge on the Healing tab.
+  ['hot_tick', /^You feel calm and healthy\.$/, () => ({ target: 'You' })],
+  ['hot_tick', /^([A-Z][\w' -]{0,40}?) seems calm and healthy\.$/, m => ({ target: m[1] })],
+  ['hot_end', /^Your meditative state fades\.?$/, () => ({ target: 'You' })],
+  ['hot_end', /^([A-Z][\w' -]{0,40}?)'s meditative state fades\.?$/, m => ({ target: m[1] })],
+
   // ---- pet lifecycle ----------------------------------------------------
   // Animist/Spiritmaster turret pets ("Forest's Core", "Ligneous Wall",
   // "Grove Augur", "Vent of Physical/Elemental Shielding", ...) append a

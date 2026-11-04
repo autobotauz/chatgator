@@ -19,6 +19,59 @@ const ENCOUNTER_GAP_MS = 45000; // a 45s silence ends one encounter and starts t
 // A stretch this long with no encounter at all is "idle" -- the time-series
 // charts can squeeze these down (see charts.js timelineChart's hideIdle).
 export const IDLE_GAP_MS = 60 * 60 * 1000;
+
+// Heal Over Time ticks land every few seconds. A tick more than HOT_GAP_MS
+// after the previous one (with no "fades" line in between) starts a new
+// stretch; a stretch with no "fades" line is assumed to run one tick past
+// its last tick.
+export const HOT_TICK_MS = 3000;
+const HOT_GAP_MS = 10000;
+
+// Heal Over Time uptime: when a HoT was running on you (and on anyone else
+// whose "seems calm and healthy" ticks are in your log), as stretches of
+// time and a share of the active time in view (idle gaps left out), plus
+// the HoT spells you cast yourself.
+export function buildHotUptime(events, startClock, endClock, idleGaps = []) {
+  const open = new Map(); // target -> { start, last }
+  const byTarget = new Map(); // target -> [{ start, end }]
+  const push = (t, s, e) => { if (!byTarget.has(t)) byTarget.set(t, []); byTarget.get(t).push({ start: s, end: Math.max(e, s + 1000) }); };
+  const casts = {};
+  for (const e of events) {
+    if (e.clock == null) continue;
+    if (e.type === 'cast' && ABILITY_DATABASE[e.name] && ABILITY_DATABASE[e.name].type === 'Heal Over Time') {
+      casts[e.name] = (casts[e.name] || 0) + 1;
+      continue;
+    }
+    if (e.type !== 'hot_tick' && e.type !== 'hot_end') continue;
+    const t = e.target || 'You';
+    const cur = open.get(t);
+    if (e.type === 'hot_tick') {
+      if (cur && e.clock - cur.last <= HOT_GAP_MS) { cur.last = e.clock; continue; }
+      if (cur) push(t, cur.start, cur.last + HOT_TICK_MS);
+      open.set(t, { start: e.clock, last: e.clock });
+    } else if (cur) {
+      push(t, cur.start, e.clock);
+      open.delete(t);
+    }
+  }
+  for (const [t, cur] of open) push(t, cur.start, cur.last + HOT_TICK_MS);
+
+  const lo = startClock, hi = endClock;
+  const gapMs = (a, b) => idleGaps.reduce((s, g) => s + Math.max(0, Math.min(b, g.end) - Math.max(a, g.start)), 0);
+  const activeMs = (lo != null && hi != null) ? Math.max(1000, (hi - lo) - gapMs(lo, hi)) : 0;
+  const targets = [];
+  for (const [name, spans] of byTarget) {
+    const clipped = spans
+      .map(s => ({ start: lo != null ? Math.max(s.start, lo) : s.start, end: hi != null ? Math.min(s.end, hi) : s.end }))
+      .filter(s => s.end > s.start);
+    if (!clipped.length) continue;
+    const upMs = clipped.reduce((s, x) => s + (x.end - x.start) - gapMs(x.start, x.end), 0);
+    targets.push({ name, spans: clipped, upMs, pct: activeMs ? Math.min(100, Math.round(100 * upMs / activeMs)) : 0 });
+  }
+  targets.sort((a, b) => (a.name === 'You' ? -1 : b.name === 'You' ? 1 : b.upMs - a.upMs));
+  const castCount = Object.values(casts).reduce((s, n) => s + n, 0);
+  return { activeMs, targets, casts, castCount };
+}
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
   'ability_hit', 'ability_crit', 'cast', 'cast_begin', 'cast_failed', 'cast_interrupted', 'ablative', 'bladeturn',
@@ -997,6 +1050,8 @@ export function buildStats(events, playerNameHint) {
     if (encs[i].start - encs[i - 1].end >= IDLE_GAP_MS) idleGaps.push({ start: encs[i - 1].end, end: encs[i].start });
   }
 
+  const hot = buildHotUptime(events, startClock, endClock, idleGaps);
+
   const totalDmgOut = sumVals(dmgOutBySource) + sumPetDmg(petStats);
   const totalDmgIn = sumVals(dmgInBySource);
 
@@ -1058,6 +1113,7 @@ export function buildStats(events, playerNameHint) {
   }
 
   return {
+    hot,
     meta: {
       playerName, startClock, endClock, durationMs, idleGaps, userTags,
       statsSnapshots, latestSnapshot, checkpointStarts,

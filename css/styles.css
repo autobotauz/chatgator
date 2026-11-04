@@ -618,3 +618,26 @@ a.today-card .today-num { font-size: 20px; }
   border: 1px solid color-mix(in srgb, var(--series-1) 45%, var(--border));
   background: color-mix(in srgb, var(--series-1) 8%, var(--surface-1)); color: var(--text-primary); }
 .time-window-banner[hidden] { display: none; }
+
+/* ---------- heal over time uptime (Healing tab) ---------- */
+.hot-card { display: flex; gap: 24px; align-items: center; }
+.hot-ring { position: relative; flex: none; width: 128px; height: 128px; }
+.hot-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.hot-ring circle { fill: none; stroke-width: 12; }
+.hot-ring-track { stroke: var(--surface-2); }
+.hot-ring-fill { stroke: var(--series-3); stroke-linecap: round; }
+.hot-ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+.hot-ring-label strong { font-size: 26px; letter-spacing: -0.02em; }
+.hot-ring-label span { font-size: 12px; color: var(--text-secondary); }
+.hot-body { flex: 1; min-width: 0; display: grid; gap: 7px; }
+.hot-summary { margin: 0 0 4px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; }
+.hot-row { display: grid; grid-template-columns: minmax(60px, 120px) 1fr 40px; align-items: center; gap: 10px; font-size: 13px; }
+.hot-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hot-strip { position: relative; height: 14px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.hot-strip i { position: absolute; top: 0; bottom: 0; background: var(--series-3); border-radius: 2px; }
+.hot-pct { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+.hot-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-left: calc(min(120px, 30%) + 10px); margin-right: 50px; }
+@media (max-width: 600px) {
+  .hot-card { flex-direction: column; align-items: stretch; }
+  .hot-ring { align-self: center; }
+}

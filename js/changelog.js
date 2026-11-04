@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-11-04',
+    title: 'Heal over time uptime',
+    bullets: [
+      'The Healing tab now shows how long a heal over time (a Friar\'s Divine Encouragement, a Shaman or Warden regen, and so on) was ticking on you, as a ring and a timeline strip',
+      'Groupmates whose HoT ticks show up in your log get their own strip, and your own HoT casts are counted',
+      'Works for every class: it reads the "You feel calm and healthy" ticks and the "meditative state fades" line',
+    ],
+  },
+  {
+    date: '2026-11-04',
     title: 'A fresh front page',
     bullets: [
       'The home page now opens with the Chat Gator banner and shows Chat Gator (your full breakdown) and Bask (your group at a glance) side by side',

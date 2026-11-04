@@ -378,6 +378,82 @@ function renderSupport(container, stats) {
   }
 }
 
+// Heal Over Time uptime: a ring for how much of the active time a HoT was
+// ticking on you, and a strip per player showing when it was up.
+function fmtSpan(ms) {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60), r = s % 60;
+  if (m < 60) return r ? `${m}m ${r}s` : `${m}m`;
+  return `${Math.floor(m / 60)}h ${m % 60}m`;
+}
+function renderHotUptime(container, stats) {
+  const hot = stats.hot;
+  if (!hot || (!hot.targets.length && !hot.castCount)) return;
+  const { startClock: lo, endClock: hi, idleGaps = [] } = stats.meta;
+  const sec = section(container);
+  h3(sec, 'Heal over time uptime');
+  const c = card(sec);
+  c.classList.add('hot-card');
+
+  const you = hot.targets.find(t => t.name === 'You');
+  const pct = you ? you.pct : 0;
+  const R = 46, C = 2 * Math.PI * R;
+  const ring = document.createElement('div');
+  ring.className = 'hot-ring';
+  ring.innerHTML = `<svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="${R}" class="hot-ring-track"/>
+      <circle cx="60" cy="60" r="${R}" class="hot-ring-fill" stroke-dasharray="${(C * pct / 100).toFixed(1)} ${C.toFixed(1)}"/>
+    </svg>
+    <div class="hot-ring-label"><strong>${pct}%</strong><span>on you</span></div>`;
+  ring.title = you ? `A heal over time was ticking on you for ${fmtSpan(you.upMs)} of ${fmtSpan(hot.activeMs)} active time.` : 'No heal over time ticks on you in this view.';
+  c.appendChild(ring);
+
+  const body = document.createElement('div');
+  body.className = 'hot-body';
+  const castNames = Object.entries(hot.casts).sort((a, b) => b[1] - a[1]);
+  const summary = document.createElement('p');
+  summary.className = 'hot-summary';
+  summary.textContent = (you ? `Up ${fmtSpan(you.upMs)} of ${fmtSpan(hot.activeMs)} active time.` : 'No HoT ticks on you in this view.')
+    + (castNames.length ? ` You cast ${castNames.map(([n, k]) => `${n} ×${k}`).join(', ')}.` : '');
+  body.appendChild(summary);
+
+  // Map a clock onto the strip with idle gaps squeezed out, like the charts.
+  const gapBefore = t => idleGaps.reduce((s, g) => s + Math.max(0, Math.min(t, g.end) - g.start), 0);
+  const total = Math.max(1, (hi - lo) - gapBefore(hi));
+  const pos = t => 100 * ((t - lo) - gapBefore(t)) / total;
+  for (const t of hot.targets.slice(0, 8)) {
+    const row = document.createElement('div');
+    row.className = 'hot-row';
+    const name = document.createElement('span');
+    name.className = 'hot-name';
+    name.textContent = t.name;
+    const strip = document.createElement('span');
+    strip.className = 'hot-strip';
+    strip.title = `${t.name}: HoT up ${fmtSpan(t.upMs)} (${t.pct}% of active time)`;
+    for (const s of t.spans) {
+      const seg = document.createElement('i');
+      const a = pos(s.start), b = pos(s.end);
+      seg.style.left = a.toFixed(2) + '%';
+      seg.style.width = Math.max(0.4, b - a).toFixed(2) + '%';
+      seg.title = `${fmtClock(s.start, true)} – ${fmtClock(s.end, true)} (${fmtSpan(s.end - s.start)})`;
+      strip.appendChild(seg);
+    }
+    const p = document.createElement('span');
+    p.className = 'hot-pct';
+    p.textContent = t.pct + '%';
+    row.append(name, strip, p);
+    body.appendChild(row);
+  }
+  if (hot.targets.length) {
+    const axis = document.createElement('div');
+    axis.className = 'hot-axis';
+    axis.innerHTML = `<span>${fmtClock(lo)}</span><span>${fmtClock(hi)}</span>`;
+    body.appendChild(axis);
+  }
+  c.appendChild(body);
+}
+
 export function renderHealing(container, stats, ctx) {
   clear(container);
   const g = grid(section(container), 4);
@@ -386,6 +462,7 @@ export function renderHealing(container, stats, ctx) {
   statTile(g, { label: 'Heal crit rate', value: stats.healOut.critRate + '%', sub: `${stats.healOut.crits} crit heals` });
   statTile(g, { label: 'Healing received', value: fmtNum(stats.healIn.total) });
 
+  renderHotUptime(container, stats);
   renderSupport(container, stats);
 
   const spellSec = section(container);
