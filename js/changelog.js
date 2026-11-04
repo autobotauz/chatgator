@@ -12,6 +12,13 @@
 export const CHANGELOG = [
   {
     date: '2026-11-04',
+    title: 'New sample: Hebal the Cabalist',
+    bullets: [
+      'A real Cabalist session (Hebal) is now in the sample picker, with pets and spell damage',
+    ],
+  },
+  {
+    date: '2026-11-04',
     title: 'New: How to use / FAQ page',
     bullets: [
       'How to turn on chat logging (/chatlog or Ctrl+L), where to find chat.log, and what each part of Chat Gator shows. Linked from the ⋯ menu and the home page',

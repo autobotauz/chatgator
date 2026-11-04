@@ -26,4 +26,9 @@ export const SAMPLE_LOGS = {
     kind: 'snapshot',
     url: 'sample-logs/hebstrel.json',
   },
+  hebal: {
+    label: 'Cabalist (real session — Hebal)',
+    kind: 'snapshot',
+    url: 'sample-logs/hebal.json',
+  },
 };
