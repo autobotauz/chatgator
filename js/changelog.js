@@ -11,6 +11,13 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-11-04',
+    title: 'New: How to use / FAQ page',
+    bullets: [
+      'How to turn on chat logging (/chatlog or Ctrl+L), where to find chat.log, and what each part of Chat Gator shows. Linked from the ⋯ menu and the home page',
+    ],
+  },
+  {
     date: '2026-11-03',
     title: 'New sample: Hebstrel the Minstrel',
     bullets: [

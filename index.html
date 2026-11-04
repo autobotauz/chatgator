@@ -3,8 +3,33 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chat Gator — DAoC Combat Log Parser</title>
-<meta name="description" content="Upload a Dark Age of Camelot chat.log and get a damage/heal meter, spell breakdowns, crit rates, pets, and realm points — entirely in your browser, nothing is uploaded.">
+<title>Chat Gator — DAoC &amp; Eden chat.log parser and damage meter</title>
+<meta name="description" content="Free Dark Age of Camelot (and Eden) chat.log parser: damage and healing meter, spell and style breakdowns, crit rates, pets and realm points, live while you play. Runs in your browser — your log is never uploaded.">
+<link rel="canonical" href="https://autobotauz.github.io/chatgator/">
+<!-- Link previews (Discord, Reddit, forums) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Chat Gator">
+<meta property="og:title" content="Chat Gator — DAoC &amp; Eden chat.log parser">
+<meta property="og:description" content="Damage and healing meter, spells, pets and realm points from your Dark Age of Camelot chat.log — live while you play, right in your browser.">
+<meta property="og:url" content="https://autobotauz.github.io/chatgator/">
+<meta property="og:image" content="https://autobotauz.github.io/chatgator/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Chat Gator",
+  "url": "https://autobotauz.github.io/chatgator/",
+  "description": "Free Dark Age of Camelot and Eden chat.log parser: damage and healing meter, spell and style breakdowns, pets and realm points, live while you play. Runs entirely in the browser.",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any (web browser)",
+  "browserRequirements": "Live watching needs Chrome or Edge",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "image": "https://autobotauz.github.io/chatgator/img/og-image.png"
+}
+</script>
 <meta name="google-adsense-account" content="ca-pub-4282193286137929">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4282193286137929" crossorigin="anonymous"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐊</text></svg>">
@@ -50,6 +75,7 @@
           <button class="menu-item danger" role="menuitem" id="btnClearLog" hidden title="Empties the chat.log file on disk that's being watched, not just this view.">🗑 Clear log file…</button>
           <div class="menu-sep" id="menuSessionSep" hidden></div>
           <button class="menu-item" role="menuitem" id="btnChangelog">📋 What's new <span class="menu-new" id="changelogNew" hidden>new</span></button>
+          <a class="menu-item" role="menuitem" href="faq/">❓ How to use / FAQ</a>
           <button class="menu-item" role="menuitem" id="btnIconSkin">🖼 Icons: New</button>
         </div>
       </div>
@@ -77,7 +103,7 @@
   <section id="dropzoneSection">
     <div class="dropzone" id="dropzone">
       <h2>Drop your DAoC chat.log here</h2>
-      <p>Or choose a log or session file below, or try a real sample session first to see how Chat Gator renders spells, styles, and pets — more real sessions will be added here over time.</p>
+      <p>Or choose a log or session file below, or try a real sample session first to see how Chat Gator renders spells, styles, and pets — more real sessions will be added here over time. New here? See <a href="faq/">how to turn on chat logging and find your chat.log</a>.</p>
       <div class="actions">
         <button class="btn primary" id="btnPickFile">Choose log or session file…</button>
         <select class="btn" id="sampleClassSelect" title="Choose a sample session">
@@ -177,7 +203,7 @@
 
   <p class="footer-note">
     Chat Gator reads the Dark Age of Camelot <code>chat.log</code> format straight from your browser — drag a file in; your log never leaves your machine.<br>
-    Built for the DAoC community. Spell/realm-ability names are best-effort matched against a public spell database when your browser can reach it; everything else comes straight from your log.
+    Built for the DAoC community. Spell/realm-ability names are best-effort matched against a public spell database when your browser can reach it; everything else comes straight from your log. <a href="faq/">How to use / FAQ</a>
   </p>
 
   <div class="ad-rail-bottom" id="adRailBottom">

@@ -150,6 +150,7 @@ a { color: var(--series-1); }
   background: none; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap;
 }
 .menu-item:hover, .menu-item:focus-visible { background: var(--surface-2); outline: none; }
+a.menu-item { text-decoration: none; }
 .menu-item.danger { color: var(--status-critical); }
 .menu-sep { height: 1px; background: var(--border); margin: 5px 4px; }
 .menu-new {
