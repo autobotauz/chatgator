@@ -12,6 +12,15 @@
 export const CHANGELOG = [
   {
     date: '2026-11-04',
+    title: 'A fresh front page',
+    bullets: [
+      'The home page now opens with the Chat Gator banner and shows Chat Gator (your full breakdown) and Bask (your group at a glance) side by side',
+      'Sample sessions are still one click away, under the drop area',
+      'Got a question or found a bug? Message @autobotauz on Discord (Heb / Theorist); this is now on the home page, the FAQ and Bask',
+    ],
+  },
+  {
+    date: '2026-11-04',
     title: 'New sample: Hebal the Cabalist',
     bullets: [
       'A real Cabalist session (Hebal) is now in the sample picker, with pets and spell damage',

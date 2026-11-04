@@ -100,40 +100,69 @@
     <div class="changelog-list" id="changelogList"></div>
   </dialog>
 
-  <section id="dropzoneSection">
-    <div class="dropzone" id="dropzone">
-      <h2>Drop your DAoC chat.log here</h2>
-      <p>Or choose a log or session file below, or try a real sample session first to see how Chat Gator renders spells, styles, and pets — more real sessions will be added here over time. New here? See <a href="faq/">how to turn on chat logging and find your chat.log</a>.</p>
-      <div class="actions">
-        <button class="btn primary" id="btnPickFile">Choose log or session file…</button>
-        <select class="btn" id="sampleClassSelect" title="Choose a sample session">
-          <option value="bainshee">Bainshee (Whispra)</option>
-          <option value="hebstrel">Minstrel (Hebstrel)</option>
-          <option value="hebal">Cabalist (Hebal)</option>
-        </select>
-        <button class="btn" id="btnSample">Try a sample log</button>
+  <section id="dropzoneSection" class="landing">
+    <div class="hero">
+      <div class="hero-text">
+        <p class="hero-title"><span class="hero-gator" aria-hidden="true">🐊</span> Chat Gator</p>
+        <p class="hero-tagline">Dark Age of Camelot chat.log parser: damage and heal meter, spells, pets and realm points, right in your browser.</p>
+        <ul class="hero-chips" aria-label="Works with">
+          <li>DAoC</li><li>Eden</li><li>Live while you play</li><li>Group Bask</li>
+        </ul>
       </div>
-      <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt,.json">
+      <div class="hero-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="modes">
+      <div class="mode mode-solo dropzone" id="dropzone">
+        <div class="mode-head">
+          <h2>Chat Gator</h2>
+          <p class="mode-sub">Your full breakdown, fight by fight</p>
+        </div>
+        <ul class="mode-points">
+          <li>Every spell, style, song and pet, with crits, resists and deathblows</li>
+          <li>Damage, healing, defense and realm points by source</li>
+          <li>Drag across any chart to zoom the whole page to that moment</li>
+        </ul>
+        <div class="drop-target">
+          <p class="drop-title">Drop your chat.log here</p>
+          <p class="drop-note">It's read in this tab and never leaves your computer. New here? See <a href="faq/">how to turn on chat logging</a>.</p>
+          <div class="actions">
+            <button class="btn primary" id="btnPickFile">Choose log or session file…</button>
+          </div>
+        </div>
+        <div class="sample-row">
+          <span>No log handy? See a real session:</span>
+          <select class="btn" id="sampleClassSelect" title="Choose a sample session">
+            <option value="bainshee">Bainshee (Whispra)</option>
+            <option value="hebstrel">Minstrel (Hebstrel)</option>
+            <option value="hebal">Cabalist (Hebal)</option>
+          </select>
+          <button class="btn" id="btnSample">Try a sample log</button>
+        </div>
+        <input type="file" id="fileInput" class="file-input-hidden" accept=".log,.txt,.json">
+      </div>
+
+      <div class="mode mode-group">
+        <div class="mode-head">
+          <h2><span class="gator-pile" aria-hidden="true"><span>🐊</span><span>🐊</span><span>🐊</span></span> Bask</h2>
+          <p class="mode-sub">Your group at a glance</p>
+        </div>
+        <div class="mini-meter" aria-hidden="true">
+          <span style="--w:92%;--c:var(--series-8)">Wizard</span>
+          <span style="--w:74%;--c:var(--series-1)">Minstrel</span>
+          <span style="--w:61%;--c:var(--series-3)">Cleric</span>
+          <span style="--w:38%;--c:var(--series-4)">Armsman</span>
+        </div>
+        <ul class="mode-points">
+          <li>Up to 8 players side by side, live</li>
+          <li>Damage, healing, resists, interrupts and cooldowns</li>
+          <li>Combat numbers only, no chat; gone after 12 idle hours</li>
+        </ul>
+        <a class="btn mode-cta" href="bask/">Start or join a bask</a>
+      </div>
     </div>
 
     <div class="today-strip" id="todayStrip"></div>
-
-    <div class="features-card">
-      <h3>What Chat Gator does</h3>
-      <ul>
-        <li><strong>Damage, healing &amp; realm point meters</strong> — broken down by spell, style, weapon, attacker, healer, or pet.</li>
-        <li><strong>Fight-by-fight splitting</strong> — your log is automatically broken into individual engagements, or view your whole session's totals at once.</li>
-        <li><strong>Ability cooldown tracker</strong> — the first time you cast a spell, style, or realm ability with a known cooldown, it gets a permanent spot in a tracker shown on every tab: full brightness and "Ready" when it's up, dimmed with a shrinking bar and countdown the moment you use it. Live, but not quite real-time — the game client buffers lines before writing them to the log file, so there can be a delay (shown separately as "File checked" vs. "Last updated" while watching) before a cast actually shows up here.</li>
-        <li><strong>/bg center callouts</strong> stay on screen on every tab, so you don't miss one that already scrolled past.</li>
-        <li><strong>Mark moments with <code>@tag &lt;text&gt;</code></strong> — type it in any chat channel (e.g. <code>@tag koth</code> in group chat) and a labelled line appears at that moment on every time chart, so you can see what a fight looked like before and after. Only your own tags count.</li>
-        <li><strong>Watch your chat.log live while you play</strong> (Chrome/Edge) — stats update in near real time, nothing to re-upload or re-drop.</li>
-        <li><strong>Clear your log file from the browser</strong> when it's gotten big, with an optional timestamped backup first.</li>
-        <li><strong>Bask with your group</strong> — <a href="bask/">start a live group session</a> for up to 8 players: everyone's damage, healing, resists, interrupts, pets, cooldowns and deathblows in one shared view. Combat numbers only, no chat, gone after 12 hours with no activity.</li>
-        <li><strong>Share a session</strong> as a file — a groupmate or BG leader can drop it in and see the same breakdown.</li>
-        <li><strong>Your own in-game <code>/stats</code> totals</strong> (RP, deathblows, deaths, kills/death) shown alongside the computed numbers, when available.</li>
-        <li><strong>Your log stays local</strong> — it's parsed in this browser tab and never leaves your machine. The only thing sent anywhere is one small note when you start a session (your character's name, class and realm, if known) so we can count how many sessions people start.</li>
-      </ul>
-    </div>
   </section>
 
   <main id="appMain" hidden>
@@ -204,7 +233,8 @@
 
   <p class="footer-note">
     Chat Gator reads the Dark Age of Camelot <code>chat.log</code> format straight from your browser — drag a file in; your log never leaves your machine.<br>
-    Built for the DAoC community. Spell/realm-ability names are best-effort matched against a public spell database when your browser can reach it; everything else comes straight from your log. <a href="faq/">How to use / FAQ</a>
+    Built for the DAoC community. Spell/realm-ability names are best-effort matched against a public spell database when your browser can reach it; everything else comes straight from your log. <a href="faq/">How to use / FAQ</a><br>
+    Questions, bugs or ideas? Message <strong>@autobotauz</strong> on Discord (Heb / Theorist).
   </p>
 
   <div class="ad-rail-bottom" id="adRailBottom">
