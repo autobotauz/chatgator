@@ -71,7 +71,7 @@ const COMBAT_TYPES = new Set([
   'ability_hit', 'ability_crit', 'cast', 'cast_begin', 'cast_failed', 'cast_interrupted', 'ablative', 'bladeturn',
   'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
   'incoming_dmg', 'incoming_crit', 'incoming_extra',
-  'heal_out', 'heal_out_crit', 'heal_in', 'power_transfer',
+  'heal_out', 'heal_out_crit', 'heal_in', 'power_transfer', 'life_transfer',
   'block', 'block_in', 'you_parry', 'you_evade', 'parry_in', 'evade_in',
   'resist_named', 'resist_generic',
   'rp_bonus', 'rp_reason', 'rp_plain',
@@ -840,7 +840,17 @@ export function buildStats(events, playerNameHint) {
   const powerOutByTarget = {};
   const powerOutBySpell = {};
   let powerOutTotal = 0;
+  // Life transfer: your own hit points given to a groupmate. The game
+  // doesn't say who, so it's tracked by spell only, and kept out of healing
+  // done (it isn't in the game's own HP healed either).
+  const lifeOutBySpell = {};
+  let lifeOutTotal = 0, lifeOutCount = 0;
   for (const e of events) {
+    if (e.type === 'life_transfer') {
+      bump(lifeOutBySpell, e.spellName || 'Life transfer (spell not identified)', e.amount, false);
+      lifeOutTotal += e.amount; lifeOutCount++;
+      continue;
+    }
     if (e.type === 'power_transfer') {
       bump(powerOutByTarget, e.target, e.amount, false);
       bump(powerOutBySpell, e.spellName || 'Power transfer (spell not identified)', e.amount, false);
@@ -1146,6 +1156,11 @@ export function buildStats(events, playerNameHint) {
       bySource: finalizeSourceMap(healInBySource),
       timeline: bucketTimeline(healInPoints, startClock, endClock),
       points: healInPoints,
+    },
+    lifeOut: {
+      total: lifeOutTotal,
+      count: lifeOutCount,
+      bySpell: finalizeSourceMap(lifeOutBySpell),
     },
     powerOut: {
       total: powerOutTotal,

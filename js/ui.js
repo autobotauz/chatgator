@@ -441,6 +441,33 @@ function renderHotUptime(container, stats) {
   c.appendChild(body);
 }
 
+// Life transfer: hit points you gave a groupmate from your own pool. The
+// log doesn't name who received them, so this is by spell only.
+function renderLifeTransfer(container, stats) {
+  const life = stats.lifeOut;
+  if (!life || !life.total) return;
+  const sec = section(container);
+  h3(sec, 'Life transferred');
+  const c = card(sec);
+  const note = document.createElement('p');
+  note.className = 'sub';
+  note.style.margin = '0 0 10px';
+  note.textContent = `You gave ${fmtExact(life.total)} of your own hit points in ${life.count} ${life.count === 1 ? 'transfer' : 'transfers'}. The game doesn't log who receives them, and they aren't counted in healing done above.`;
+  c.appendChild(note);
+  const bySpell = filterGhostSource(life.bySpell, stats.meta.inferredClass);
+  barChart(c, { items: sourceMapToItems(bySpell), colorFn: () => 'var(--series-5)' });
+  dataTable(c, {
+    columns: [
+      { key: 'name', label: 'Spell', html: nameWithIcon },
+      { key: 'totalHits', label: 'Transfers', num: true },
+      { key: 'dmg', label: 'Hit points given', num: true, fmt: fmtExact },
+      { key: 'avg', label: 'Avg', num: true },
+      { key: 'max', label: 'Max', num: true },
+    ],
+    rows: sourceMapToRows(bySpell),
+  });
+}
+
 export function renderHealing(container, stats, ctx) {
   clear(container);
   const g = grid(section(container), 4);
@@ -450,6 +477,7 @@ export function renderHealing(container, stats, ctx) {
   statTile(g, { label: 'Healing received', value: fmtNum(stats.healIn.total) });
 
   renderHotUptime(container, stats);
+  renderLifeTransfer(container, stats);
   renderSupport(container, stats);
 
   const spellSec = section(container);
@@ -1035,6 +1063,17 @@ export function renderSpells(container, stats, ctx) {
       byName[name] = { ...byName[name], ...mergeSpellStats(byName[name], s), name, role: combineRole(byName[name].role, 'Power Transfer') };
     } else {
       byName[name] = { name, role: 'Power Transfer', ...s };
+    }
+  }
+  // Life transfer (Cabalist's Transplace Health and the like) moves real
+  // hit points too, so it gets a row with its numbers like power transfer.
+  for (const [name, s] of Object.entries(stats.lifeOut?.bySpell || {})) {
+    if (name === 'Life transfer (spell not identified)') continue;
+    if (isAbilityGhost(name, inferredClass)) continue;
+    if (byName[name]) {
+      byName[name] = { ...byName[name], ...mergeSpellStats(byName[name], s), name, role: combineRole(byName[name].role, 'Life Transfer') };
+    } else {
+      byName[name] = { name, role: 'Life Transfer', ...s };
     }
   }
   const allRows = Object.values(byName);

@@ -266,6 +266,12 @@ const RULES = [
   // tracker (kept separate from activeHealName) in case a transfer spell
   // ever hits more than one target per cast, the same way a group heal does.
   ['power_transfer', /^You transfer (\d+) power to (.+?)!$/, m => ({ amount: +m[1], target: m[2] })],
+  // Life transfer (Cabalist "Transplace Health", Spiritmaster "Spirit ..."
+  // and other ABILITY_DATABASE type "Life Transfer" spells): gives your own
+  // hit points to a groupmate. The line never names who got them, so it
+  // carries only the amount; the spell comes from the cast just before it,
+  // same as power_transfer.
+  ['life_transfer', /^You transfer (\d+) hit points!?$/, m => ({ amount: +m[1] })],
   // Reported directly, a second time: "Gift of Arawn" itself (and "Mystic
   // Ground", an Occultist Type "Storm") ALSO shows up as "You restore
   // <target> for N power points!" — a totally different phrasing from the
@@ -1331,7 +1337,7 @@ export function parseLogText(rawText, resume) {
           // heal_out_crit's own regex never captures one — see above.
           payload.target = lastHealTarget || 'Unknown';
         }
-      } else if (type === 'power_transfer') {
+      } else if (type === 'power_transfer' || type === 'life_transfer') {
         // Same cast-window attribution as heal_out just above, but its own
         // activePowerName/activePowerAt burst tracker — see its declaration
         // for why this is deliberately separate from activeHealName.

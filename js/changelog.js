@@ -11,6 +11,15 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-11-05',
+    title: 'Life transfer',
+    bullets: [
+      'Hit points you give away with a life transfer spell (a Cabalist\'s Transplace Health, for example) now show on the Healing tab, by spell, with count, total, average and max',
+      'The game doesn\'t log who receives them, so there\'s no per-target breakdown, and they aren\'t added to healing done',
+      'Life transfer spells also show their numbers on the Spells & Styles tab',
+    ],
+  },
+  {
     date: '2026-11-04',
     title: 'Heal over time uptime',
     bullets: [
