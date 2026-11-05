@@ -378,8 +378,8 @@ function renderSupport(container, stats) {
   }
 }
 
-// Heal Over Time uptime: a ring for how much of the active time a HoT was
-// ticking on you, and a strip per player showing when it was up.
+// Heal Over Time uptime on you: a ring for the share of active time a HoT
+// was ticking on you, and a strip showing when.
 function fmtSpan(ms) {
   const s = Math.round(ms / 1000);
   if (s < 60) return `${s}s`;
@@ -389,24 +389,22 @@ function fmtSpan(ms) {
 }
 function renderHotUptime(container, stats) {
   const hot = stats.hot;
-  if (!hot || (!hot.targets.length && !hot.castCount)) return;
+  if (!hot || (!hot.spans.length && !hot.castCount)) return;
   const { startClock: lo, endClock: hi, idleGaps = [] } = stats.meta;
   const sec = section(container);
   h3(sec, 'Heal over time uptime');
   const c = card(sec);
   c.classList.add('hot-card');
 
-  const you = hot.targets.find(t => t.name === 'You');
-  const pct = you ? you.pct : 0;
   const R = 46, C = 2 * Math.PI * R;
   const ring = document.createElement('div');
   ring.className = 'hot-ring';
   ring.innerHTML = `<svg viewBox="0 0 120 120" aria-hidden="true">
       <circle cx="60" cy="60" r="${R}" class="hot-ring-track"/>
-      <circle cx="60" cy="60" r="${R}" class="hot-ring-fill" stroke-dasharray="${(C * pct / 100).toFixed(1)} ${C.toFixed(1)}"/>
+      <circle cx="60" cy="60" r="${R}" class="hot-ring-fill" stroke-dasharray="${(C * hot.pct / 100).toFixed(1)} ${C.toFixed(1)}"/>
     </svg>
-    <div class="hot-ring-label"><strong>${pct}%</strong><span>on you</span></div>`;
-  ring.title = you ? `A heal over time was ticking on you for ${fmtSpan(you.upMs)} of ${fmtSpan(hot.activeMs)} active time.` : 'No heal over time ticks on you in this view.';
+    <div class="hot-ring-label"><strong>${hot.pct}%</strong><span>on you</span></div>`;
+  ring.title = `A heal over time was ticking on you for ${fmtSpan(hot.upMs)} of ${fmtSpan(hot.activeMs)} active time.`;
   c.appendChild(ring);
 
   const body = document.createElement('div');
@@ -414,24 +412,20 @@ function renderHotUptime(container, stats) {
   const castNames = Object.entries(hot.casts).sort((a, b) => b[1] - a[1]);
   const summary = document.createElement('p');
   summary.className = 'hot-summary';
-  summary.textContent = (you ? `Up ${fmtSpan(you.upMs)} of ${fmtSpan(hot.activeMs)} active time.` : 'No HoT ticks on you in this view.')
+  summary.textContent = (hot.spans.length
+      ? `A heal over time was on you for ${fmtSpan(hot.upMs)} of ${fmtSpan(hot.activeMs)} active time (${hot.spans.length} ${hot.spans.length === 1 ? 'time' : 'times'}).`
+      : 'No heal over time ticked on you in this view.')
     + (castNames.length ? ` You cast ${castNames.map(([n, k]) => `${n} ×${k}`).join(', ')}.` : '');
   body.appendChild(summary);
 
-  // Map a clock onto the strip with idle gaps squeezed out, like the charts.
-  const gapBefore = t => idleGaps.reduce((s, g) => s + Math.max(0, Math.min(t, g.end) - g.start), 0);
-  const total = Math.max(1, (hi - lo) - gapBefore(hi));
-  const pos = t => 100 * ((t - lo) - gapBefore(t)) / total;
-  for (const t of hot.targets.slice(0, 8)) {
-    const row = document.createElement('div');
-    row.className = 'hot-row';
-    const name = document.createElement('span');
-    name.className = 'hot-name';
-    name.textContent = t.name;
-    const strip = document.createElement('span');
+  if (hot.spans.length) {
+    // Map a clock onto the strip with idle gaps squeezed out, like the charts.
+    const gapBefore = t => idleGaps.reduce((s, g) => s + Math.max(0, Math.min(t, g.end) - g.start), 0);
+    const total = Math.max(1, (hi - lo) - gapBefore(hi));
+    const pos = t => 100 * ((t - lo) - gapBefore(t)) / total;
+    const strip = document.createElement('div');
     strip.className = 'hot-strip';
-    strip.title = `${t.name}: HoT up ${fmtSpan(t.upMs)} (${t.pct}% of active time)`;
-    for (const s of t.spans) {
+    for (const s of hot.spans) {
       const seg = document.createElement('i');
       const a = pos(s.start), b = pos(s.end);
       seg.style.left = a.toFixed(2) + '%';
@@ -439,17 +433,10 @@ function renderHotUptime(container, stats) {
       seg.title = `${fmtClock(s.start, true)} – ${fmtClock(s.end, true)} (${fmtSpan(s.end - s.start)})`;
       strip.appendChild(seg);
     }
-    const p = document.createElement('span');
-    p.className = 'hot-pct';
-    p.textContent = t.pct + '%';
-    row.append(name, strip, p);
-    body.appendChild(row);
-  }
-  if (hot.targets.length) {
     const axis = document.createElement('div');
     axis.className = 'hot-axis';
     axis.innerHTML = `<span>${fmtClock(lo)}</span><span>${fmtClock(hi)}</span>`;
-    body.appendChild(axis);
+    body.append(strip, axis);
   }
   c.appendChild(body);
 }

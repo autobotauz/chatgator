@@ -100,8 +100,9 @@ const RULES = [
   // Mentalist regens, potions...) prints the same tick and end lines, with
   // no amount: "You feel calm and healthy." each tick on you, "<Name>
   // seems calm and healthy." on someone else, and "Your meditative state
-  // fades." / "<Name>'s meditative state fades." when it runs out. Used
-  // for the HoT uptime gauge on the Healing tab.
+  // fades." / "<Name>'s meditative state fades." when it runs out. The
+  // HoT uptime gauge on the Healing tab only uses your own (target 'You')
+  // lines; other players' only appear when you're near them.
   ['hot_tick', /^You feel calm and healthy\.$/, () => ({ target: 'You' })],
   ['hot_tick', /^([A-Z][\w' -]{0,40}?) seems calm and healthy\.$/, m => ({ target: m[1] })],
   ['hot_end', /^Your meditative state fades\.?$/, () => ({ target: 'You' })],

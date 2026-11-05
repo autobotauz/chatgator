@@ -15,8 +15,8 @@ export const CHANGELOG = [
     title: 'Heal over time uptime',
     bullets: [
       'The Healing tab now shows how long a heal over time (a Friar\'s Divine Encouragement, a Shaman or Warden regen, and so on) was ticking on you, as a ring and a timeline strip',
-      'Groupmates whose HoT ticks show up in your log get their own strip, and your own HoT casts are counted',
-      'Works for every class: it reads the "You feel calm and healthy" ticks and the "meditative state fades" line',
+      'Works whoever cast it, for every class: it reads your own "You feel calm and healthy" ticks and "Your meditative state fades" line',
+      'If you cast HoTs yourself, how many of each is listed too',
     ],
   },
   {

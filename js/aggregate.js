@@ -27,14 +27,16 @@ export const IDLE_GAP_MS = 60 * 60 * 1000;
 export const HOT_TICK_MS = 3000;
 const HOT_GAP_MS = 10000;
 
-// Heal Over Time uptime: when a HoT was running on you (and on anyone else
-// whose "seems calm and healthy" ticks are in your log), as stretches of
-// time and a share of the active time in view (idle gaps left out), plus
-// the HoT spells you cast yourself.
+// Heal Over Time uptime on you. Only your own lines are used ("You feel
+// calm and healthy." ticks, "Your meditative state fades."): those are
+// always in your log whoever cast the HoT, while groupmates' ticks only
+// show up when you happen to be near them, so their uptime can't be known.
+// Returns the stretches a HoT was up, their share of the active time in
+// view (idle gaps left out), and the HoT spells you cast yourself.
 export function buildHotUptime(events, startClock, endClock, idleGaps = []) {
-  const open = new Map(); // target -> { start, last }
-  const byTarget = new Map(); // target -> [{ start, end }]
-  const push = (t, s, e) => { if (!byTarget.has(t)) byTarget.set(t, []); byTarget.get(t).push({ start: s, end: Math.max(e, s + 1000) }); };
+  const spans = [];
+  let cur = null; // { start, last }
+  const close = (end) => { spans.push({ start: cur.start, end: Math.max(end, cur.start + 1000) }); cur = null; };
   const casts = {};
   for (const e of events) {
     if (e.clock == null) continue;
@@ -42,35 +44,27 @@ export function buildHotUptime(events, startClock, endClock, idleGaps = []) {
       casts[e.name] = (casts[e.name] || 0) + 1;
       continue;
     }
-    if (e.type !== 'hot_tick' && e.type !== 'hot_end') continue;
-    const t = e.target || 'You';
-    const cur = open.get(t);
+    if ((e.type !== 'hot_tick' && e.type !== 'hot_end') || e.target !== 'You') continue;
     if (e.type === 'hot_tick') {
       if (cur && e.clock - cur.last <= HOT_GAP_MS) { cur.last = e.clock; continue; }
-      if (cur) push(t, cur.start, cur.last + HOT_TICK_MS);
-      open.set(t, { start: e.clock, last: e.clock });
+      if (cur) close(cur.last + HOT_TICK_MS);
+      cur = { start: e.clock, last: e.clock };
     } else if (cur) {
-      push(t, cur.start, e.clock);
-      open.delete(t);
+      close(e.clock);
     }
   }
-  for (const [t, cur] of open) push(t, cur.start, cur.last + HOT_TICK_MS);
+  if (cur) close(cur.last + HOT_TICK_MS);
 
   const lo = startClock, hi = endClock;
   const gapMs = (a, b) => idleGaps.reduce((s, g) => s + Math.max(0, Math.min(b, g.end) - Math.max(a, g.start)), 0);
   const activeMs = (lo != null && hi != null) ? Math.max(1000, (hi - lo) - gapMs(lo, hi)) : 0;
-  const targets = [];
-  for (const [name, spans] of byTarget) {
-    const clipped = spans
-      .map(s => ({ start: lo != null ? Math.max(s.start, lo) : s.start, end: hi != null ? Math.min(s.end, hi) : s.end }))
-      .filter(s => s.end > s.start);
-    if (!clipped.length) continue;
-    const upMs = clipped.reduce((s, x) => s + (x.end - x.start) - gapMs(x.start, x.end), 0);
-    targets.push({ name, spans: clipped, upMs, pct: activeMs ? Math.min(100, Math.round(100 * upMs / activeMs)) : 0 });
-  }
-  targets.sort((a, b) => (a.name === 'You' ? -1 : b.name === 'You' ? 1 : b.upMs - a.upMs));
+  const clipped = spans
+    .map(s => ({ start: lo != null ? Math.max(s.start, lo) : s.start, end: hi != null ? Math.min(s.end, hi) : s.end }))
+    .filter(s => s.end > s.start);
+  const upMs = clipped.reduce((s, x) => s + (x.end - x.start) - gapMs(x.start, x.end), 0);
+  const pct = activeMs ? Math.min(100, Math.round(100 * upMs / activeMs)) : 0;
   const castCount = Object.values(casts).reduce((s, n) => s + n, 0);
-  return { activeMs, targets, casts, castCount };
+  return { activeMs, spans: clipped, upMs, pct, casts, castCount };
 }
 const COMBAT_TYPES = new Set([
   'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
