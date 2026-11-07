@@ -163,6 +163,15 @@
     </div>
 
     <div class="today-strip" id="todayStrip"></div>
+
+    <div class="about">
+      <h2>About Chat Gator</h2>
+      <div class="about-cols">
+        <p>Dark Age of Camelot writes everything in your chat window to a file called <code>chat.log</code> when you turn logging on with <code>/chatlog</code>. Chat Gator reads that file and turns it into the numbers the game doesn't show you: how much damage and healing you did and took, which spells and styles landed or were resisted, what your pets did, and where your realm points came from.</p>
+        <p>Your log is split into fights automatically, and every chart can be zoomed to a single moment. In Chrome or Edge it can follow your log while you play, so the meters and the cooldown tracker update as you go. It's built and tested on real logs from the Eden server and reads the standard DAoC log format.</p>
+        <p>Everything is worked out inside your browser, so your log never leaves your computer. Playing in a group? Bask lets up to eight players see each other's combat numbers side by side. New to logging? The <a href="faq/">how to use guide</a> walks through turning it on and finding the file.</p>
+      </div>
+    </div>
   </section>
 
   <main id="appMain" hidden>
@@ -186,7 +195,7 @@
       <ul class="bg-ticker-list" id="bgTickerList"></ul>
     </div>
 
-    <div class="cooldown-tracker" id="cooldownTracker" hidden title="Every ability with a known cooldown gets a permanent slot here the first time you cast it, and keeps that same spot for the rest of the session — shown on every tab. Full brightness + 'Ready' = available now. Dimmed + a shrinking bar/countdown = on cooldown, ticking down from your last cast. Icons show their numeric id for now; image mapping is future work.">
+    <div class="cooldown-tracker" id="cooldownTracker" hidden title="Every ability with a known cooldown gets a permanent slot here the first time you cast it, and keeps that same spot for the rest of the session — shown on every tab. Full brightness + 'Ready' = available now. Dimmed + a shrinking bar/countdown = on cooldown, ticking down from your last cast.">
       <span class="cooldown-tracker-icon">⏱</span>
       <ul class="cooldown-tracker-list" id="cooldownTrackerList"></ul>
     </div>
@@ -225,6 +234,10 @@
     <section class="panel" id="panel-spells"></section>
 
   </main>
+
+<nav class="site-nav" aria-label="Site">
+    <a href="./">Chat Gator</a><a href="bask/">Bask</a><a href="faq/">How to use / FAQ</a><a href="privacy/">Privacy</a>
+  </nav>
 
   <aside class="support-note">
     <span class="support-cup" aria-hidden="true">☕</span>

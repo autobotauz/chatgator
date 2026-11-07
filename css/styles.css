@@ -638,3 +638,15 @@ a.today-card .today-num { font-size: 20px; }
   .hot-card { flex-direction: column; align-items: stretch; }
   .hot-ring { align-self: center; }
 }
+
+/* ---------- site links + about (shared footer, home page) ---------- */
+.site-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin: 36px 0 0; font-size: 13.5px; }
+.site-nav a { color: var(--text-secondary); text-decoration: none; }
+.site-nav a:hover { color: var(--text-primary); text-decoration: underline; }
+.site-nav + .support-note, .site-nav + .footer-note { margin-top: 18px; }
+.about { margin: 28px 0 0; }
+.about h2 { margin: 0 0 10px; font-size: 18px; letter-spacing: -0.01em; }
+.about-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.about-cols p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
+.about code { font-size: .92em; }
+@media (max-width: 860px) { .about-cols { grid-template-columns: 1fr; gap: 12px; } }

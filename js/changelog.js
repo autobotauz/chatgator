@@ -11,6 +11,15 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-11-07',
+    title: 'Privacy policy and site links',
+    bullets: [
+      'A privacy policy page explains what stays in your browser, what\'s sent, how Bask data is kept, and how ads and cookies work',
+      'Every page now has the same links at the bottom: Chat Gator, Bask, How to use / FAQ and Privacy',
+      'The home page has a short About section on what Chat Gator does',
+    ],
+  },
+  {
     date: '2026-11-05',
     title: 'Life transfer',
     bullets: [
