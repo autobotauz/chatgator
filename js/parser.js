@@ -210,6 +210,10 @@ const RULES = [
   ['you_miss', /^You miss!(?:\s*\((?:Miss Chance:\s*)?([\d.]+)%\))?$/, m => ({ pct: m[1] ? parseFloat(m[1]) : null })],
   ['you_miss', /^You attack (.+?) and miss!$/, m => ({ target: m[1], pct: null })],
   ['you_fumble', /^You fumble!/, () => ({})],
+  // The enemy's bladeturn eating your swing. The game follows it with a
+  // "You miss! (Miss Chance: 100.00%)" line for the same swing; aggregate
+  // folds that one into this so it isn't also counted as a miss.
+  ['bladeturn_out', /^Your (?:strike|arrow|shot) was absorbed by a magical barrier!$/, () => ({})],
   ['block_in', /^(.+?) blocks your attack!(?:\s*\(Block Chance:\s*([\d.]+)%\))?$/, m => ({ blocker: m[1], pct: m[2] ? parseFloat(m[2]) : null })],
 
   // ---- incoming damage ----------------------------------------------------
@@ -298,7 +302,8 @@ const RULES = [
     m => ({ attacker: m[1], pct: m[2] ? parseFloat(m[2]) : null })],
   ['parry_in', /^(.+?) parries your attack!(?:\s*\(Parry Chance:\s*([\d.]+)%\))?$/,
     m => ({ attacker: m[1], pct: m[2] ? parseFloat(m[2]) : null })],
-  ['evade_in', /^(.+?) evades (?:your attack|with extra skill)!$/, m => ({ defender: m[1] })],
+  ['evade_in', /^(.+?) evades (?:your attack|with extra skill)!(?:\s*\(Evade Chance:\s*([\d.]+)%\))?$/,
+    m => ({ defender: m[1], pct: m[2] ? parseFloat(m[2]) : null })],
   ['resist_named', /^(.+?) resists your (.+?)'s effect!(?:\s*\((?:Resist Chance:\s*)?([\d.]+)%\))?$/,
     m => ({ target: m[1], source: m[2], pct: m[3] ? parseFloat(m[3]) : null })],
   ['resist_generic', /^(.+?) resists the effect!(?:\s*\((?:Resist Chance:\s*)?([\d.]+)%\))?$/,

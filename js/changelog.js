@@ -11,6 +11,17 @@
 // visible effect don't need one.
 export const CHANGELOG = [
   {
+    date: '2026-11-17',
+    title: 'Melee misses, shown',
+    bullets: [
+      'The Spells & Styles tab now has a "Your melee swings" row, under melee crit rate: how many swings landed, missed, were eaten by the enemy\'s bladeturn, or were parried, evaded or blocked',
+      'Misses were always counted but never shown anywhere. The miss tile also shows the game\'s own miss chance from your log',
+      'A swing eaten by an enemy bladeturn is no longer counted as a miss (the game logs it as a 100% miss)',
+      'Fixed: "evades your attack" lines that include the evade chance were not counted',
+      'Fixed: melee crit rate now counts crits out of hits, not out of hits plus crits',
+    ],
+  },
+  {
     date: '2026-11-07',
     title: 'Privacy policy and site links',
     bullets: [

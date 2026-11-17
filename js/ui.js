@@ -622,11 +622,22 @@ export function renderDefense(container, stats, ctx) {
   const g2 = grid(section(container), 4);
   statTile(g2, { label: 'Ablative absorbed', value: fmtExact(d.ablativeAbsorbed), sub: `${fmtExact(d.ablativeHits)} hits soaked` });
   statTile(g2, { label: 'Bladeturns', value: fmtExact(d.bladeturns), sub: `${d.bladeturnRate}% of attacks` });
+}
 
-  const g3 = grid(section(container), 4);
-  statTile(g3, { label: 'Your attacks blocked by enemy', value: fmtExact(d.enemyBlockedYou) });
-  statTile(g3, { label: 'Your attacks parried by enemy', value: fmtExact(d.enemyParriedYou) });
-  statTile(g3, { label: 'Your attacks evaded by enemy', value: fmtExact(d.enemyEvadedYou) });
+// Where every melee swing you took went: landed, missed, or stopped by the
+// enemy (bladeturn, parry, evade, block). Shown under the headline tiles on
+// the Spells & Styles tab, only when there were swings at all.
+function renderSwings(container, sw) {
+  if (!sw || !sw.total) return;
+  const s = section(container);
+  h3(s, `Your melee swings (${fmtExact(sw.total)})`);
+  const g = grid(s, 4);
+  const pctOf = (n) => `${(100 * n / sw.total).toFixed(1)}% of swings`;
+  statTile(g, { label: 'Landed', value: sw.landedRate + '%', sub: `${fmtExact(sw.landed)} of ${fmtExact(sw.total)} swings` });
+  statTile(g, { label: 'Missed', value: sw.missRate + '%', sub: `${fmtExact(sw.missed)} misses` + (sw.missChance != null ? ` · game's miss chance ~${sw.missChance}%` : '') });
+  statTile(g, { label: 'Bladeturned', value: fmtExact(sw.bladeturned), sub: pctOf(sw.bladeturned) + ' · eaten by their bladeturn' });
+  const def = sw.parried + sw.evaded + sw.blocked;
+  statTile(g, { label: 'Parried / evaded / blocked', value: fmtExact(def), sub: `${sw.parried} parried · ${sw.evaded} evaded · ${sw.blocked} blocked` + (sw.fumbled ? ` · ${sw.fumbled} fumbled` : '') });
 }
 
 // ===========================================================================
@@ -1010,7 +1021,8 @@ export function renderSpells(container, stats, ctx) {
   const g = grid(section(container), 3);
   statTile(g, { label: 'Total damage done', value: fmtNum(stats.damageOut.total) });
   statTile(g, { label: 'DPS (this view)', value: fmtNum(stats.damageOut.dps) });
-  statTile(g, { label: 'Melee crit rate', value: stats.damageOut.melee.critRate + '%', sub: `${stats.damageOut.melee.crits} / ${stats.damageOut.melee.hits + stats.damageOut.melee.crits} swings` });
+  statTile(g, { label: 'Melee crit rate', value: stats.damageOut.melee.critRate + '%', sub: `${stats.damageOut.melee.crits} crits in ${stats.damageOut.melee.hits} hits` });
+  renderSwings(container, stats.damageOut.melee.swings);
 
   renderAbilityTimeline(container, stats, inferredClass);
 

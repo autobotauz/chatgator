@@ -67,7 +67,7 @@ export function buildHotUptime(events, startClock, endClock, idleGaps = []) {
   return { activeMs, spans: clipped, upMs, pct, casts, castCount };
 }
 const COMBAT_TYPES = new Set([
-  'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble',
+  'melee_weapon', 'melee_plain', 'melee_extra', 'melee_crit_named', 'melee_crit_generic', 'you_miss', 'you_fumble', 'bladeturn_out',
   'ability_hit', 'ability_crit', 'cast', 'cast_begin', 'cast_failed', 'cast_interrupted', 'ablative', 'bladeturn',
   'pet_melee', 'pet_melee_stray', 'pet_hit', 'pet_self_heal', 'pet_summon', 'pet_command', 'pet_lost', 'pet_cast',
   'incoming_dmg', 'incoming_crit', 'incoming_extra',
@@ -424,6 +424,10 @@ export function buildStats(events, playerNameHint) {
   }
 
   let totalMeleeHits = 0, totalMeleeCrits = 0, totalMeleeMisses = 0, totalMeleeDmg = 0;
+  // Swings the enemy's bladeturn ate, fumbles, and the game's own "Miss
+  // Chance" from each real miss line (100% lines are bladeturns, not misses).
+  let meleeBladeturned = 0, meleeFumbles = 0, lastBladeturnOutClock = null;
+  const missChances = [];
   let pendingWeapon = null;    // last weapon used, for the generic "Melee: <weapon>" bucket
   let lastMeleeLabel = 'Melee'; // bucket key the most recent swing landed in — crit/extra follow-ups reuse it,
                                  // so a style's crit or a spell's "extra damage" line lands on the same row
@@ -536,7 +540,15 @@ export function buildStats(events, playerNameHint) {
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
-      case 'you_miss': totalMeleeMisses++; break;
+      case 'bladeturn_out': meleeBladeturned++; lastBladeturnOutClock = e.clock; break;
+      case 'you_miss':
+        // "Your strike was absorbed by a magical barrier!" is always followed
+        // by a 100% miss line for the same swing -- already counted above.
+        if (e.pct === 100 && lastBladeturnOutClock != null && e.clock === lastBladeturnOutClock) { lastBladeturnOutClock = null; break; }
+        totalMeleeMisses++;
+        if (e.pct != null && e.pct < 100) missChances.push(e.pct);
+        break;
+      case 'you_fumble': meleeFumbles++; break;
 
       case 'ability_hit': {
         if (petNames.has(e.name)) {
@@ -1129,8 +1141,19 @@ export function buildStats(events, playerNameHint) {
       bySource: dmgOutBySourceFinal,
       byTarget: finalizeSourceMap(dmgOutByTarget),
       dps: durationSec ? +(totalDmgOut / durationSec).toFixed(1) : 0,
+      // A crit is a follow-up line on a swing that already counted as a hit,
+      // so the crit rate is crits out of hits (not hits + crits).
       melee: { hits: totalMeleeHits, crits: totalMeleeCrits, misses: totalMeleeMisses, dmg: totalMeleeDmg,
-        critRate: (totalMeleeHits + totalMeleeCrits) ? +(100 * totalMeleeCrits / (totalMeleeHits + totalMeleeCrits)).toFixed(1) : 0 },
+        critRate: totalMeleeHits ? +(100 * totalMeleeCrits / totalMeleeHits).toFixed(1) : 0,
+        swings: (() => {
+          const s = { landed: totalMeleeHits, missed: totalMeleeMisses, bladeturned: meleeBladeturned,
+            parried: enemyParriedYou, evaded: enemyEvadedYou, blocked: enemyBlockedYou, fumbled: meleeFumbles };
+          s.total = s.landed + s.missed + s.bladeturned + s.parried + s.evaded + s.blocked + s.fumbled;
+          s.landedRate = s.total ? +(100 * s.landed / s.total).toFixed(1) : 0;
+          s.missRate = s.total ? +(100 * s.missed / s.total).toFixed(1) : 0;
+          s.missChance = missChances.length ? +(missChances.reduce((a, b) => a + b, 0) / missChances.length).toFixed(1) : null;
+          return s;
+        })() },
       timeline: bucketTimeline(dmgOutPoints, startClock, endClock),
       points: dmgOutPoints, // raw { clock, amount }, for the zoomable charts
     },
