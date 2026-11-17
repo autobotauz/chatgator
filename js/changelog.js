@@ -16,6 +16,7 @@ export const CHANGELOG = [
     bullets: [
       'The Spells & Styles tab now has a "Your melee swings" row, under melee crit rate: how many swings landed, missed, were eaten by the enemy\'s bladeturn, or were parried, evaded or blocked',
       'Misses were always counted but never shown anywhere. The miss tile also shows the game\'s own miss chance from your log',
+      'Missed and bladeturned swings also show in the Failed column of the Spells & Styles table, on the weapon\'s Melee row (the game doesn\'t say which style missed, so they go on the weapon you last hit with)',
       'A swing eaten by an enemy bladeturn is no longer counted as a miss (the game logs it as a 100% miss)',
       'Fixed: "evades your attack" lines that include the evade chance were not counted',
       'Fixed: melee crit rate now counts crits out of hits, not out of hits plus crits',

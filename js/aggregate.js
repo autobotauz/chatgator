@@ -428,6 +428,11 @@ export function buildStats(events, playerNameHint) {
   // Chance" from each real miss line (100% lines are bladeturns, not misses).
   let meleeBladeturned = 0, meleeFumbles = 0, lastBladeturnOutClock = null;
   const missChances = [];
+  // Missed and bladeturned swings per weapon row ("Melee: <weapon>"), for
+  // the Failed column of the Spells & Styles table. The game doesn't say
+  // which weapon or style missed, so it goes on the last weapon you hit with.
+  const meleeFailedByKey = {};
+  const failSwing = () => { const k = pendingWeapon ? `Melee: ${pendingWeapon}` : 'Melee'; meleeFailedByKey[k] = (meleeFailedByKey[k] || 0) + 1; };
   let pendingWeapon = null;    // last weapon used, for the generic "Melee: <weapon>" bucket
   let lastMeleeLabel = 'Melee'; // bucket key the most recent swing landed in — crit/extra follow-ups reuse it,
                                  // so a style's crit or a spell's "extra damage" line lands on the same row
@@ -540,12 +545,12 @@ export function buildStats(events, playerNameHint) {
         dmgOutPoints.push({ clock: e.clock, amount: e.dmg });
         break;
       }
-      case 'bladeturn_out': meleeBladeturned++; lastBladeturnOutClock = e.clock; break;
+      case 'bladeturn_out': meleeBladeturned++; lastBladeturnOutClock = e.clock; failSwing(); break;
       case 'you_miss':
         // "Your strike was absorbed by a magical barrier!" is always followed
         // by a 100% miss line for the same swing -- already counted above.
         if (e.pct === 100 && lastBladeturnOutClock != null && e.clock === lastBladeturnOutClock) { lastBladeturnOutClock = null; break; }
-        totalMeleeMisses++;
+        totalMeleeMisses++; failSwing();
         if (e.pct != null && e.pct < 100) missChances.push(e.pct);
         break;
       case 'you_fumble': meleeFumbles++; break;
@@ -1145,6 +1150,7 @@ export function buildStats(events, playerNameHint) {
       // so the crit rate is crits out of hits (not hits + crits).
       melee: { hits: totalMeleeHits, crits: totalMeleeCrits, misses: totalMeleeMisses, dmg: totalMeleeDmg,
         critRate: totalMeleeHits ? +(100 * totalMeleeCrits / totalMeleeHits).toFixed(1) : 0,
+        failedByKey: meleeFailedByKey,
         swings: (() => {
           const s = { landed: totalMeleeHits, missed: totalMeleeMisses, bladeturned: meleeBladeturned,
             parried: enemyParriedYou, evaded: enemyEvadedYou, blocked: enemyBlockedYou, fumbled: meleeFumbles };

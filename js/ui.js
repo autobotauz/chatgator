@@ -909,7 +909,7 @@ const CAST_COLUMNS = [
   { key: 'attempted', label: 'Attempted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Started casting it ("You begin casting"), plus instant casts' },
   { key: 'casted', label: 'Casted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'The cast went off ("You cast")' },
   { key: 'interrupted', label: 'Interrupted', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Cut off by moving or being hit' },
-  { key: 'failed', label: 'Failed', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Went off, but the target already had the effect, was immune, or was out of range' },
+  { key: 'failed', label: 'Failed', num: true, fmt: castFmt, hideIfEmpty: true, title: 'Spells: went off, but the target already had the effect, was immune, or was out of range. Weapon swings: missed or eaten by the enemy\'s bladeturn' },
 ];
 
 // "Abilities & styles over time": one row per ability/style, one dot per
@@ -1113,6 +1113,8 @@ export function renderSpells(container, stats, ctx) {
   const coveredNames = new Set(allRows.map(r => r.name));
   const castOnlyNames = stats.spellsCast.filter(n => !coveredNames.has(n) && !isAbilityGhost(n, inferredClass));
 
+  // Missed / bladeturned swings, keyed like the "Melee: <weapon>" rows.
+  const meleeFailed = stats.damageOut.melee.failedByKey || {};
   const castCountByName = stats.castCountByName || {};
   const castFailedByName = stats.castFailedByName || {};
   // Attempted ("You begin casting X", plus instant casts), Casted ("You cast
@@ -1166,6 +1168,7 @@ export function renderSpells(container, stats, ctx) {
     ],
     rows: rows.map(r => ({
       ...r, ...castCounts(r.name),
+      ...(meleeFailed[r.name] ? { failed: meleeFailed[r.name] } : {}),
       ccLanded: r.landed ?? r.ccLanded ?? 0,
       info: roleOrType(r.name, r.role, skillMap),
     })),
